@@ -74,6 +74,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await service.logout();
+
+                        Navigator.of(
+                          context,
+                        ).pushNamedAndRemoveUntil('/login', (route) => false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
