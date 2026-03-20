@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
 import '../services/cart_manager.dart';
 import 'order_screen.dart';
 import 'payment_screen.dart';
-import 'package:get/get.dart';
+import 'profile_screen.dart';
 import '../Home_Page_widgets/home_tab.dart';
 import '../Home_Page_widgets/bottom_cart_bar.dart';
 import '../Home_Page_widgets/bottom_nav.dart';
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             const _ComingSoonTab(emoji: '🍽️', label: 'Menu'),
             OrderScreen(key: ValueKey('order-$_navIdx')),
-            const _ComingSoonTab(emoji: '👤', label: 'Profil'),
+            const ProfileScreen(),
           ],
         ),
         bottomNavigationBar: Obx(() {

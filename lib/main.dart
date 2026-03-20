@@ -1,9 +1,22 @@
 import 'package:application_gamiku/services/cart_manager.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'pages/home_screen.dart';
+import 'pages/login_screen.dart';
+import 'pages/register_screen.dart';
+import 'pages/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
+
   Get.put(CartController());
 
   runApp(const GamikuApp());
@@ -15,13 +28,13 @@ class GamikuApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Gamiku',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFCC1B1B)),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      initialRoute: '/splash',
+      getPages: [
+        GetPage(name: '/splash', page: () => SplashScreen()),
+        GetPage(name: '/login', page: () => LoginPage()),
+        GetPage(name: '/register', page: () => RegisterPage()),
+        GetPage(name: '/home', page: () => HomeScreen()),
+      ],
     );
   }
 }
