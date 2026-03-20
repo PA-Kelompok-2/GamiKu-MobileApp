@@ -5,6 +5,7 @@ import '../constants/menu_data.dart';
 import '../services/cart_manager.dart';
 import 'order_screen.dart';
 import 'payment_screen.dart';
+import 'package:get/get.dart';
 import '../Home_Page_widgets/home_tab.dart';
 import '../Home_Page_widgets/bottom_cart_bar.dart';
 import '../Home_Page_widgets/bottom_nav.dart';
@@ -49,8 +50,19 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cartCount = CartManager.instance.totalItems;
-    final showCartBar = cartCount > 0 && _navIdx == 0;
+    final cartC = Get.find<CartController>();
+    Obx(() {
+      final cartCount = cartC.totalItems;
+      final showCartBar = cartCount > 0 && _navIdx == 0;
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showCartBar) BottomCartBar(onTap: _openPayment),
+          BottomNav(selected: _navIdx, cartCount: cartCount, onTap: _onNavTap),
+        ],
+      );
+    });
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -68,17 +80,23 @@ class _HomeScreenState extends State<HomeScreen>
             const _ComingSoonTab(emoji: '👤', label: 'Profil'),
           ],
         ),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (showCartBar) BottomCartBar(onTap: _openPayment),
-            BottomNav(
-              selected: _navIdx,
-              cartCount: cartCount,
-              onTap: _onNavTap,
-            ),
-          ],
-        ),
+        bottomNavigationBar: Obx(() {
+          final cartC = Get.find<CartController>();
+          final cartCount = cartC.totalItems;
+          final showCartBar = cartCount > 0 && _navIdx == 0;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showCartBar) BottomCartBar(onTap: _openPayment),
+              BottomNav(
+                selected: _navIdx,
+                cartCount: cartCount,
+                onTap: _onNavTap,
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

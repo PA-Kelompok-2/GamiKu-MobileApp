@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
 import '../services/cart_manager.dart';
@@ -23,12 +24,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _placeOrder() {
+    final cartC = Get.find<CartController>();
+
     OrderManager.instance.addOrder(
-      cartEntries: CartManager.instance.entries,
+      cartEntries: cartC.entries,
       tableNote: '',
       orderNote: _noteCtrl.text.trim(),
     );
-    CartManager.instance.clear();
+
+    cartC.clear();
     _showSuccessDialog();
   }
 
@@ -104,7 +108,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final entries = CartManager.instance.entries;
+    final cartC = Get.find<CartController>();
+    final entries = cartC.entries;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -163,9 +168,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildContent(List<OrderItem> entries) {
-    final subtotal = CartManager.instance.subtotal;
-    final serviceFee = CartManager.serviceFee;
-    final grandTotal = CartManager.instance.grandTotal;
+    final cartC = Get.find<CartController>();
+
+    final subtotal = cartC.subtotal;
+    final serviceFee = CartController.serviceFee;
+    final grandTotal = cartC.grandTotal;
 
     return Column(
       children: [

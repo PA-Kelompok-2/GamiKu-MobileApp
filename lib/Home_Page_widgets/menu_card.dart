@@ -1,35 +1,19 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
 import '../services/cart_manager.dart';
 
-class MenuCard extends StatefulWidget {
+class MenuCard extends StatelessWidget {
   final Map<String, dynamic> item;
   final VoidCallback? onChanged;
+
   const MenuCard({super.key, required this.item, this.onChanged});
 
   @override
-  State<MenuCard> createState() => _MenuCardState();
-}
-
-class _MenuCardState extends State<MenuCard> {
-  int get _qty => CartManager.instance.qtyOf(widget.item['name'] as String);
-
-  void _add() {
-    CartManager.instance.add(widget.item['name'] as String);
-    setState(() {});
-    widget.onChanged?.call();
-  }
-
-  void _remove() {
-    CartManager.instance.remove(widget.item['name'] as String);
-    setState(() {});
-    widget.onChanged?.call();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final tag = widget.item['tag'] as String?;
+    final cartC = Get.find<CartController>();
+    final tag = item['tag'] as String?;
 
     return Container(
       decoration: BoxDecoration(
@@ -56,7 +40,7 @@ class _MenuCardState extends State<MenuCard> {
                 ),
                 child: Center(
                   child: Text(
-                    widget.item['emoji'] as String,
+                    item['emoji'] as String,
                     style: const TextStyle(fontSize: 64),
                   ),
                 ),
@@ -86,36 +70,59 @@ class _MenuCardState extends State<MenuCard> {
                 ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.item['name'] as String,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                    height: 1.3,
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['name'] as String,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  MenuData.formatPrice(widget.item['price'] as int),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
+                  const SizedBox(height: 6),
+                  Text(
+                    MenuData.formatPrice(item['price'] as int),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                _qty == 0
-                    ? _AddBtn(onTap: _add)
-                    : _Counter(qty: _qty, onAdd: _add, onRemove: _remove),
-              ],
+
+                  const Spacer(),
+
+                  Obx(() {
+                    final qty = cartC.qtyOf(item['name']);
+
+                    return qty == 0
+                        ? _AddBtn(
+                            onTap: () {
+                              cartC.add(item['name']);
+                              onChanged?.call();
+                            },
+                          )
+                        : _Counter(
+                            qty: qty,
+                            onAdd: () {
+                              cartC.add(item['name']);
+                              onChanged?.call();
+                            },
+                            onRemove: () {
+                              cartC.remove(item['name']);
+                              onChanged?.call();
+                            },
+                          );
+                  }),
+                ],
+              ),
             ),
           ),
         ],
@@ -161,6 +168,7 @@ class _AddBtn extends StatelessWidget {
 class _Counter extends StatelessWidget {
   final int qty;
   final VoidCallback onAdd, onRemove;
+
   const _Counter({
     required this.qty,
     required this.onAdd,
@@ -201,6 +209,7 @@ class _CBtn extends StatelessWidget {
   final IconData icon;
   final bool filled;
   final VoidCallback onTap;
+
   const _CBtn({required this.icon, required this.filled, required this.onTap});
 
   @override

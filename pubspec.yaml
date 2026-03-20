@@ -1,6 +1,6 @@
 name: application_gamiku
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.1
+  get: ^4.6.5
 
 dev_dependencies:
   flutter_test:

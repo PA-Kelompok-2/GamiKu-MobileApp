@@ -1,14 +1,20 @@
+import 'package:application_gamiku/services/cart_manager.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'pages/home_screen.dart';
 
-void main() => runApp(const GamikuApp());
+void main() {
+  Get.put(CartController());
+
+  runApp(const GamikuApp());
+}
 
 class GamikuApp extends StatelessWidget {
   const GamikuApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Gamiku',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

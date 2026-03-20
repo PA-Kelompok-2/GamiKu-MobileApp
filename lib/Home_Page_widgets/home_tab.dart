@@ -128,11 +128,11 @@ class _MenuTabBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.75, 
         crossAxisSpacing: 12,
-        childAspectRatio: 0.87,
+        mainAxisSpacing: 12,
       ),
       itemCount: items.length,
       itemBuilder: (_, i) => MenuCard(item: items[i], onChanged: onCartChanged),
