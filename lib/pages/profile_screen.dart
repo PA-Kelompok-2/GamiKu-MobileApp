@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../services/supabase_services.dart';
 import '../constants/app_colors.dart';
 
@@ -32,6 +33,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void confirmLogout() {
+    Get.defaultDialog(
+      title: "Logout",
+      middleText: "Yakin mau logout?",
+      textConfirm: "Ya",
+      textCancel: "Batal",
+      onConfirm: () async {
+        await service.logout();
+        Get.offAllNamed('/login');
+      },
+    );
   }
 
   @override
@@ -79,13 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        await service.logout();
-
-                        Navigator.of(
-                          context,
-                        ).pushNamedAndRemoveUntil('/login', (route) => false);
-                      },
+                      onPressed: confirmLogout,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,

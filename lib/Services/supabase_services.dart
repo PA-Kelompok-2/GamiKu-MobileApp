@@ -61,4 +61,17 @@ class SupabaseService {
 
     return data;
   }
+
+  Future<String?> getUserRole() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return null;
+
+    final data = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    return data['role'];
+  }
 }

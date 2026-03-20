@@ -7,6 +7,8 @@ import 'pages/home_screen.dart';
 import 'pages/login_screen.dart';
 import 'pages/register_screen.dart';
 import 'pages/splash_screen.dart';
+import 'pages/owner_screen.dart';
+import 'pages/karyawan_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,8 @@ class GamikuApp extends StatelessWidget {
         GetPage(name: '/login', page: () => LoginPage()),
         GetPage(name: '/register', page: () => RegisterPage()),
         GetPage(name: '/home', page: () => HomeScreen()),
+        GetPage(name: '/owner', page: () => OwnerScreen()),
+        GetPage(name: '/karyawan', page: () => KaryawanScreen()),
       ],
     );
   }
