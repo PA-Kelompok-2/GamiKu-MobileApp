@@ -32,17 +32,22 @@ class MenuCard extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Container(
-                height: 130,
-                decoration: const BoxDecoration(
-                  color: AppColors.imgBg,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
                 ),
-                child: Center(
-                  child: Text(
-                    item['emoji'] as String,
-                    style: const TextStyle(fontSize: 64),
-                  ),
+                child: Image.network(
+                  item['image_url'] ?? 'https://via.placeholder.com/300',
+                  height: 130,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.image, size: 50);
+                  },
                 ),
               ),
               if (tag != null)

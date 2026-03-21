@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
 class QuickActions extends StatelessWidget {
-  const QuickActions({super.key});
+  final TabController tabCtrl;
+
+  const QuickActions({super.key, required this.tabCtrl});
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +24,22 @@ class QuickActions extends StatelessWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            const _BigBtn(
+            _BigBtn(
               icon: Icons.ramen_dining_rounded,
               label: 'Makanan',
               color: AppColors.primary,
+              onTap: () {
+                tabCtrl.animateTo(1);
+              },
             ),
             Container(width: 1, color: AppColors.border),
-            const _BigBtn(
+            _BigBtn(
               icon: Icons.local_cafe_rounded,
               label: 'Minuman',
               color: AppColors.primary,
+              onTap: () {
+                tabCtrl.animateTo(8);
+              },
             ),
           ],
         ),
@@ -44,13 +52,20 @@ class _BigBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _BigBtn({required this.icon, required this.label, required this.color});
+  final VoidCallback onTap;
+
+  const _BigBtn({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: GestureDetector(
-        onTap: () {},
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Row(

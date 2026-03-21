@@ -25,14 +25,15 @@ class SupabaseService {
 
   Future<String?> getRole() async {
     final user = supabase.auth.currentUser;
+    if (user == null) return null;
 
-    final res = await supabase
+    final data = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', user!.id)
-        .single();
+        .eq('id', user.id)
+        .maybeSingle();
 
-    return res['role'];
+    return data?['role'];
   }
 
   Future<void> insertProfile({
@@ -73,5 +74,14 @@ class SupabaseService {
         .single();
 
     return data['role'];
+  }
+
+  Future<List<Map<String, dynamic>>> getMenus() async {
+    final res = await supabase
+        .from('menus')
+        .select('*, categories(name)')
+        .order('created_at');
+
+    return List<Map<String, dynamic>>.from(res);
   }
 }

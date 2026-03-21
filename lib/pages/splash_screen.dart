@@ -20,21 +20,32 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void checkUser() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+      final user = Supabase.instance.client.auth.currentUser;
 
-    if (user == null) {
+      print("USER: $user");
+
+      if (user == null) {
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      final role = await supabaseService.getRole();
+
+      print("ROLE: $role");
+
+      if (role == 'owner') {
+        Get.offAllNamed('/owner');
+      } else if (role == 'karyawan') {
+        Get.offAllNamed('/karyawan');
+      } else {
+        Get.offAllNamed('/home');
+      }
+    } catch (e) {
+      print("ERROR SPLASH: $e");
+
       Get.offAllNamed('/login');
-      return;
-    }
-
-    final role = await supabaseService.getRole();
-
-    if (role == 'owner') {
-      Get.offAllNamed('/owner');
-    } else if (role == 'karyawan') {
-      Get.offAllNamed('/karyawan');
-    } else {
-      Get.offAllNamed('/home');
     }
   }
 

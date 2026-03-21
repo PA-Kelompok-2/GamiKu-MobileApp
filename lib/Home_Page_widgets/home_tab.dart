@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import '../services/menu_controller.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
 import 'banner_slider.dart';
@@ -16,12 +18,9 @@ class HomeTab extends StatelessWidget {
     required this.onCartChanged,
   });
 
-  List<Map<String, dynamic>> _itemsFor(String cat) => cat == 'Semua'
-      ? MenuData.items
-      : MenuData.items.where((m) => m['cat'] == cat).toList();
-
   @override
   Widget build(BuildContext context) {
+    final menuC = Get.find<MenuC>();
     return NestedScrollView(
       headerSliverBuilder: (ctx, _) => [
         SliverAppBar(
@@ -77,7 +76,7 @@ class HomeTab extends StatelessWidget {
           ),
         ),
         const SliverToBoxAdapter(child: BannerSlider()),
-        const SliverToBoxAdapter(child: QuickActions()),
+        SliverToBoxAdapter(child: QuickActions(tabCtrl: tabCtrl)),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
         SliverPersistentHeader(
           pinned: true,
@@ -106,14 +105,19 @@ class HomeTab extends StatelessWidget {
       ],
       body: TabBarView(
         controller: tabCtrl,
-        children: MenuData.categories
-            .map(
-              (cat) => _MenuTabBody(
-                items: _itemsFor(cat),
-                onCartChanged: onCartChanged,
-              ),
-            )
-            .toList(),
+        children: MenuData.categories.map((cat) {
+          return Obx(() {
+            if (menuC.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final items = cat == 'Semua'
+                ? menuC.menus
+                : menuC.menus.where((m) => m['cat'] == cat).toList();
+
+            return _MenuTabBody(items: items, onCartChanged: onCartChanged);
+          });
+        }).toList(),
       ),
     );
   }
@@ -130,7 +134,7 @@ class _MenuTabBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.75, 
+        childAspectRatio: 0.75,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),

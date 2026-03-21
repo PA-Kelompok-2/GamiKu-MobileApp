@@ -1,4 +1,5 @@
 import 'package:application_gamiku/services/cart_manager.dart';
+import 'package:application_gamiku/services/menu_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,6 +21,7 @@ void main() async {
   );
 
   Get.put(CartController());
+  Get.put(MenuC());
 
   runApp(const GamikuApp());
 }
