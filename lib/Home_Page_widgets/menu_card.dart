@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
-import '../services/cart_manager.dart';
+import '../services/cart_controller.dart';
 
 class MenuCard extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -105,23 +105,26 @@ class MenuCard extends StatelessWidget {
                   const Spacer(),
 
                   Obx(() {
-                    final qty = cartC.qtyOf(item['name']);
+                    final id = item['id'] is String
+                        ? item['id']
+                        : item['id'].toString();
+                    final qty = cartC.qtyOf(id);
 
                     return qty == 0
                         ? _AddBtn(
                             onTap: () {
-                              cartC.add(item['name']);
+                              cartC.add(item);
                               onChanged?.call();
                             },
                           )
                         : _Counter(
                             qty: qty,
                             onAdd: () {
-                              cartC.add(item['name']);
+                              cartC.add(item);
                               onChanged?.call();
                             },
                             onRemove: () {
-                              cartC.remove(item['name']);
+                              cartC.remove(item['id']);
                               onChanged?.call();
                             },
                           );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
-import '../services/cart_manager.dart';
+import '../services/cart_controller.dart';
 
 class BottomCartBar extends StatelessWidget {
   final VoidCallback onTap;

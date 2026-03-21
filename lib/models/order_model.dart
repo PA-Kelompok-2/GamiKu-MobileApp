@@ -1,10 +1,12 @@
 class OrderItem {
+  final String id;
   final String name;
   final String emoji;
   final int price;
   int qty;
 
   OrderItem({
+    required this.id,
     required this.name,
     required this.emoji,
     required this.price,
@@ -14,11 +16,11 @@ class OrderItem {
   int get subtotal => price * qty;
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'emoji': emoji,
-        'price': price,
-        'qty': qty,
-      };
+    'name': name,
+    'emoji': emoji,
+    'price': price,
+    'qty': qty,
+  };
 }
 
 enum OrderStatus { menunggu, diproses, siap, selesai }
@@ -26,28 +28,40 @@ enum OrderStatus { menunggu, diproses, siap, selesai }
 extension OrderStatusExt on OrderStatus {
   String get label {
     switch (this) {
-      case OrderStatus.menunggu:  return 'Menunggu';
-      case OrderStatus.diproses:  return 'Diproses';
-      case OrderStatus.siap:      return 'Siap';
-      case OrderStatus.selesai:   return 'Selesai';
+      case OrderStatus.menunggu:
+        return 'Menunggu';
+      case OrderStatus.diproses:
+        return 'Diproses';
+      case OrderStatus.siap:
+        return 'Siap';
+      case OrderStatus.selesai:
+        return 'Selesai';
     }
   }
 
   OrderStatus? get next {
     switch (this) {
-      case OrderStatus.menunggu: return OrderStatus.diproses;
-      case OrderStatus.diproses: return OrderStatus.siap;
-      case OrderStatus.siap:     return OrderStatus.selesai;
-      case OrderStatus.selesai:  return null;
+      case OrderStatus.menunggu:
+        return OrderStatus.diproses;
+      case OrderStatus.diproses:
+        return OrderStatus.siap;
+      case OrderStatus.siap:
+        return OrderStatus.selesai;
+      case OrderStatus.selesai:
+        return null;
     }
   }
 
   String get nextLabel {
     switch (this) {
-      case OrderStatus.menunggu: return '▶ Proses';
-      case OrderStatus.diproses: return '✓ Tandai Siap';
-      case OrderStatus.siap:     return '✓ Selesai';
-      case OrderStatus.selesai:  return '';
+      case OrderStatus.menunggu:
+        return '▶ Proses';
+      case OrderStatus.diproses:
+        return '✓ Tandai Siap';
+      case OrderStatus.siap:
+        return '✓ Selesai';
+      case OrderStatus.selesai:
+        return '';
     }
   }
 }

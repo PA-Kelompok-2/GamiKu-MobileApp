@@ -21,6 +21,7 @@ class OrderManager {
       items: cartEntries
           .map(
             (e) => OrderItem(
+              id: e.id,
               name: e.name,
               emoji: e.emoji,
               price: e.price,

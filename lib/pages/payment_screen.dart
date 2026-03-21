@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 import '../constants/menu_data.dart';
-import '../services/cart_manager.dart';
-import '../services/order_manager.dart';
+import '../services/cart_controller.dart';
+import '../services/supabase_services.dart';
 import '../models/order_model.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -23,17 +23,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.dispose();
   }
 
-  void _placeOrder() {
+  void _placeOrder() async {
     final cartC = Get.find<CartController>();
+    final service = SupabaseService();
 
-    OrderManager.instance.addOrder(
-      cartEntries: cartC.entries,
-      tableNote: '',
-      orderNote: _noteCtrl.text.trim(),
-    );
+    try {
+      await service.createOrder(
+        total: cartC.grandTotal,
+        items: cartC.entries.map((e) {
+          return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
+        }).toList(),
+      );
 
-    cartC.clear();
-    _showSuccessDialog();
+      cartC.clear();
+      _showSuccessDialog();
+    } catch (e) {
+      print("ERROR ORDER: $e");
+      Get.snackbar("Error", "Gagal membuat pesanan");
+    }
   }
 
   void _showSuccessDialog() {

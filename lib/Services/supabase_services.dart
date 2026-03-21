@@ -84,4 +84,58 @@ class SupabaseService {
 
     return List<Map<String, dynamic>>.from(res);
   }
+
+  Future<List<Map<String, dynamic>>> getOrders() async {
+    final res = await supabase
+        .from('orders')
+        .select()
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  Future<void> updateOrderStatus(String id, String status) async {
+    await supabase.from('orders').update({'status': status}).eq('id', id);
+  }
+
+  Future<void> createOrder({
+    required int total,
+    required List<Map<String, dynamic>> items,
+  }) async {
+    final user = supabase.auth.currentUser;
+
+    // insert order
+    final order = await supabase
+        .from('orders')
+        .insert({
+          'user_id': user!.id,
+          'total_price': total,
+          'status': 'pending',
+        })
+        .select()
+        .single();
+
+    final orderId = order['id'];
+
+    // insert items
+    final orderItems = items.map((i) {
+      return {
+        'order_id': orderId,
+        'menu_id': i['id'],
+        'quantity': i['qty'],
+        'price': i['price'],
+      };
+    }).toList();
+
+    await supabase.from('order_items').insert(orderItems);
+  }
+
+  Future<List<Map<String, dynamic>>> getOrdersWithItems() async {
+    final res = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(res);
+  }
 }
