@@ -12,7 +12,15 @@ class LoginPage extends StatelessWidget {
   void login() async {
     try {
       await service.login(emailC.text, passC.text);
-      Get.offAllNamed('/home');
+
+      final role = await service.getUserRole();
+      if (role == 'owner') {
+        Get.offAllNamed('/owner');
+      } else if (role == 'karyawan') {
+        Get.offAllNamed('/karyawan');
+      } else {
+        Get.offAllNamed('/home');
+      }
     } catch (e) {
       Get.snackbar('Error', e.toString());
     }
