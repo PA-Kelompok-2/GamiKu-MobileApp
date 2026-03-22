@@ -49,6 +49,8 @@ class _KaryawanScreenState extends State<KaryawanScreen> {
         itemCount: orders.length,
         itemBuilder: (context, i) {
           final o = orders[i];
+          final items = o['order_items'] ?? [];
+
 
           return Card(
             child: ListTile(
@@ -60,9 +62,12 @@ class _KaryawanScreenState extends State<KaryawanScreen> {
 
                   const SizedBox(height: 6),
 
-                  ...o['order_items'].map<Widget>((item) {
+
+                  ...items.map<Widget>((item) {
+                    final menu = item['menus'];
+
                     return Text(
-                      "${item['name']} x${item['qty']}",
+                      "${menu?['name'] ?? 'Unknown'} x${item['quantity']}",
                       style: const TextStyle(fontSize: 12),
                     );
                   }).toList(),

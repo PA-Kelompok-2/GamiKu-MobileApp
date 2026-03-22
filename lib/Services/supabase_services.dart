@@ -88,7 +88,7 @@ class SupabaseService {
   Future<List<Map<String, dynamic>>> getOrders() async {
     final res = await supabase
         .from('orders')
-        .select()
+        .select('*, order_items(*, menus(*))')
         .order('created_at', ascending: false);
 
     return List<Map<String, dynamic>>.from(res);
@@ -133,7 +133,7 @@ class SupabaseService {
   Future<List<Map<String, dynamic>>> getOrdersWithItems() async {
     final res = await supabase
         .from('orders')
-        .select('*, order_items(*)')
+        .select('*, order_items(*, menus(*))')
         .order('created_at', ascending: false);
 
     return List<Map<String, dynamic>>.from(res);
