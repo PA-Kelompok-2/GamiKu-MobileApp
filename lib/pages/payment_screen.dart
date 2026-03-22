@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
-import '../constants/menu_data.dart';
 import '../services/cart_controller.dart';
 import '../services/supabase_services.dart';
 import '../models/order_model.dart';
@@ -38,7 +37,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       cartC.clear();
       _showSuccessDialog();
     } catch (e) {
-      print("ERROR ORDER: $e");
       Get.snackbar("Error", "Gagal membuat pesanan");
     }
   }
@@ -194,17 +192,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   children: [
                     ...entries.map((e) => _buildItemRow(e)),
                     const Divider(height: 24, color: AppColors.border),
-                    _priceRow('Subtotal', MenuData.formatPrice(subtotal)),
+                    _priceRow('Subtotal', 'Rp $subtotal'),
                     const SizedBox(height: 4),
                     _priceRow(
                       'Biaya Layanan',
-                      MenuData.formatPrice(serviceFee),
+                      'Rp $serviceFee',
                       valueColor: AppColors.textGrey,
                     ),
                     const Divider(height: 16, color: AppColors.border),
                     _priceRow(
                       'Total',
-                      MenuData.formatPrice(grandTotal),
+                      'Rp $grandTotal',
                       isBold: true,
                       valueColor: AppColors.primary,
                     ),
@@ -328,7 +326,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                 ),
                 Text(
-                  MenuData.formatPrice(e.price),
+                  'Rp ${e.price}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textGrey,
@@ -347,7 +345,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(width: 8),
           Text(
-            MenuData.formatPrice(e.price * e.qty),
+            'Rp ${e.price * e.qty}',
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -412,7 +410,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 style: TextStyle(fontSize: 11, color: AppColors.textGrey),
               ),
               Text(
-                MenuData.formatPrice(total),
+                'Rp $total',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,

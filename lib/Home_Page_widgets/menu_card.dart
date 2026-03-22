@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../constants/menu_data.dart';
 import '../services/cart_controller.dart';
 
 class MenuCard extends StatelessWidget {
@@ -94,7 +93,7 @@ class MenuCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    MenuData.formatPrice(item['price'] as int),
+                    'Rp ${item['price']}',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,

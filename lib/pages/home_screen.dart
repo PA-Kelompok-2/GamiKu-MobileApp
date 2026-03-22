@@ -1,8 +1,8 @@
+import 'package:application_gamiku/pages/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
-import '../constants/menu_data.dart';
 import '../services/cart_controller.dart';
 import 'order_screen.dart';
 import 'payment_screen.dart';
@@ -20,15 +20,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _homeTabCtrl;
+  List<String> categories = [];
   int _navIdx = 0;
 
   @override
   void initState() {
     super.initState();
-    _homeTabCtrl = TabController(
-      length: MenuData.categories.length,
-      vsync: this,
-    );
+    _homeTabCtrl = TabController(length: categories.length, vsync: this);
   }
 
   @override
@@ -54,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen>
     final cartC = Get.find<CartController>();
     Obx(() {
       final cartCount = cartC.totalItems;
-      final showCartBar = cartCount > 0 && _navIdx == 0;
+      final showCartBar = cartCount > 0 && _navIdx == 1;
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -72,11 +70,8 @@ class _HomeScreenState extends State<HomeScreen>
         body: IndexedStack(
           index: _navIdx,
           children: [
-            HomeTab(
-              tabCtrl: _homeTabCtrl,
-              onCartChanged: () => setState(() {}),
-            ),
-            const _ComingSoonTab(emoji: '🍽️', label: 'Menu'),
+            HomeTab(onCartChanged: () => setState(() {})),
+            const MenuScreen(),
             OrderScreen(key: ValueKey('order-$_navIdx')),
             const ProfileScreen(),
           ],
@@ -84,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen>
         bottomNavigationBar: Obx(() {
           final cartC = Get.find<CartController>();
           final cartCount = cartC.totalItems;
-          final showCartBar = cartCount > 0 && _navIdx == 0;
+          final showCartBar = cartCount > 0 && _navIdx == 1;
 
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -98,42 +93,6 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           );
         }),
-      ),
-    );
-  }
-}
-
-// Coming Soon Tab
-class _ComingSoonTab extends StatelessWidget {
-  final String emoji;
-  final String label;
-  const _ComingSoonTab({required this.emoji, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 64)),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Coming soon',
-              style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-            ),
-          ],
-        ),
       ),
     );
   }

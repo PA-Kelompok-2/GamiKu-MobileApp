@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
-import '../constants/menu_data.dart';
 import '../services/cart_controller.dart';
 
 class BottomCartBar extends StatelessWidget {
@@ -72,7 +71,7 @@ class BottomCartBar extends StatelessWidget {
                     style: TextStyle(color: AppColors.white70, fontSize: 11),
                   ),
                   Text(
-                    MenuData.formatPrice(total),
+                    'Rp $total',
                     style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 16,
