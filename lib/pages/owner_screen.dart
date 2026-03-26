@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../services/supabase_services.dart';
 
 class OwnerScreen extends StatefulWidget {
@@ -11,7 +10,7 @@ class OwnerScreen extends StatefulWidget {
 
 class _OwnerScreenState extends State<OwnerScreen> {
   final service = SupabaseService();
-  List orders = [];
+  List<Map<String, dynamic>> orders = [];
 
   @override
   void initState() {
@@ -20,47 +19,53 @@ class _OwnerScreenState extends State<OwnerScreen> {
   }
 
   void loadOrders() async {
-    final data = await service.getOrders();
+    final data = await service.getOrdersWithItems();
     setState(() => orders = data);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Owner'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              final service = SupabaseService();
-              await service.logout();
-              Get.offAllNamed('/login');
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Owner')),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, i) {
           final o = orders[i];
+          final items = o['order_items'] as List;
 
           return Card(
-            child: ListTile(
-              title: Text("Order ${o['id']}"),
-              subtitle: Column(
+            margin: const EdgeInsets.all(10),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// HEADER
+                  Text(
+                    o['order_code'] ?? 'Order',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   Text("Status: ${o['status']}"),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
 
-                  ...o['order_items'].map<Widget>((item) {
-                    return Text(
-                      "${item['name']} x${item['qty']}",
-                      style: const TextStyle(fontSize: 12),
-                    );
-                  }).toList(),
+                  /// ITEMS
+                  ...items.map<Widget>((item) {
+                    final menu = item['menus'];
+
+                    return Text("${menu['name']} x${item['quantity']}");
+                  }),
+
+                  const SizedBox(height: 10),
+
+                  /// TOTAL
+                  Text(
+                    "Total: Rp ${o['total_price']}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),

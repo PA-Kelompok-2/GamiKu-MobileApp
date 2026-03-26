@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  final authC = Get.find<AuthController>();
+
+  bool isObscure = true;
 
   void register() {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty) {
-      Get.snackbar("Error", "Semua field wajib diisi",
-          backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar("Error", "Semua field wajib diisi");
     } else {
-      Get.snackbar("Sukses", "Registrasi berhasil",
-          backgroundColor: Colors.green, colorText: Colors.white);
-
-      Get.offAllNamed('/login');
+      authC.register(
+        email: emailController.text,
+        password: passwordController.text,
+        name: nameController.text,
+      );
     }
   }
 
@@ -28,61 +38,52 @@ class RegisterPage extends StatelessWidget {
       backgroundColor: const Color(0xFFD32F2F),
       body: Column(
         children: [
-        Container(
-          height: 200,
-          width: double.infinity,
-          padding: const EdgeInsets.only(left: 25, top: 70, right: 25),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Create Account",
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+          Container(
+            height: 200,
+            width: double.infinity,
+            padding: const EdgeInsets.only(left: 25, top: 70, right: 25),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Create Account",
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Join GamiKu sekarang",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
+                      SizedBox(height: 8),
+                      Text(
+                        "Join GamiKu sekarang",
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-
-              const SizedBox(width: 15),
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: Offset(0,3),
-                    )
-                  ],
+                const SizedBox(width: 15),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset('assets/logo.png', height: 50),
                 ),
-                child: Image.asset(
-                  'assets/logo.png',
-                  height: 50,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
           Expanded(
             child: Container(
@@ -100,7 +101,6 @@ class RegisterPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-
                     const Text(
                       "Register",
                       style: TextStyle(
@@ -115,8 +115,10 @@ class RegisterPage extends StatelessWidget {
                       controller: nameController,
                       decoration: InputDecoration(
                         hintText: "Nama",
-                        prefixIcon: const Icon(Icons.person,
-                            color: Color(0xFFD32F2F)),
+                        prefixIcon: const Icon(
+                          Icons.person,
+                          color: Color(0xFFD32F2F),
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF3F3F3),
                         border: OutlineInputBorder(
@@ -132,8 +134,10 @@ class RegisterPage extends StatelessWidget {
                       controller: emailController,
                       decoration: InputDecoration(
                         hintText: "Email",
-                        prefixIcon: const Icon(Icons.email,
-                            color: Color(0xFFD32F2F)),
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Color(0xFFD32F2F),
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF3F3F3),
                         border: OutlineInputBorder(
@@ -147,11 +151,23 @@ class RegisterPage extends StatelessWidget {
 
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: isObscure,
                       decoration: InputDecoration(
                         hintText: "Password",
-                        prefixIcon: const Icon(Icons.lock,
-                            color: Color(0xFFD32F2F)),
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Color(0xFFD32F2F),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            isObscure ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isObscure = !isObscure;
+                            });
+                          },
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF3F3F3),
                         border: OutlineInputBorder(
@@ -163,23 +179,27 @@ class RegisterPage extends StatelessWidget {
 
                     const SizedBox(height: 25),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: register,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD32F2F),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                    Obx(
+                      () => SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: authC.isLoading.value ? null : register,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                           ),
+                          child: authC.isLoading.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Register",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                         ),
-                        child: const Text(
-                          "Register",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                            ),
                       ),
                     ),
 
@@ -203,7 +223,6 @@ class RegisterPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 25),
-
                   ],
                 ),
               ),

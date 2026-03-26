@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final authC = Get.find<AuthController>();
+
+  bool isObscure = true;
 
   void login() {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar("Error", "Email dan Password wajib diisi");
     } else {
-      Get.offAllNamed('/home');
+      authC.login(emailController.text, passwordController.text);
     }
+  }
+
+  void forgotPassword() async {
+    if (emailController.text.isEmpty) {
+      Get.snackbar("Error", "Masukkan email terlebih dahulu");
+      return;
+    }
+
+    await authC.resetPassword(emailController.text);
   }
 
   @override
@@ -21,13 +39,11 @@ class LoginPage extends StatelessWidget {
       backgroundColor: const Color(0xFFD32F2F),
       body: Column(
         children: [
-          
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 80, bottom: 40),
             child: Column(
               children: [
-
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: const BoxDecoration(
@@ -37,18 +53,13 @@ class LoginPage extends StatelessWidget {
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 8,
-                        offset: Offset(0,3),
-                      )
-                    ]
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Image.asset(
-                    'assets/logo.png',
-                    height: 60,
-                  ),
+                  child: Image.asset('assets/logo.png', height: 60),
                 ),
-
                 const SizedBox(height: 20),
-
                 const Text(
                   "Hello!",
                   style: TextStyle(
@@ -57,25 +68,15 @@ class LoginPage extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
                 const Text(
                   "Welcome to GamiKu",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
-
                 const SizedBox(height: 6),
-
                 const Text(
                   "Login to order your favorite food",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white60,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white60),
                 ),
               ],
             ),
@@ -96,9 +97,7 @@ class LoginPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     const SizedBox(height: 30),
-
                     const Text(
                       "Login",
                       style: TextStyle(
@@ -130,12 +129,22 @@ class LoginPage extends StatelessWidget {
 
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: isObscure,
                       decoration: InputDecoration(
                         hintText: "Password",
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFFD32F2F),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            isObscure ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isObscure = !isObscure;
+                            });
+                          },
                         ),
                         filled: true,
                         fillColor: const Color(0xFFF3F3F3),
@@ -150,30 +159,40 @@ class LoginPage extends StatelessWidget {
 
                     Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        "Forgot Password?",
-                        style: TextStyle(color: Colors.grey[600]),
+                      child: GestureDetector(
+                        onTap: forgotPassword,
+                        child: Text(
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ),
 
                     const SizedBox(height: 25),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD32F2F),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                    Obx(
+                      () => SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: authC.isLoading.value ? null : login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16),
+                          child: authC.isLoading.value
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
                         ),
                       ),
                     ),

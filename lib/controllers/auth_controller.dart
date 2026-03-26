@@ -9,7 +9,6 @@ class AuthController extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
-
       await service.login(email, password);
 
       final role = await service.getUserRole();
@@ -55,6 +54,15 @@ class AuthController extends GetxController {
       Get.snackbar('Error', e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await service.supabase.auth.resetPasswordForEmail(email);
+      Get.snackbar('Success', 'Link reset password dikirim ke email');
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
     }
   }
 }

@@ -27,7 +27,11 @@ class MenuC extends GetxController {
         };
       }).toList();
     } catch (e) {
-      print('Error fetch menu: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to fetch menus: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
     }
