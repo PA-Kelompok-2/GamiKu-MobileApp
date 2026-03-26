@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../models/order_model.dart';
+import '../../order/models/order_model.dart';
 
 class CartController extends GetxController {
   var cart = <String, Map<String, dynamic>>{}.obs;

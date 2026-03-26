@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../constants/app_colors.dart';
+import '../../../core/constants/app_colors.dart';
 import '../controllers/cart_controller.dart';
 
 class BottomCartBar extends StatelessWidget {

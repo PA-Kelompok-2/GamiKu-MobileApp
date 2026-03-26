@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/app_colors.dart';
+import '../../../core/constants/app_colors.dart';
 import 'banner_slider.dart';
 
 class HomeTab extends StatelessWidget {

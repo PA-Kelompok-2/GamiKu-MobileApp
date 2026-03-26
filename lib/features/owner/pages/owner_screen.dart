@@ -1,5 +1,7 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import '../services/supabase_services.dart';
+import 'package:get/get.dart';
+import '../../../core/services/supabase_services.dart';
 
 class OwnerScreen extends StatefulWidget {
   const OwnerScreen({super.key});
@@ -26,7 +28,19 @@ class _OwnerScreenState extends State<OwnerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Owner')),
+      appBar: AppBar(
+        title: const Text('Owner'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              final service = SupabaseService();
+              await service.logout();
+              Get.offAllNamed(Routes.login);
+            },
+          ),
+        ],
+      ),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, i) {

@@ -1,5 +1,6 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:get/get.dart';
-import '../services/supabase_services.dart';
+import '../../../core/services/supabase_services.dart';
 
 class AuthController extends GetxController {
   final service = SupabaseService();
@@ -14,11 +15,11 @@ class AuthController extends GetxController {
       final role = await service.getUserRole();
 
       if (role == 'owner') {
-        Get.offAllNamed('/owner');
+        Get.offAllNamed(Routes.owner);
       } else if (role == 'karyawan') {
-        Get.offAllNamed('/karyawan');
+        Get.offAllNamed(Routes.karyawan);
       } else {
-        Get.offAllNamed('/home');
+        Get.offAllNamed(Routes.home);
       }
     } catch (e) {
       Get.snackbar('Login Gagal', e.toString());
@@ -29,7 +30,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     await service.logout();
-    Get.offAllNamed('/login');
+    Get.offAllNamed(Routes.login);
   }
 
   Future<void> register({

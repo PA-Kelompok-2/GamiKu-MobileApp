@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../services/supabase_services.dart';
+import '../../../core/services/supabase_services.dart';
 
 class KaryawanScreen extends StatefulWidget {
   const KaryawanScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../constants/app_colors.dart';
-import '../controllers/cart_controller.dart';
-import '../services/supabase_services.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../customer/controllers/cart_controller.dart';
+import '../../../core/services/supabase_services.dart';
 import '../models/order_model.dart';
 
 class PaymentScreen extends StatefulWidget {

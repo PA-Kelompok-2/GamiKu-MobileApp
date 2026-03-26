@@ -1,15 +1,15 @@
-import 'package:application_gamiku/pages/menu_screen.dart';
+import 'package:application_gamiku/features/customer/pages/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../constants/app_colors.dart';
+import '../../../core/constants/app_colors.dart';
 import '../controllers/cart_controller.dart';
-import 'order_screen.dart';
-import 'payment_screen.dart';
+import '../../order/pages/order_screen.dart';
+import '../../order/pages/payment_screen.dart';
 import 'profile_screen.dart';
-import '../Home_Page_widgets/home_tab.dart';
-import '../Home_Page_widgets/bottom_cart_bar.dart';
-import '../Home_Page_widgets/bottom_nav.dart';
+import '../widgets/home_tab.dart';
+import '../widgets/bottom_cart_bar.dart';
+import '../widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

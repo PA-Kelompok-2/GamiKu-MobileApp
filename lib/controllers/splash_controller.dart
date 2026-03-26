@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../services/supabase_services.dart';
+import '../core/services/supabase_services.dart';
 
 class SplashController extends GetxController {
   final service = SupabaseService();

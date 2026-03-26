@@ -1,16 +1,16 @@
-import 'package:application_gamiku/controllers/cart_controller.dart';
+import 'package:application_gamiku/features/customer/controllers/cart_controller.dart';
 import 'package:application_gamiku/controllers/menu_controller.dart';
-import 'package:application_gamiku/controllers/auth_controller.dart';
+import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'pages/home_screen.dart';
-import 'pages/login_screen.dart';
-import 'pages/register_screen.dart';
-import 'pages/splash_screen.dart';
-import 'pages/owner_screen.dart';
-import 'pages/karyawan_screen.dart';
+import 'features/customer/pages/home_screen.dart';
+import 'features/auth/pages/login_screen.dart';
+import 'features/auth/pages/register_screen.dart';
+import 'features/auth/pages/splash_screen.dart';
+import 'features/owner/pages/owner_screen.dart';
+import 'features/karyawan/pages/karyawan_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

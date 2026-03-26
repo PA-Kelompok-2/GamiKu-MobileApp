@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../services/supabase_services.dart';
-import '../constants/app_colors.dart';
+import '../../../core/services/supabase_services.dart';
+import '../../../core/constants/app_colors.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
