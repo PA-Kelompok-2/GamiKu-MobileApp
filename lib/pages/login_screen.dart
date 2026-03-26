@@ -1,56 +1,208 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../services/supabase_services.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  final emailC = TextEditingController();
-  final passC = TextEditingController();
-  final service = SupabaseService();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
-  void login() async {
-    try {
-      await service.login(emailC.text, passC.text);
-
-      final role = await service.getUserRole();
-      if (role == 'owner') {
-        Get.offAllNamed('/owner');
-      } else if (role == 'karyawan') {
-        Get.offAllNamed('/karyawan');
-      } else {
-        Get.offAllNamed('/home');
-      }
-    } catch (e) {
-      Get.snackbar('Error', e.toString());
+  void login() {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      Get.snackbar("Error", "Email dan Password wajib diisi");
+    } else {
+      Get.offAllNamed('/home');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(height: 80),
-            TextField(
-              controller: emailC,
-              decoration: const InputDecoration(labelText: 'Email'),
+      backgroundColor: const Color(0xFFD32F2F),
+      body: Column(
+        children: [
+          
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(top: 80, bottom: 40),
+            child: Column(
+              children: [
+
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: Offset(0,3),
+                      )
+                    ]
+                  ),
+                  child: Image.asset(
+                    'assets/logo.png',
+                    height: 60,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Hello!",
+                  style: TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  "Welcome to GamiKu",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  "Login to order your favorite food",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
             ),
-            TextField(
-              controller: passC,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password'),
+          ),
+
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        hintText: "Email",
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Color(0xFFD32F2F),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF3F3F3),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: "Password",
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Color(0xFFD32F2F),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF3F3F3),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "Forgot Password?",
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD32F2F),
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Don’t have an account? "),
+                        GestureDetector(
+                          onTap: () => Get.toNamed('/register'),
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              color: Color(0xFFD32F2F),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: login, child: const Text('Login')),
-            TextButton(
-              onPressed: () => Get.toNamed('/register'),
-              child: const Text('Belum punya akun? Register'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
