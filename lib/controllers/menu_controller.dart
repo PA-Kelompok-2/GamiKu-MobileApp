@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'supabase_services.dart';
+import '../services/supabase_services.dart';
 
 class MenuC extends GetxController {
   final SupabaseService service = SupabaseService();

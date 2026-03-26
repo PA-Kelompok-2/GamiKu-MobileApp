@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../Home_Page_widgets/quick_actions.dart';
 import '../constants/app_colors.dart';
 import '../Home_Page_widgets/menu_card.dart';
-import '../services/menu_controller.dart';
+import '../controllers/menu_controller.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});

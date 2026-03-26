@@ -1,5 +1,6 @@
-import 'package:application_gamiku/services/cart_controller.dart';
-import 'package:application_gamiku/services/menu_controller.dart';
+import 'package:application_gamiku/controllers/cart_controller.dart';
+import 'package:application_gamiku/controllers/menu_controller.dart';
+import 'package:application_gamiku/controllers/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,6 +21,7 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  Get.put(AuthController());
   Get.put(CartController());
   Get.put(MenuC());
 

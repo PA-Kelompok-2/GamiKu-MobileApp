@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../services/cart_controller.dart';
+import '../controllers/cart_controller.dart';
 
 class MenuCard extends StatelessWidget {
   final Map<String, dynamic> item;

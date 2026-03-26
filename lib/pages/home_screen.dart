@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../constants/app_colors.dart';
-import '../services/cart_controller.dart';
+import '../controllers/cart_controller.dart';
 import 'order_screen.dart';
 import 'payment_screen.dart';
 import 'profile_screen.dart';
