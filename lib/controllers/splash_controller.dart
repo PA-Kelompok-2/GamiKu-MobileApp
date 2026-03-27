@@ -15,7 +15,10 @@ class SplashController extends GetxController {
 
     final user = service.supabase.auth.currentUser;
 
-    if (user == null) return;
+    if (user == null) {
+      Get.offAllNamed('/login');
+      return;
+    }
 
     final role = await service.getUserRole();
 

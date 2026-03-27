@@ -54,7 +54,6 @@ class _OwnerScreenState extends State<OwnerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// HEADER
                   Text(
                     o['order_code'] ?? 'Order',
                     style: const TextStyle(
@@ -66,7 +65,6 @@ class _OwnerScreenState extends State<OwnerScreen> {
 
                   const SizedBox(height: 10),
 
-                  /// ITEMS
                   ...items.map<Widget>((item) {
                     final menu = item['menus'];
 
@@ -75,7 +73,6 @@ class _OwnerScreenState extends State<OwnerScreen> {
 
                   const SizedBox(height: 10),
 
-                  /// TOTAL
                   Text(
                     "Total: Rp ${o['total_price']}",
                     style: const TextStyle(fontWeight: FontWeight.bold),

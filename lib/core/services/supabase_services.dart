@@ -85,6 +85,42 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(res);
   }
 
+    Future<void> addMenu({
+    required String name,
+    required int price,
+    required String imageUrl,
+    required int categoryId,
+  }) async {
+    await supabase.from('menus').insert({
+      'name': name,
+      'price': price,
+      'image_url': imageUrl,
+      'category_id': categoryId,
+    });
+  }
+
+    Future<void> updateMenu({
+    required dynamic id,
+    required String name,
+    required int price,
+    required String imageUrl,
+    required int categoryId,
+  }) async {
+    await supabase
+        .from('menus')
+        .update({
+          'name': name,
+          'price': price,
+          'image_url': imageUrl,
+          'category_id': categoryId,
+        })
+        .eq('id', id);
+      }
+
+  Future<void> deleteMenu(dynamic id) async {
+  await supabase.from('menus').delete().eq('id', id);
+  }
+
   Future<List<Map<String, dynamic>>> getOrders() async {
     final res = await supabase
         .from('orders')
@@ -104,7 +140,6 @@ class SupabaseService {
   }) async {
     final user = supabase.auth.currentUser;
 
-    // insert order
     final order = await supabase
         .from('orders')
         .insert({
@@ -117,7 +152,6 @@ class SupabaseService {
 
     final orderId = order['id'];
 
-    // insert items
     final orderItems = items.map((i) {
       return {
         'order_id': orderId,

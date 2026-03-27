@@ -16,7 +16,9 @@ class MenuC extends GetxController {
   Future<void> fetchMenus() async {
     try {
       isLoading.value = true;
+
       final data = await service.getMenus();
+
       menus.value = data.map((e) {
         return {
           'id': e['id'],
@@ -34,6 +36,76 @@ class MenuC extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> addMenu({
+    required String name,
+    required int price,
+    required String imageUrl,
+    required int categoryId,
+  }) async {
+    try {
+      await service.addMenu(
+        name: name,
+        price: price,
+        imageUrl: imageUrl,
+        categoryId: categoryId,
+      );
+
+      Get.snackbar('Success', 'Menu berhasil ditambahkan');
+
+      await fetchMenus();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to add menu: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> updateMenu({
+    required dynamic id,
+    required String name,
+    required int price,
+    required String imageUrl,
+    required int categoryId,
+  }) async {
+    try {
+      await service.updateMenu(
+        id: id,
+        name: name,
+        price: price,
+        imageUrl: imageUrl,
+        categoryId: categoryId,
+      );
+
+      Get.snackbar('Success', 'Menu berhasil diupdate');
+
+      await fetchMenus();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to update menu: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> deleteMenu(dynamic id) async {
+    try {
+      await service.deleteMenu(id);
+
+      Get.snackbar('Success', 'Menu berhasil dihapus');
+
+      await fetchMenus();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete menu: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
