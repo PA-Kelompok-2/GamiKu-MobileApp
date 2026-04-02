@@ -2,6 +2,7 @@ import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
+import 'menu_management_screen.dart';
 
 class OwnerScreen extends StatefulWidget {
   const OwnerScreen({super.key});
@@ -31,6 +32,12 @@ class _OwnerScreenState extends State<OwnerScreen> {
       appBar: AppBar(
         title: const Text('Owner'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.restaurant_menu),
+            onPressed: () {
+              Get.to(() => const MenuManagementScreen());
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {

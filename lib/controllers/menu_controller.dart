@@ -5,11 +5,13 @@ class MenuC extends GetxController {
   final SupabaseService service = SupabaseService();
 
   var menus = <Map<String, dynamic>>[].obs;
+  var categories = <Map<String, dynamic>>[].obs;
   var isLoading = true.obs;
 
   @override
   void onInit() {
     fetchMenus();
+    fetchCategories();
     super.onInit();
   }
 
@@ -25,6 +27,7 @@ class MenuC extends GetxController {
           'name': e['name'],
           'price': e['price'],
           'image_url': e['image_url'],
+          'category_id': e['category_id'],
           'cat': e['categories']?['name'] ?? 'unknown',
         };
       }).toList();
@@ -39,11 +42,24 @@ class MenuC extends GetxController {
     }
   }
 
+  Future<void> fetchCategories() async {
+    try {
+      final data = await service.getCategories();
+      categories.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to fetch categories: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   Future<void> addMenu({
     required String name,
     required int price,
     required String imageUrl,
-    required int categoryId,
+    required String categoryId,
   }) async {
     try {
       await service.addMenu(
@@ -53,9 +69,10 @@ class MenuC extends GetxController {
         categoryId: categoryId,
       );
 
-      Get.snackbar('Success', 'Menu berhasil ditambahkan');
-
       await fetchMenus();
+      menus.refresh();
+
+      Get.snackbar('Success', 'Menu berhasil ditambahkan');
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -70,7 +87,7 @@ class MenuC extends GetxController {
     required String name,
     required int price,
     required String imageUrl,
-    required int categoryId,
+    required String categoryId,
   }) async {
     try {
       await service.updateMenu(
@@ -81,9 +98,10 @@ class MenuC extends GetxController {
         categoryId: categoryId,
       );
 
-      Get.snackbar('Success', 'Menu berhasil diupdate');
-
       await fetchMenus();
+      menus.refresh();
+
+      Get.snackbar('Success', 'Menu berhasil diupdate');
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -97,9 +115,12 @@ class MenuC extends GetxController {
     try {
       await service.deleteMenu(id);
 
-      Get.snackbar('Success', 'Menu berhasil dihapus');
+      menus.removeWhere((m) => m['id'] == id);
+      menus.refresh();
 
       await fetchMenus();
+
+      Get.snackbar('Success', 'Menu berhasil dihapus');
     } catch (e) {
       Get.snackbar(
         'Error',

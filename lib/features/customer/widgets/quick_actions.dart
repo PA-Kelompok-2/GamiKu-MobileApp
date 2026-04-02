@@ -3,8 +3,20 @@ import '../../../core/constants/app_colors.dart';
 
 class QuickActions extends StatelessWidget {
   final TabController tabCtrl;
+  final List<String> categories;
 
-  const QuickActions({super.key, required this.tabCtrl});
+  const QuickActions({
+    super.key,
+    required this.tabCtrl,
+    required this.categories,
+  });
+
+  void _goToCategory(String categoryName) {
+    final index = categories.indexOf(categoryName);
+    if (index != -1 && index < tabCtrl.length) {
+      tabCtrl.animateTo(index);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +41,7 @@ class QuickActions extends StatelessWidget {
               label: 'Makanan',
               color: AppColors.primary,
               onTap: () {
-                tabCtrl.animateTo(1);
+                _goToCategory('Makanan');
               },
             ),
             Container(width: 1, color: AppColors.border),
@@ -38,7 +50,7 @@ class QuickActions extends StatelessWidget {
               label: 'Minuman',
               color: AppColors.primary,
               onTap: () {
-                tabCtrl.animateTo(8);
+                _goToCategory('Minuman');
               },
             ),
           ],

@@ -85,11 +85,17 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(res);
   }
 
-    Future<void> addMenu({
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final res = await supabase.from('categories').select().order('name');
+
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  Future<void> addMenu({
     required String name,
     required int price,
     required String imageUrl,
-    required int categoryId,
+    required String categoryId,
   }) async {
     await supabase.from('menus').insert({
       'name': name,
@@ -99,12 +105,12 @@ class SupabaseService {
     });
   }
 
-    Future<void> updateMenu({
+  Future<void> updateMenu({
     required dynamic id,
     required String name,
     required int price,
     required String imageUrl,
-    required int categoryId,
+    required String categoryId,
   }) async {
     await supabase
         .from('menus')
@@ -115,10 +121,10 @@ class SupabaseService {
           'category_id': categoryId,
         })
         .eq('id', id);
-      }
+  }
 
   Future<void> deleteMenu(dynamic id) async {
-  await supabase.from('menus').delete().eq('id', id);
+    await supabase.from('menus').delete().eq('id', id);
   }
 
   Future<List<Map<String, dynamic>>> getOrders() async {
