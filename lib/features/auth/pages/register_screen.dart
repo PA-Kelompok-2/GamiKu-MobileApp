@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../../../core/constants/app_colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -35,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFD32F2F),
+      backgroundColor: AppColors.splashRed,
       body: Column(
         children: [
           Container(
@@ -73,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: AppColors.black26,
                         blurRadius: 8,
                         offset: Offset(0, 3),
                       ),
@@ -117,10 +118,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "Nama",
                         prefixIcon: const Icon(
                           Icons.person,
-                          color: Color(0xFFD32F2F),
+                          color: AppColors.splashRed,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
+                        fillColor: AppColors.inputBg,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -136,10 +137,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "Email",
                         prefixIcon: const Icon(
                           Icons.email,
-                          color: Color(0xFFD32F2F),
+                          color: AppColors.splashRed,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
+                        fillColor: AppColors.inputBg,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -156,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "Password",
                         prefixIcon: const Icon(
                           Icons.lock,
-                          color: Color(0xFFD32F2F),
+                          color: AppColors.splashRed,
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -169,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
+                        fillColor: AppColors.inputBg,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -185,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: ElevatedButton(
                           onPressed: authC.isLoading.value ? null : register,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD32F2F),
+                            backgroundColor: AppColors.splashRed,
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -214,7 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           child: const Text(
                             "Login",
                             style: TextStyle(
-                              color: Color(0xFFD32F2F),
+                              color: AppColors.splashRed,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

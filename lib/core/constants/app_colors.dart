@@ -35,4 +35,8 @@ class AppColors {
   static const Color statusDiprosesBg = Color(0xFFE3F2FD);
   static const Color statusMenungguFg = Color(0xFFF57C00);
   static const Color statusDiprosesFg = Color(0xFF1565C0);
+
+  static const Color splashRed = Color(0xFFD32F2F);
+  static const Color black26 = Color(0x42000000);
+  static const Color inputBg = Color(0xFFF3F3F3);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/splash_controller.dart';
+import '../../../core/constants/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFD32F2F),
+      backgroundColor: AppColors.splashRed,
       body: FadeTransition(
         opacity: _fadeAnim,
         child: ScaleTransition(
@@ -93,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
                     onPressed: goToLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFD32F2F),
+                      foregroundColor: AppColors.splashRed,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 40,
                         vertical: 15,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../../../core/constants/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFD32F2F),
+      backgroundColor: AppColors.splashRed,
       body: Column(
         children: [
           Container(
@@ -51,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: AppColors.black26,
                         blurRadius: 8,
                         offset: Offset(0, 3),
                       ),
@@ -114,10 +115,10 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: "Email",
                         prefixIcon: const Icon(
                           Icons.email,
-                          color: Color(0xFFD32F2F),
+                          color: AppColors.splashRed,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
+                        fillColor: AppColors.inputBg,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: "Password",
                         prefixIcon: const Icon(
                           Icons.lock,
-                          color: Color(0xFFD32F2F),
+                          color: AppColors.splashRed,
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -147,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF3F3F3),
+                        fillColor: AppColors.inputBg,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -176,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: authC.isLoading.value ? null : login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD32F2F),
+                            backgroundColor: AppColors.splashRed,
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -202,13 +203,13 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don’t have an account? "),
+                        const Text("Don't have an account? "),
                         GestureDetector(
                           onTap: () => Get.toNamed('/register'),
                           child: const Text(
                             "Sign Up",
                             style: TextStyle(
-                              color: Color(0xFFD32F2F),
+                              color: AppColors.splashRed,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

@@ -13,22 +13,34 @@ class _BannerSliderState extends State<BannerSlider> {
 
   static const _banners = [
     _BannerData(
-      'Gami Bebek Spesial 🦆',
-      'Rasa autentik, harga terjangkau',
-      AppColors.primary,
-      AppColors.bannerRed1End,
+      title: 'Gami Bebek Spesial 🦆',
+      subtitle: 'Rasa autentik, harga terjangkau',
+      tag: 'TERPOPULER',
+      tagColor: AppColors.accent,
+      imageUrl:
+          'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=600&q=80',
+      gradientStart: AppColors.primary,
+      gradientEnd: AppColors.primaryDark,
     ),
     _BannerData(
-      'Sambal Bakar Iga Premium 🥩',
-      'Sensasi pedas nampol abis',
-      AppColors.bannerRed2Start,
-      AppColors.bannerRed2End,
+      title: 'Sambal Bakar Iga Premium 🥩',
+      subtitle: 'Sensasi pedas nampol abis',
+      tag: 'HOT 🔥',
+      tagColor: AppColors.bannerRed2Start,
+      imageUrl:
+          'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80',
+      gradientStart: AppColors.bannerRed2Start,
+      gradientEnd: AppColors.bannerRed2End,
     ),
     _BannerData(
-      'Mie Gami, Cuma 25k! 🍜',
-      'Beli 2 gratis es teh',
-      AppColors.bannerGoldStart,
-      AppColors.bannerGoldEnd,
+      title: 'Mie Gami, Cuma 25k! 🍜',
+      subtitle: 'Beli 2 gratis es teh manis',
+      tag: 'PROMO',
+      tagColor: AppColors.accent,
+      imageUrl:
+          'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80',
+      gradientStart: AppColors.bannerGoldStart,
+      gradientEnd: AppColors.bannerGoldEnd,
     ),
   ];
 
@@ -40,11 +52,11 @@ class _BannerSliderState extends State<BannerSlider> {
 
   void _startAutoSlide() {
     Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 4));
       if (!mounted) return false;
       _ctrl.animateToPage(
         (_cur + 1) % _banners.length,
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
       return true;
@@ -59,47 +71,51 @@ class _BannerSliderState extends State<BannerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 240,
-      child: Stack(
-        children: [
-          PageView.builder(
+    return Column(
+      children: [
+        SizedBox(
+          height: 400,
+          child: PageView.builder(
             controller: _ctrl,
             itemCount: _banners.length,
             onPageChanged: (i) => setState(() => _cur = i),
             itemBuilder: (_, i) => _BannerCard(data: _banners[i]),
           ),
-          _buildIndicators(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIndicators() => Positioned(
-    bottom: 12,
-    right: 16,
-    child: Row(
-      children: List.generate(
-        _banners.length,
-        (i) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.only(left: 4),
-          width: i == _cur ? 16 : 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: i == _cur ? AppColors.white : AppColors.white38,
-            borderRadius: BorderRadius.circular(3),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            _banners.length,
+            (i) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: i == _cur ? 20 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: i == _cur ? AppColors.primary : AppColors.textLight,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
+      ],
+    );
+  }
 }
 
 class _BannerData {
-  final String title, subtitle;
-  final Color colorStart, colorEnd;
-  const _BannerData(this.title, this.subtitle, this.colorStart, this.colorEnd);
+  final String title, subtitle, tag, imageUrl;
+  final Color tagColor, gradientStart, gradientEnd;
+  const _BannerData({
+    required this.title,
+    required this.subtitle,
+    required this.tag,
+    required this.tagColor,
+    required this.imageUrl,
+    required this.gradientStart,
+    required this.gradientEnd,
+  });
 }
 
 class _BannerCard extends StatelessWidget {
@@ -108,100 +124,117 @@ class _BannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [data.colorStart, data.colorEnd],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Container(
-              width: 110,
-              height: 110,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.bannerCircle,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.network(
+          data.imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => Container(color: data.gradientStart),
+          loadingBuilder: (_, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              color: data.gradientStart,
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.white38),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildTag(),
-                const SizedBox(height: 8),
-                Text(
-                  data.title,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  data.subtitle,
-                  style: const TextStyle(
-                    color: AppColors.white38,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildCtaButton(),
+            );
+          },
+        ),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                data.gradientStart.withValues(alpha: 0.85),
+                data.gradientEnd.withValues (alpha: 0.5),
+                AppColors.bannerCircle,
               ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
           ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: data.tagColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  data.tag,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.white,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                data.title,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  height: 1.3,
+                  shadows: [
+                    Shadow(
+                      color: AppColors.black26,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                data.subtitle,
+                style: const TextStyle(
+                  color: AppColors.white70,
+                  fontSize: 11,
+                  shadows: [Shadow(color: AppColors.black26, blurRadius: 4)],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppColors.black26,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  'Pesan Sekarang →',
+                  style: TextStyle(
+                    color: data.gradientStart,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
-
-  Widget _buildTag() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-    decoration: BoxDecoration(
-      color: AppColors.accent,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: const Text(
-      'TERPOPULER',
-      style: TextStyle(
-        fontSize: 9,
-        fontWeight: FontWeight.w800,
-        color: AppColors.textDark,
-        letterSpacing: 0.5,
-      ),
-    ),
-  );
-
-  Widget _buildCtaButton() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-    decoration: BoxDecoration(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Text(
-      'Pesan Sekarang',
-      style: TextStyle(
-        color: data.colorStart,
-        fontWeight: FontWeight.w700,
-        fontSize: 11,
-      ),
-    ),
-  );
 }
