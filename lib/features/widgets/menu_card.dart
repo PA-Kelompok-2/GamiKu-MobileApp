@@ -1,18 +1,20 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../controllers/cart_controller.dart';
+import '../../core/constants/app_colors.dart';
+import '../customer/controllers/cart_controller.dart';
 
 class MenuCard extends StatelessWidget {
   final Map<String, dynamic> item;
+  final String? role;
   final VoidCallback? onChanged;
 
-  const MenuCard({super.key, required this.item, this.onChanged});
+  const MenuCard({super.key, required this.item, this.role, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final cartC = Get.find<CartController>();
     final tag = item['tag'] as String?;
+    final isOwner = role == 'owner';
 
     return Container(
       decoration: BoxDecoration(
@@ -103,31 +105,32 @@ class MenuCard extends StatelessWidget {
 
                   const Spacer(),
 
-                  Obx(() {
-                    final id = item['id'] is String
-                        ? item['id']
-                        : item['id'].toString();
-                    final qty = cartC.qtyOf(id);
+                  if (!isOwner)
+                    Obx(() {
+                      final id = item['id'] is String
+                          ? item['id']
+                          : item['id'].toString();
+                      final qty = cartC.qtyOf(id);
 
-                    return qty == 0
-                        ? _AddBtn(
-                            onTap: () {
-                              cartC.add(item);
-                              onChanged?.call();
-                            },
-                          )
-                        : _Counter(
-                            qty: qty,
-                            onAdd: () {
-                              cartC.add(item);
-                              onChanged?.call();
-                            },
-                            onRemove: () {
-                              cartC.remove(item['id']);
-                              onChanged?.call();
-                            },
-                          );
-                  }),
+                      return qty == 0
+                          ? _AddBtn(
+                              onTap: () {
+                                cartC.add(item);
+                                onChanged?.call();
+                              },
+                            )
+                          : _Counter(
+                              qty: qty,
+                              onAdd: () {
+                                cartC.add(item);
+                                onChanged?.call();
+                              },
+                              onRemove: () {
+                                cartC.remove(item['id']);
+                                onChanged?.call();
+                              },
+                            );
+                    }),
                 ],
               ),
             ),

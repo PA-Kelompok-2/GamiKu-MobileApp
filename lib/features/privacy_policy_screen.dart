@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import '../core/constants/app_colors.dart';
 
-class TermsOfServicesScreen extends StatelessWidget {
-  const TermsOfServicesScreen({super.key});
+class PrivacyPolicyScreen extends StatelessWidget {
+  const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class TermsOfServicesScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Terms of Services',
+          'Privacy Policy',
           style: TextStyle(
             color: AppColors.textDark,
             fontSize: 20,
@@ -31,29 +31,29 @@ class TermsOfServicesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              title: '1. Acceptance of Terms',
+              title: 'Information We Collect',
               content:
-                  'By accessing and using this application, you accept and agree to be bound by the terms and provisions of this agreement.',
+                  'We collect information you provide directly to us, including your name, email address, phone number, and any other information you choose to provide.',
             ),
             _buildSection(
-              title: '2. Use License',
+              title: 'How We Use Your Information',
               content:
-                  'Permission is granted to temporarily download one copy of the materials for personal, non-commercial transitory viewing only.',
+                  'We use the information we collect to provide, maintain, and improve our services, to process transactions, and to send you technical notices and support messages.',
             ),
             _buildSection(
-              title: '3. User Account',
+              title: 'Information Sharing',
               content:
-                  'You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.',
+                  'We do not share your personal information with third parties except as described in this privacy policy or with your consent.',
             ),
             _buildSection(
-              title: '4. Privacy Policy',
+              title: 'Data Security',
               content:
-                  'Your use of the application is also governed by our Privacy Policy. Please review our Privacy Policy for more information.',
+                  'We take reasonable measures to help protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction.',
             ),
             _buildSection(
-              title: '5. Limitations',
+              title: 'Your Rights',
               content:
-                  'In no event shall the application or its suppliers be liable for any damages arising out of the use or inability to use the materials.',
+                  'You may update, correct, or delete your account information at any time by logging into your account or contacting us directly.',
             ),
             const SizedBox(height: 20),
             const Text(

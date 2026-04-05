@@ -11,16 +11,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       await service.login(email, password);
-
-      final role = await service.getUserRole();
-
-      if (role == 'owner') {
-        Get.offAllNamed(Routes.owner);
-      } else if (role == 'karyawan') {
-        Get.offAllNamed(Routes.karyawan);
-      } else {
-        Get.offAllNamed(Routes.home);
-      }
+      Get.offAllNamed(Routes.home); // semua role ke home
     } catch (e) {
       Get.snackbar('Login Gagal', e.toString());
     } finally {
@@ -42,7 +33,6 @@ class AuthController extends GetxController {
       isLoading.value = true;
 
       final res = await service.register(email, password);
-
       final user = res.user;
 
       if (user != null) {

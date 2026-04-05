@@ -144,7 +144,7 @@ class _OrderScreenState extends State<OrderScreen> {
               color: AppColors.primary,
             ),
           ),
-        ),  
+        ),
       ],
     );
   }

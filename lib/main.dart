@@ -5,12 +5,10 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/customer/pages/home_screen.dart';
+import 'features/home_screen.dart';
 import 'features/auth/pages/login_screen.dart';
 import 'features/auth/pages/register_screen.dart';
 import 'features/auth/pages/splash_screen.dart';
-import 'features/owner/pages/owner_screen.dart';
-import 'features/karyawan/pages/karyawan_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +39,6 @@ class GamikuApp extends StatelessWidget {
         GetPage(name: '/login', page: () => LoginPage()),
         GetPage(name: '/register', page: () => RegisterPage()),
         GetPage(name: '/home', page: () => HomeScreen()),
-        GetPage(name: '/owner', page: () => OwnerScreen()),
-        GetPage(name: '/karyawan', page: () => KaryawanScreen()),
       ],
     );
   }

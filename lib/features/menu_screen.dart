@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../widgets/quick_actions.dart';
-import '../../../core/constants/app_colors.dart';
-import '../widgets/menu_card.dart';
-import '../../../controllers/menu_controller.dart';
+import '../core/constants/app_colors.dart';
+import 'widgets/menu_card.dart';
+import '../controllers/menu_controller.dart';
+import '../core/services/supabase_services.dart';
+import 'owner/pages/menu_management_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -16,11 +17,18 @@ class _MenuScreenState extends State<MenuScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
   List<String> categories = ['Semua'];
+  String? _role;
 
   @override
   void initState() {
     super.initState();
     _tabCtrl = TabController(length: categories.length, vsync: this);
+    _loadRole();
+  }
+
+  Future<void> _loadRole() async {
+    final role = await SupabaseService().getUserRole();
+    if (mounted) setState(() => _role = role);
   }
 
   @override
@@ -63,9 +71,7 @@ class _MenuScreenState extends State<MenuScreen>
       ];
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _syncTabs(newCategories);
-        }
+        if (mounted) _syncTabs(newCategories);
       });
 
       return Scaffold(
@@ -76,10 +82,6 @@ class _MenuScreenState extends State<MenuScreen>
         ),
         body: Column(
           children: [
-            QuickActions(
-              tabCtrl: _tabCtrl,
-              categories: categories,
-            ),
             TabBar(
               controller: _tabCtrl,
               isScrollable: true,
@@ -94,8 +96,8 @@ class _MenuScreenState extends State<MenuScreen>
                         final items = cat == 'Semua'
                             ? menuC.menus
                             : menuC.menus
-                                .where((m) => m['cat'] == cat)
-                                .toList();
+                                  .where((m) => m['cat'] == cat)
+                                  .toList();
 
                         if (items.isEmpty) {
                           return const Center(
@@ -113,20 +115,24 @@ class _MenuScreenState extends State<MenuScreen>
                                 mainAxisSpacing: 12,
                               ),
                           itemCount: items.length,
-                          itemBuilder: (_, i) {
-                            final item = items[i];
-
-                            return MenuCard(
-                              item: item,
-                              onChanged: () => setState(() {}),
-                            );
-                          },
+                          itemBuilder: (_, i) => MenuCard(
+                            item: items[i],
+                            role: _role,
+                            onChanged: () => setState(() {}),
+                          ),
                         );
                       }).toList(),
                     ),
             ),
           ],
         ),
+        floatingActionButton: _role == 'owner'
+            ? FloatingActionButton(
+                backgroundColor: AppColors.primary,
+                onPressed: () => Get.to(() => const MenuManagementScreen()),
+                child: const Icon(Icons.edit_note, color: AppColors.white),
+              )
+            : null,
       );
     });
   }

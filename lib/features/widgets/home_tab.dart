@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constants/app_colors.dart';
 import 'banner_slider.dart';
+import 'quick_actions.dart';
 
 class HomeTab extends StatefulWidget {
   final VoidCallback onCartChanged;
@@ -12,10 +13,19 @@ class HomeTab extends StatefulWidget {
   State<HomeTab> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends State<HomeTab> {
+class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
   bool _searchExpanded = false;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
+
+  late TabController _tabCtrl;
+  final List<String> _categories = ['Semua', 'Makanan', 'Minuman'];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabCtrl = TabController(length: _categories.length, vsync: this);
+  }
 
   void _toggleSearch() {
     setState(() {
@@ -35,6 +45,7 @@ class _HomeTabState extends State<HomeTab> {
   void dispose() {
     _searchController.dispose();
     _searchFocus.dispose();
+    _tabCtrl.dispose();
     super.dispose();
   }
 
@@ -154,7 +165,7 @@ class _HomeTabState extends State<HomeTab> {
                       decoration: InputDecoration(
                         hintText: 'Cari menu favoritmu...',
                         hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha:0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 13,
                         ),
                         prefixIcon: const Icon(
@@ -196,6 +207,12 @@ class _HomeTabState extends State<HomeTab> {
         ),
 
         const SliverToBoxAdapter(child: BannerSlider()),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+        // QuickActions dipindah ke sini
+        SliverToBoxAdapter(
+          child: QuickActions(tabCtrl: _tabCtrl, categories: _categories),
+        ),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
       ],
 

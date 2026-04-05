@@ -20,14 +20,6 @@ class SplashController extends GetxController {
       return;
     }
 
-    final role = await service.getUserRole();
-
-    if (role == 'owner') {
-      Get.offAllNamed('/owner');
-    } else if (role == 'karyawan') {
-      Get.offAllNamed('/karyawan');
-    } else {
-      Get.offAllNamed('/home');
-    }
+    Get.offAllNamed('/home'); // semua role ke home
   }
 }

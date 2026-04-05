@@ -1,15 +1,15 @@
-import 'package:application_gamiku/features/customer/pages/menu_screen.dart';
+import 'package:application_gamiku/features/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/app_colors.dart';
-import '../controllers/cart_controller.dart';
-import '../../order/pages/order_screen.dart';
-import '../../order/pages/payment_screen.dart';
+import '../core/constants/app_colors.dart';
+import 'customer/controllers/cart_controller.dart';
+import 'order/pages/order_screen.dart';
+import 'order/pages/payment_screen.dart';
 import 'profile_screen.dart';
-import '../widgets/home_tab.dart';
-import '../widgets/bottom_cart_bar.dart';
-import '../widgets/bottom_nav.dart';
+import 'widgets/home_tab.dart';
+import 'widgets/bottom_cart_bar.dart';
+import 'widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,20 +49,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final cartC = Get.find<CartController>();
-    Obx(() {
-      final cartCount = cartC.totalItems;
-      final showCartBar = cartCount > 0 && _navIdx == 1;
-
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (showCartBar) BottomCartBar(onTap: _openPayment),
-          BottomNav(selected: _navIdx, cartCount: cartCount, onTap: _onNavTap),
-        ],
-      );
-    });
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(

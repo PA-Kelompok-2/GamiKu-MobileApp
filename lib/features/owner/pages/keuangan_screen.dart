@@ -1,0 +1,313 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/services/supabase_services.dart';
+import '../models/pengeluaran_model.dart';
+import '../widgets/summary_card.dart';
+import '../widgets/keuangan_card.dart';
+
+class KeuanganScreen extends StatefulWidget {
+  const KeuanganScreen({super.key});
+
+  @override
+  State<KeuanganScreen> createState() => _KeuanganScreenState();
+}
+
+class _KeuanganScreenState extends State<KeuanganScreen> {
+  final service = SupabaseService();
+
+  List<Map<String, dynamic>> _completedOrders = [];
+  final List<Pengeluaran> _pengeluaranList = [];
+  bool _isLoading = true;
+
+  int get totalPemasukan =>
+      _completedOrders.fold(0, (s, o) => s + (o['total_price'] as int? ?? 0));
+  int get totalPengeluaran => _pengeluaranList.fold(0, (s, p) => s + p.nominal);
+  int get saldo => totalPemasukan - totalPengeluaran;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    setState(() => _isLoading = true);
+    final orders = await service.getOrdersWithItems();
+    setState(() {
+      _completedOrders = orders
+          .where((o) => o['status'] == 'completed')
+          .toList();
+      _isLoading = false;
+    });
+  }
+
+  void _tambahPengeluaran() {
+    final namaC = TextEditingController();
+    final nominalC = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tambah Pengeluaran',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: namaC,
+                decoration: InputDecoration(
+                  labelText: 'Nama Pengeluaran',
+                  filled: true,
+                  fillColor: AppColors.bg,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nominalC,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Nominal (Rp)',
+                  filled: true,
+                  fillColor: AppColors.bg,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null){
+                    setModalState(() => selectedDate = picked);}
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.bg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: AppColors.textGrey,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                        style: const TextStyle(color: AppColors.textDark),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (namaC.text.isEmpty || nominalC.text.isEmpty) {
+                      Get.snackbar(
+                        'Error',
+                        'Semua field wajib diisi',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+                    final nominal = int.tryParse(nominalC.text);
+                    if (nominal == null) {
+                      Get.snackbar(
+                        'Error',
+                        'Nominal harus berupa angka',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+                    setState(
+                      () => _pengeluaranList.insert(
+                        0,
+                        Pengeluaran(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          nama: namaC.text,
+                          nominal: nominal,
+                          tanggal: selectedDate,
+                        ),
+                      ),
+                    );
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Simpan',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: AppColors.bg,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+          title: const Text(
+            'Manajemen Keuangan',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          bottom: const TabBar(
+            indicatorColor: AppColors.white,
+            labelColor: AppColors.white,
+            unselectedLabelColor: AppColors.white70,
+            tabs: [
+              Tab(text: 'Pemasukan'),
+              Tab(text: 'Pengeluaran'),
+            ],
+          ),
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  SummaryCard(
+                    totalPemasukan: totalPemasukan,
+                    totalPengeluaran: totalPengeluaran,
+                    saldo: saldo,
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        // Tab Pemasukan
+                        _completedOrders.isEmpty
+                            ? _emptyState('Belum ada pemasukan')
+                            : ListView.builder(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  16,
+                                ),
+                                itemCount: _completedOrders.length,
+                                itemBuilder: (_, i) {
+                                  final o = _completedOrders[i];
+                                  return KeuanganCard(
+                                    title: o['order_code'] ?? '-',
+                                    subtitle: o['created_at'] ?? '-',
+                                    nominal: o['total_price'] ?? 0,
+                                    isIncome: true,
+                                  );
+                                },
+                              ),
+
+                        // Tab Pengeluaran
+                        _pengeluaranList.isEmpty
+                            ? _emptyState('Belum ada pengeluaran')
+                            : ListView.builder(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  16,
+                                ),
+                                itemCount: _pengeluaranList.length,
+                                itemBuilder: (_, i) {
+                                  final p = _pengeluaranList[i];
+                                  return KeuanganCard(
+                                    title: p.nama,
+                                    subtitle:
+                                        '${p.tanggal.day}/${p.tanggal.month}/${p.tanggal.year}',
+                                    nominal: p.nominal,
+                                    isIncome: false,
+                                    onDelete: () => setState(
+                                      () => _pengeluaranList.removeWhere(
+                                        (e) => e.id == p.id,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.primary,
+          onPressed: _tambahPengeluaran,
+          child: const Icon(Icons.add, color: AppColors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('💰', style: TextStyle(fontSize: 48)),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textGrey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
