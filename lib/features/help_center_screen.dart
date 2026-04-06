@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
+import 'package:get/get.dart';
 
 class HelpCenterScreen extends StatelessWidget {
   const HelpCenterScreen({super.key});
@@ -13,7 +14,7 @@ class HelpCenterScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back()
         ),
         title: const Text(
           'Help Center',
