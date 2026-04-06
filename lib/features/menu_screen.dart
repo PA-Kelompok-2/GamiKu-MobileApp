@@ -38,15 +38,22 @@ class _MenuScreenState extends State<MenuScreen>
   }
 
   void _syncTabs(List<String> newCategories) {
+    if (!mounted) return;
+
     if (categories.length == newCategories.length &&
         categories.join('|') == newCategories.join('|')) {
       return;
     }
 
     final oldIndex = _tabCtrl.index;
-    final oldCtrl = _tabCtrl;
+
+    // 🔥 Hindari double create dalam frame yang sama
+    if (_tabCtrl.length == newCategories.length) return;
+
+    _tabCtrl.dispose();
 
     categories = newCategories;
+
     _tabCtrl = TabController(length: categories.length, vsync: this);
 
     if (oldIndex < categories.length) {
@@ -54,10 +61,6 @@ class _MenuScreenState extends State<MenuScreen>
     }
 
     setState(() {});
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      oldCtrl.dispose();
-    });
   }
 
   @override
