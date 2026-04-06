@@ -8,6 +8,7 @@ import 'terms_of_services_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'owner/pages/keuangan_screen.dart';
 import 'owner/pages/bahan_baku_screen.dart';
+import 'owner/pages/karyawan_management_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -194,15 +195,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuItem(
                           Icons.description_outlined,
                           'Terms of Services',
-                          onTap: () =>
-                              Get.to(() => const TermsOfServicesScreen()),
+                          onTap: () => Get.to(() => const TermsOfServicesScreen()),
                         ),
                         _divider(),
                         _buildMenuItem(
                           Icons.privacy_tip_outlined,
                           'Privacy Policy',
-                          onTap: () =>
-                              Get.to(() => const PrivacyPolicyScreen()),
+                          onTap: () => Get.to(() => const PrivacyPolicyScreen()),
                         ),
                         _divider(),
 
@@ -222,6 +221,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onTap: () => Get.to(() => const KeuanganScreen()),
                           ),
                           _divider(),
+                          _buildMenuItem(
+                            Icons.people_outline,
+                            'Manajemen Karyawan',
+                            onTap: () => Get.to(() => const KaryawanManagementScreen()),
+                          ),
+                          _divider(),
                         ],
 
                         _buildMenuItem(
@@ -233,7 +238,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
                 const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),
