@@ -127,6 +127,13 @@ class SupabaseService {
     await supabase.from('menus').delete().eq('id', id);
   }
 
+  Future<void> updateMenuAvailability(String id, bool isAvailable) async {
+  await supabase
+      .from('menus')
+      .update({'is_available': isAvailable})
+      .eq('id', id);
+  }
+
   Future<List<Map<String, dynamic>>> getOrders() async {
     final res = await supabase
         .from('orders')

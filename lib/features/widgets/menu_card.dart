@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../controllers/menu_controller.dart';
 import '../customer/controllers/cart_controller.dart';
 
 class MenuCard extends StatelessWidget {
@@ -15,6 +16,7 @@ class MenuCard extends StatelessWidget {
     final cartC = Get.find<CartController>();
     final tag = item['tag'] as String?;
     final isOwner = role == 'owner';
+    final isKaryawan = role == 'karyawan'; 
 
     return Container(
       decoration: BoxDecoration(
@@ -76,7 +78,6 @@ class MenuCard extends StatelessWidget {
                 ),
             ],
           ),
-
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -102,35 +103,94 @@ class MenuCard extends StatelessWidget {
                       color: AppColors.primary,
                     ),
                   ),
-
                   const Spacer(),
-
-                  if (!isOwner)
+                  if (isKaryawan)
                     Obx(() {
-                      final id = item['id'] is String
-                          ? item['id']
-                          : item['id'].toString();
-                      final qty = cartC.qtyOf(id);
-
-                      return qty == 0
-                          ? _AddBtn(
-                              onTap: () {
-                                cartC.add(item);
-                                onChanged?.call();
-                              },
-                            )
-                          : _Counter(
-                              qty: qty,
-                              onAdd: () {
-                                cartC.add(item);
-                                onChanged?.call();
-                              },
-                              onRemove: () {
-                                cartC.remove(item['id']);
-                                onChanged?.call();
-                              },
-                            );
-                    }),
+                      final menuC = Get.find<MenuC>();
+                      final idx = menuC.menus.indexWhere(
+                        (m) => m['id'].toString() == item['id'].toString(),
+                      );
+                      final isAvailable = idx != -1
+                          ? menuC.menus[idx]['is_available'] as bool? ?? true
+                          : item['is_available'] as bool? ?? true;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isAvailable ? 'Tersedia' : 'Habis',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isAvailable ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Switch(
+                            value: isAvailable,
+                            thumbColor: WidgetStateProperty.resolveWith(
+                            (states) => states.contains(WidgetState.selected)
+                                ? AppColors.primary
+                                : null,
+                            ),
+                            onChanged: (val) {
+                              menuC.updateAvailability(
+                                item['id'].toString(),
+                                val,
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    })
+                    else if (!isOwner)
+                      Obx(() {
+                        final menuC = Get.find<MenuC>();
+                        final id = item['id'] is String
+                            ? item['id']
+                            : item['id'].toString();
+                        final qty = cartC.qtyOf(id);
+                        final idx = menuC.menus.indexWhere((m) => m['id'].toString() == id);
+                        final isAvailable = idx != -1
+                            ? menuC.menus[idx]['is_available'] as bool? ?? true
+                            : item['is_available'] as bool? ?? true;
+                        if (!isAvailable) {
+                          return Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Habis',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return qty == 0
+                            ? _AddBtn(
+                                onTap: () {
+                                  cartC.add(item);
+                                  onChanged?.call();
+                                },
+                              )
+                            : _Counter(
+                                qty: qty,
+                                onAdd: () {
+                                  cartC.add(item);
+                                  onChanged?.call();
+                                },
+                                onRemove: () {
+                                  cartC.remove(item['id']);
+                                  onChanged?.call();
+                                },
+                              );
+                      }),
                 ],
               ),
             ),

@@ -129,4 +129,18 @@ class MenuC extends GetxController {
       );
     }
   }
-}
+  Future<void> updateAvailability(String id, bool isAvailable) async {
+  try {
+    await service.updateMenuAvailability(id, isAvailable);
+    final index = menus.indexWhere((m) => m['id'].toString() == id);
+    if (index != -1) {
+      menus[index] = {...menus[index], 'is_available': isAvailable};
+      menus.refresh();
+    }
+  } catch (e) {
+    Get.snackbar('Error', 'Gagal update status: $e',
+        snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+} 
+
