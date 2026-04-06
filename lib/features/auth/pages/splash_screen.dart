@@ -1,3 +1,4 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/splash_controller.dart';
@@ -51,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void goToLogin() {
-    Get.toNamed('/login');
+    Get.offAllNamed(Routes.login);
   }
 
   @override

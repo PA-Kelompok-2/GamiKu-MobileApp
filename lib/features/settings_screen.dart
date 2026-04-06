@@ -1,3 +1,4 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
@@ -8,7 +9,7 @@ class SettingsScreen extends StatelessWidget {
 
   final service = SupabaseService();
 
-  void confirmLogout(BuildContext context) {
+  void confirmLogout() {
     Get.defaultDialog(
       title: "Logout",
       titleStyle: const TextStyle(color: AppColors.textDark),
@@ -26,6 +27,23 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  void _showDeleteAccountDialog() {
+    Get.defaultDialog(
+      title: 'Delete Account',
+      middleText:
+          'Are you sure you want to delete your account? This action cannot be undone.',
+      textConfirm: 'Delete',
+      textCancel: 'Cancel',
+      confirmTextColor: AppColors.white,
+      cancelTextColor: AppColors.textGrey,
+      buttonColor: AppColors.primary,
+      onConfirm: () {
+        Get.back();
+      },
+      onCancel: () {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'Settings',
@@ -54,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
           _buildMenuItem(
             icon: Icons.person_outline,
             title: 'My Profile',
-            onTap: () {},
+            onTap: () => Get.toNamed(Routes.myProfile)
           ),
 
           _buildMenuItem(
@@ -79,9 +97,7 @@ class SettingsScreen extends StatelessWidget {
             title: 'Delete Account',
             iconColor: AppColors.primary,
             textColor: AppColors.textDark,
-            onTap: () {
-              _showDeleteAccountDialog(context);
-            },
+            onTap: _showDeleteAccountDialog,
           ),
 
           _buildMenuItem(
@@ -89,9 +105,7 @@ class SettingsScreen extends StatelessWidget {
             title: 'Logout',
             iconColor: AppColors.textDark,
             textColor: AppColors.textDark,
-            onTap: () {
-              confirmLogout(context);
-            },
+            onTap: confirmLogout,
           ),
         ],
       ),
@@ -128,36 +142,6 @@ class SettingsScreen extends StatelessWidget {
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         minLeadingWidth: 24,
-      ),
-    );
-  }
-
-  void _showDeleteAccountDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textGrey),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
       ),
     );
   }

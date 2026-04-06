@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
 import '../core/constants/app_colors.dart';
-import 'settings_screen.dart';
-import 'help_center_screen.dart';
-import 'terms_of_services_screen.dart';
-import 'privacy_policy_screen.dart';
-import 'owner/pages/keuangan_screen.dart';
-import 'owner/pages/bahan_baku_screen.dart';
+import '../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -188,21 +183,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuItem(
                           Icons.help_outline,
                           'Help Center',
-                          onTap: () => Get.to(() => const HelpCenterScreen()),
+                          onTap: () => Get.toNamed(Routes.helpCenter),
                         ),
                         _divider(),
                         _buildMenuItem(
                           Icons.description_outlined,
                           'Terms of Services',
-                          onTap: () =>
-                              Get.to(() => const TermsOfServicesScreen()),
+                          onTap: () => Get.toNamed(Routes.terms),
                         ),
                         _divider(),
                         _buildMenuItem(
                           Icons.privacy_tip_outlined,
                           'Privacy Policy',
-                          onTap: () =>
-                              Get.to(() => const PrivacyPolicyScreen()),
+                          onTap: () => Get.toNamed(Routes.privacyPolicy),
                         ),
                         _divider(),
 
@@ -210,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildMenuItem(
                             Icons.countertops_outlined,
                             'Manajemen Bahan Baku',
-                            onTap: () => Get.to(() => const BahanBakuScreen()),
+                            onTap: () => Get.toNamed(Routes.bahanBaku),
                           ),
                           _divider(),
                         ],
@@ -219,7 +212,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildMenuItem(
                             Icons.account_balance_wallet_outlined,
                             'Manajemen Keuangan',
-                            onTap: () => Get.to(() => const KeuanganScreen()),
+                            onTap: () => Get.toNamed(Routes.keuangan),
+                          ),
+                          _divider(),
+                          _buildMenuItem(
+                            Icons.people_outline,
+                            'Manajemen Karyawan',
+                            onTap: () => Get.toNamed(Routes.karyawanManagement),
                           ),
                           _divider(),
                         ],
@@ -227,13 +226,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuItem(
                           Icons.settings_outlined,
                           'Settings',
-                          onTap: () => Get.to(() => SettingsScreen()),
+                          onTap: () => Get.toNamed(Routes.settings),
                         ),
                       ],
                     ),
                   ),
                 ),
-
                 const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),

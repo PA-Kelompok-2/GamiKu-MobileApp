@@ -13,8 +13,7 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen>
-    with SingleTickerProviderStateMixin {
+class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late TabController _tabCtrl;
   List<String> categories = ['Semua'];
   String? _role;
@@ -37,32 +36,6 @@ class _MenuScreenState extends State<MenuScreen>
     super.dispose();
   }
 
-  void _syncTabs(List<String> newCategories) {
-    if (!mounted) return;
-
-    if (categories.length == newCategories.length &&
-        categories.join('|') == newCategories.join('|')) {
-      return;
-    }
-
-    final oldIndex = _tabCtrl.index;
-
-    // 🔥 Hindari double create dalam frame yang sama
-    if (_tabCtrl.length == newCategories.length) return;
-
-    _tabCtrl.dispose();
-
-    categories = newCategories;
-
-    _tabCtrl = TabController(length: categories.length, vsync: this);
-
-    if (oldIndex < categories.length) {
-      _tabCtrl.index = oldIndex;
-    }
-
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     final menuC = Get.find<MenuC>();
@@ -73,9 +46,14 @@ class _MenuScreenState extends State<MenuScreen>
         ...menuC.menus.map((m) => m['cat'] as String).toSet(),
       ];
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _syncTabs(newCategories);
-      });
+      if (categories.length != newCategories.length ||
+          categories.join('|') != newCategories.join('|')) {
+        categories = newCategories;
+        _tabCtrl.dispose();
+        _tabCtrl = TabController(length: categories.length, vsync: this);
+      }
+
+      final currentCategories = List<String>.from(categories);
 
       return Scaffold(
         backgroundColor: AppColors.bg,
@@ -88,14 +66,14 @@ class _MenuScreenState extends State<MenuScreen>
             TabBar(
               controller: _tabCtrl,
               isScrollable: true,
-              tabs: categories.map((c) => Tab(text: c)).toList(),
+              tabs: currentCategories.map((c) => Tab(text: c)).toList(),
             ),
             Expanded(
               child: menuC.isLoading.value
                   ? const Center(child: CircularProgressIndicator())
                   : TabBarView(
                       controller: _tabCtrl,
-                      children: categories.map((cat) {
+                      children: currentCategories.map((cat) {
                         final items = cat == 'Semua'
                             ? menuC.menus
                             : menuC.menus

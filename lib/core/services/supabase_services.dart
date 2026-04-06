@@ -127,6 +127,13 @@ class SupabaseService {
     await supabase.from('menus').delete().eq('id', id);
   }
 
+  Future<void> updateMenuAvailability(String id, bool isAvailable) async {
+  await supabase
+      .from('menus')
+      .update({'is_available': isAvailable})
+      .eq('id', id);
+  }
+
   Future<List<Map<String, dynamic>>> getOrders() async {
     final res = await supabase
         .from('orders')
@@ -177,5 +184,48 @@ class SupabaseService {
         .order('created_at', ascending: false);
 
     return List<Map<String, dynamic>>.from(res);
+  }
+    Future<List<Map<String, dynamic>>> getKaryawan() async {
+    final res = await supabase
+        .from('profiles')
+        .select()
+        .eq('role', 'karyawan')
+        .order('name');
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  Future<void> addKaryawan({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final res = await supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
+    final uid = res.user?.id;
+    if (uid != null) {
+      await supabase.from('profiles').insert({
+        'id': uid,
+        'name': name,
+        'email': email,
+        'role': 'karyawan',
+      });
+    }
+  }
+
+  Future<void> updateKaryawan({
+    required String id,
+    required String name,
+    required String email,
+  }) async {
+    await supabase
+        .from('profiles')
+        .update({'name': name, 'email': email})
+        .eq('id', id);
+  }
+
+  Future<void> deleteKaryawan(String id) async {
+    await supabase.from('profiles').delete().eq('id', id);
   }
 }

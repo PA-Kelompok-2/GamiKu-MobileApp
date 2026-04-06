@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
-import '../models/pengeluaran_model.dart';
+import '../controllers/keuangan_controller.dart';
 import '../widgets/summary_card.dart';
 import '../widgets/keuangan_card.dart';
 
@@ -15,15 +15,14 @@ class KeuanganScreen extends StatefulWidget {
 
 class _KeuanganScreenState extends State<KeuanganScreen> {
   final service = SupabaseService();
+  final keuanganC = Get.put(KeuanganController());
 
   List<Map<String, dynamic>> _completedOrders = [];
-  final List<Pengeluaran> _pengeluaranList = [];
   bool _isLoading = true;
 
   int get totalPemasukan =>
       _completedOrders.fold(0, (s, o) => s + (o['total_price'] as int? ?? 0));
-  int get totalPengeluaran => _pengeluaranList.fold(0, (s, p) => s + p.nominal);
-  int get saldo => totalPemasukan - totalPengeluaran;
+  int get saldo => totalPemasukan - keuanganC.totalPengeluaran;
 
   @override
   void initState() {
@@ -109,8 +108,9 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                     firstDate: DateTime(2020),
                     lastDate: DateTime.now(),
                   );
-                  if (picked != null){
-                    setModalState(() => selectedDate = picked);}
+                  if (picked != null) {
+                    setModalState(() => selectedDate = picked);
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -159,16 +159,10 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                       );
                       return;
                     }
-                    setState(
-                      () => _pengeluaranList.insert(
-                        0,
-                        Pengeluaran(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          nama: namaC.text,
-                          nominal: nominal,
-                          tanggal: selectedDate,
-                        ),
-                      ),
+                    keuanganC.tambah(
+                      nama: namaC.text,
+                      nominal: nominal,
+                      tanggal: selectedDate,
                     );
                     Navigator.pop(ctx);
                   },
@@ -202,6 +196,10 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
+            onPressed: () => Get.offNamed('/profile'),
+          ),
           title: const Text(
             'Manajemen Keuangan',
             style: TextStyle(fontWeight: FontWeight.w800),
@@ -218,69 +216,67 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  SummaryCard(
-                    totalPemasukan: totalPemasukan,
-                    totalPengeluaran: totalPengeluaran,
-                    saldo: saldo,
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        // Tab Pemasukan
-                        _completedOrders.isEmpty
-                            ? _emptyState('Belum ada pemasukan')
-                            : ListView.builder(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  0,
-                                  16,
-                                  16,
-                                ),
-                                itemCount: _completedOrders.length,
-                                itemBuilder: (_, i) {
-                                  final o = _completedOrders[i];
-                                  return KeuanganCard(
-                                    title: o['order_code'] ?? '-',
-                                    subtitle: o['created_at'] ?? '-',
-                                    nominal: o['total_price'] ?? 0,
-                                    isIncome: true,
-                                  );
-                                },
-                              ),
-
-                        // Tab Pengeluaran
-                        _pengeluaranList.isEmpty
-                            ? _emptyState('Belum ada pengeluaran')
-                            : ListView.builder(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  0,
-                                  16,
-                                  16,
-                                ),
-                                itemCount: _pengeluaranList.length,
-                                itemBuilder: (_, i) {
-                                  final p = _pengeluaranList[i];
-                                  return KeuanganCard(
-                                    title: p.nama,
-                                    subtitle:
-                                        '${p.tanggal.day}/${p.tanggal.month}/${p.tanggal.year}',
-                                    nominal: p.nominal,
-                                    isIncome: false,
-                                    onDelete: () => setState(
-                                      () => _pengeluaranList.removeWhere(
-                                        (e) => e.id == p.id,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                      ],
+            : Obx(
+                () => Column(
+                  children: [
+                    SummaryCard(
+                      totalPemasukan: totalPemasukan,
+                      totalPengeluaran: keuanganC.totalPengeluaran,
+                      saldo: saldo,
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          // Tab Pemasukan
+                          _completedOrders.isEmpty
+                              ? _emptyState('Belum ada pemasukan')
+                              : ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    0,
+                                    16,
+                                    16,
+                                  ),
+                                  itemCount: _completedOrders.length,
+                                  itemBuilder: (_, i) {
+                                    final o = _completedOrders[i];
+                                    return KeuanganCard(
+                                      title: o['order_code'] ?? '-',
+                                      subtitle: o['created_at'] ?? '-',
+                                      nominal: o['total_price'] ?? 0,
+                                      isIncome: true,
+                                    );
+                                  },
+                                ),
+
+                          // Tab Pengeluaran
+                          keuanganC.pengeluaranList.isEmpty
+                              ? _emptyState('Belum ada pengeluaran')
+                              : ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    0,
+                                    16,
+                                    16,
+                                  ),
+                                  itemCount: keuanganC.pengeluaranList.length,
+                                  itemBuilder: (_, i) {
+                                    final p = keuanganC.pengeluaranList[i];
+                                    return KeuanganCard(
+                                      title: p.nama,
+                                      subtitle:
+                                          '${p.tanggal.day}/${p.tanggal.month}/${p.tanggal.year}',
+                                      nominal: p.nominal,
+                                      isIncome: false,
+                                      onDelete: () => keuanganC.hapus(p.id),
+                                    );
+                                  },
+                                ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: AppColors.primary,

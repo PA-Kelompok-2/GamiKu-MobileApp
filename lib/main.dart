@@ -1,14 +1,13 @@
 import 'package:application_gamiku/features/customer/controllers/cart_controller.dart';
 import 'package:application_gamiku/controllers/menu_controller.dart';
 import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
+import 'package:application_gamiku/features/owner/controllers/keuangan_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/home_screen.dart';
-import 'features/auth/pages/login_screen.dart';
-import 'features/auth/pages/register_screen.dart';
-import 'features/auth/pages/splash_screen.dart';
+import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +21,8 @@ void main() async {
   Get.put(AuthController());
   Get.put(CartController());
   Get.put(MenuC());
+  Get.put(KeuanganController());
+
 
   runApp(const GamikuApp());
 }
@@ -33,13 +34,8 @@ class GamikuApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
-      getPages: [
-        GetPage(name: '/splash', page: () => SplashScreen()),
-        GetPage(name: '/login', page: () => LoginPage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
-        GetPage(name: '/home', page: () => HomeScreen()),
-      ],
+      initialRoute: Routes.splash,
+      getPages: AppPages.pages,
     );
   }
 }
