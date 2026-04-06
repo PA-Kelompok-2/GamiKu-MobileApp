@@ -31,10 +31,7 @@ class MenuManagementScreen extends StatelessWidget {
           itemBuilder: (context, i) {
             final item = menuC.menus[i];
 
-            final categoryName =
-                item['categories'] != null && item['categories']['name'] != null
-                    ? item['categories']['name']
-                    : '-';
+            final categoryName = item['cat'] ?? '-';
 
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
