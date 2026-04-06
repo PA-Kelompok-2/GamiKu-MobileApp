@@ -1,6 +1,7 @@
 import 'package:application_gamiku/features/customer/controllers/cart_controller.dart';
 import 'package:application_gamiku/controllers/menu_controller.dart';
 import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
+import 'package:application_gamiku/features/owner/controllers/keuangan_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,6 +21,8 @@ void main() async {
   Get.put(AuthController());
   Get.put(CartController());
   Get.put(MenuC());
+  Get.put(KeuanganController());
+
 
   runApp(const GamikuApp());
 }

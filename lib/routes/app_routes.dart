@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class Routes {
   static const splash = '/splash';
   static const login = '/login';
@@ -5,6 +7,7 @@ abstract class Routes {
   static const home = '/home';
   static const settings = '/settings';
   static const myProfile = '/my-profile';
+  static const profile = '/profile';
   static const helpCenter = '/help-center';
   static const terms = '/terms';
   static const privacyPolicy = '/privacy-policy';
