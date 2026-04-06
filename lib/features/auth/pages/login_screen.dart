@@ -1,3 +1,4 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
@@ -205,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         const Text("Don't have an account? "),
                         GestureDetector(
-                          onTap: () => Get.toNamed('/register'),
+                          onTap: () => Get.toNamed(Routes.register),
                           child: const Text(
                             "Sign Up",
                             style: TextStyle(

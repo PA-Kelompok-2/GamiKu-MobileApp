@@ -1,3 +1,4 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
@@ -211,7 +212,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: [
                         const Text("Sudah punya akun? "),
                         GestureDetector(
-                          onTap: () => Get.toNamed('/login'),
+                          onTap: () => Get.toNamed(Routes.login),
                           child: const Text(
                             "Login",
                             style: TextStyle(

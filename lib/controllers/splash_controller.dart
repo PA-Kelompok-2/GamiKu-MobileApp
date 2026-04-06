@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
+import '../routes/app_routes.dart';
 
 class SplashController extends GetxController {
   final service = SupabaseService();
@@ -16,10 +17,10 @@ class SplashController extends GetxController {
     final user = service.supabase.auth.currentUser;
 
     if (user == null) {
-      Get.offAllNamed('/login');
+      Get.offAllNamed(Routes.login);
       return;
     }
 
-    Get.offAllNamed('/home'); // semua role ke home
+    Get.offAllNamed(Routes.home);
   }
 }

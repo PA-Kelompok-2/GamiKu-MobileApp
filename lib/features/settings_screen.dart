@@ -1,3 +1,4 @@
+import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
@@ -71,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
           _buildMenuItem(
             icon: Icons.person_outline,
             title: 'My Profile',
-            onTap: () => Get.toNamed('/my-profile')
+            onTap: () => Get.toNamed(Routes.myProfile)
           ),
 
           _buildMenuItem(
