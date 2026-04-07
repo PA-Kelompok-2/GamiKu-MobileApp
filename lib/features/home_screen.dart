@@ -63,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Get.find<MenuC>().selectedCategory.value = cat;
                 _onNavTap(1);
               },
+              onOpenOrders: () => _onNavTap(2),
             ),
             const MenuScreen(),
             OrderScreen(key: ValueKey('order-$_navIdx')),

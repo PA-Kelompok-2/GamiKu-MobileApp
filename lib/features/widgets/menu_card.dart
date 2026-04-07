@@ -45,7 +45,6 @@ class _MenuCardState extends State<MenuCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// IMAGE (dibesarkan)
              ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
@@ -60,7 +59,6 @@ class _MenuCardState extends State<MenuCard> {
 
             const SizedBox(height: 6),
 
-            /// NAME
             Text(
               widget.item['name'],
               maxLines: 1,
@@ -73,7 +71,6 @@ class _MenuCardState extends State<MenuCard> {
 
             const SizedBox(height: 2),
 
-            /// CATEGORY
             Text(
               widget.item['cat'] ?? '',
               style: TextStyle(
@@ -82,10 +79,8 @@ class _MenuCardState extends State<MenuCard> {
               ),
             ),
 
-            /// BIAR HARGA DI BAWAH
             const Spacer(),
 
-            /// PRICE + CART BUTTON
             Row(
               children: [
 
