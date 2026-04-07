@@ -10,6 +10,9 @@ class MenuC extends GetxController {
 
   RxString selectedCategory = ''.obs;
 
+  /// menyimpan semua menu asli
+  List<Map<String, dynamic>> allMenus = [];
+
   @override
   void onInit() {
     fetchMenus();
@@ -17,13 +20,16 @@ class MenuC extends GetxController {
     super.onInit();
   }
 
+  /// ========================
+  /// FETCH MENUS
+  /// ========================
   Future<void> fetchMenus() async {
     try {
       isLoading.value = true;
 
       final data = await service.getMenus();
 
-      menus.value = data.map((e) {
+      final mappedMenus = data.map((e) {
         return {
           'id': e['id'],
           'name': e['name'],
@@ -33,6 +39,10 @@ class MenuC extends GetxController {
           'cat': e['categories']?['name'] ?? 'unknown',
         };
       }).toList();
+
+      menus.value = mappedMenus;
+      allMenus = mappedMenus;
+
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -44,6 +54,32 @@ class MenuC extends GetxController {
     }
   }
 
+  /// ========================
+  /// SEARCH MENU
+  /// ========================
+  void searchMenu(String query) {
+
+    if (query.isEmpty) {
+      menus.value = allMenus;
+      return;
+    }
+
+    final filtered = allMenus.where((menu) {
+
+      final name = menu['name'].toString().toLowerCase();
+      final cat = menu['cat'].toString().toLowerCase();
+
+      return name.contains(query.toLowerCase()) ||
+             cat.contains(query.toLowerCase());
+
+    }).toList();
+
+    menus.value = filtered;
+  }
+
+  /// ========================
+  /// FETCH CATEGORIES
+  /// ========================
   Future<void> fetchCategories() async {
     try {
       final data = await service.getCategories();
@@ -57,6 +93,9 @@ class MenuC extends GetxController {
     }
   }
 
+  /// ========================
+  /// ADD MENU
+  /// ========================
   Future<void> addMenu({
     required String name,
     required int price,
@@ -84,6 +123,9 @@ class MenuC extends GetxController {
     }
   }
 
+  /// ========================
+  /// UPDATE MENU
+  /// ========================
   Future<void> updateMenu({
     required dynamic id,
     required String name,
@@ -113,6 +155,9 @@ class MenuC extends GetxController {
     }
   }
 
+  /// ========================
+  /// DELETE MENU
+  /// ========================
   Future<void> deleteMenu(dynamic id) async {
     try {
       await service.deleteMenu(id);
@@ -131,18 +176,28 @@ class MenuC extends GetxController {
       );
     }
   }
+  
   Future<void> updateAvailability(String id, bool isAvailable) async {
-  try {
-    await service.updateMenuAvailability(id, isAvailable);
-    final index = menus.indexWhere((m) => m['id'].toString() == id);
-    if (index != -1) {
-      menus[index] = {...menus[index], 'is_available': isAvailable};
-      menus.refresh();
-    }
-  } catch (e) {
-    Get.snackbar('Error', 'Gagal update status: $e',
-        snackPosition: SnackPosition.BOTTOM);
+    try {
+      await service.updateMenuAvailability(id, isAvailable);
+
+      final index = menus.indexWhere((m) => m['id'].toString() == id);
+
+      if (index != -1) {
+        menus[index] = {
+          ...menus[index],
+          'is_available': isAvailable,
+        };
+
+        menus.refresh();
+      }
+
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Gagal update status: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
-} 
-
+}
