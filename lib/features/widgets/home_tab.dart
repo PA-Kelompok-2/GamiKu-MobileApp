@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:get/get.dart';
+import '../../controllers/menu_controller.dart';
+import '../../core/constants/app_colors.dart';
 import 'banner_slider.dart';
-import 'quick_actions.dart';
 
 class HomeTab extends StatefulWidget {
   final VoidCallback onCartChanged;
+  final Function(String category) onOpenMenu;
 
-  const HomeTab({super.key, required this.onCartChanged});
+  const HomeTab({
+    super.key,
+    required this.onCartChanged,
+    required this.onOpenMenu,
+  });
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -18,19 +24,18 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
-  late TabController _tabCtrl;
-  final List<String> _categories = ['Semua', 'Makanan', 'Minuman'];
-
   @override
-  void initState() {
-    super.initState();
-    _tabCtrl = TabController(length: _categories.length, vsync: this);
+  void dispose() {
+    _searchController.dispose();
+    _searchFocus.dispose();
+    super.dispose();
   }
 
   void _toggleSearch() {
     setState(() {
       _searchExpanded = !_searchExpanded;
     });
+
     if (_searchExpanded) {
       Future.delayed(const Duration(milliseconds: 150), () {
         _searchFocus.requestFocus();
@@ -42,17 +47,12 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    _searchFocus.dispose();
-    _tabCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final menuC = Get.find<MenuC>();
+
     return NestedScrollView(
       headerSliverBuilder: (ctx, _) => [
+        /// APP BAR
         SliverAppBar(
           pinned: true,
           backgroundColor: AppColors.primary,
@@ -72,7 +72,9 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                   ),
                   child: Image.asset('assets/logo.png', height: 28),
                 ),
+
                 const SizedBox(width: 10),
+
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -81,11 +83,12 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                       'GAMIKU',
                       style: TextStyle(
                         color: AppColors.white,
-                        fontSize: 17,
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2,
                       ),
                     ),
+
                     Row(
                       children: [
                         Icon(
@@ -98,26 +101,26 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                           'Samarinda',
                           style: TextStyle(
                             color: AppColors.white70,
-                            fontSize: 10,
+                            fontSize: 11,
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
+
                 const Spacer(),
 
-                // Search icon
+                /// SEARCH
                 IconButton(
                   icon: Icon(
                     _searchExpanded ? Icons.search_off : Icons.search,
                     color: AppColors.white,
-                    size: 24,
                   ),
                   onPressed: _toggleSearch,
                 ),
 
-                // Notifikasi
+                /// NOTIFICATION
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -125,7 +128,6 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                       icon: const Icon(
                         Icons.notifications_outlined,
                         color: AppColors.white,
-                        size: 24,
                       ),
                       onPressed: () {},
                     ),
@@ -148,75 +150,195 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
           ),
         ),
 
-        // Dropdown search bar
+        /// SEARCH BAR
         SliverToBoxAdapter(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
             height: _searchExpanded ? 64 : 0,
             color: AppColors.primary,
             child: _searchExpanded
                 ? Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    padding: const EdgeInsets.all(12),
                     child: TextField(
                       controller: _searchController,
                       focusNode: _searchFocus,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Cari menu favoritmu...',
                         hintStyle: TextStyle(
                           color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: 13,
                         ),
                         prefixIcon: const Icon(
                           Icons.search,
                           color: Colors.white70,
-                          size: 18,
-                        ),
-                        suffixIcon: GestureDetector(
-                          onTap: _toggleSearch,
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white70,
-                            size: 18,
-                          ),
                         ),
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.15),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.white30),
-                        ),
                       ),
                     ),
                   )
-                : const SizedBox.shrink(),
+                : const SizedBox(),
           ),
         ),
 
         const SliverToBoxAdapter(child: BannerSlider()),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-        // QuickActions dipindah ke sini
-        SliverToBoxAdapter(
-          child: QuickActions(tabCtrl: _tabCtrl, categories: _categories),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
 
-      body: const SizedBox(),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 100),
+        children: [
+          /// CATEGORY TITLE
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Categories",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+
+                GestureDetector(
+                  onTap: () {
+                    widget.onOpenMenu("Semua");
+                  },
+                  child: const Text(
+                    "See all",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// CATEGORY LIST (DARI SUPABASE)
+          Obx(() {
+            final categories =
+                menuC.menus.map((m) => m['cat'] as String).toSet().toList()
+                  ..sort();
+
+            return SizedBox(
+              height: 130,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: categories.map((cat) => _categoryItem(cat)).toList(),
+              ),
+            );
+          }),
+
+          const SizedBox(height: 28),
+
+          /// POPULAR TITLE
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Popular",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// POPULAR MENU
+          Obx(() {
+            final menus = menuC.menus.take(5).toList();
+
+            return SizedBox(
+              height: 160,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: menus.map((m) => _popularCard(m)).toList(),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  /// CATEGORY ITEM
+  Widget _categoryItem(String title) {
+    return InkWell(
+      onTap: () {
+        widget.onOpenMenu(title);
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 18),
+        child: Column(
+          children: [
+            Container(
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// POPULAR CARD
+  Widget _popularCard(Map item) {
+    return Container(
+      width: 260,
+      margin: const EdgeInsets.only(right: 18),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item['name'] ?? '',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            "Rp ${item['price']}",
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            item['desc'] ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+        ],
+      ),
     );
   }
 }

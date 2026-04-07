@@ -23,7 +23,6 @@ void main() async {
   Get.put(MenuC());
   Get.put(KeuanganController());
 
-
   runApp(const GamikuApp());
 }
 

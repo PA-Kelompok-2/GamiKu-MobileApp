@@ -17,6 +17,7 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late TabController _tabCtrl;
   List<String> categories = ['Semua'];
+
   String? _role;
   bool _searchExpanded = false;
   final TextEditingController _searchController = TextEditingController();
@@ -27,6 +28,18 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     super.initState();
     _tabCtrl = TabController(length: categories.length, vsync: this);
     _loadRole();
+
+    // Listen ke selectedCategory dari MenuC
+    final menuC = Get.find<MenuC>();
+    ever(menuC.selectedCategory, (String cat) {
+      if (cat.isNotEmpty && mounted) {
+        final index = categories.indexOf(cat);
+        if (index != -1) {
+          _tabCtrl.animateTo(index);
+        }
+        menuC.selectedCategory.value = '';
+      }
+    });
   }
 
   Future<void> _loadRole() async {
@@ -65,11 +78,20 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         ...menuC.menus.map((m) => m['cat'] as String).toSet(),
       ];
 
-      if (categories.length != newCategories.length ||
-          categories.join('|') != newCategories.join('|')) {
+      if (categories.join('|') != newCategories.join('|')) {
         categories = newCategories;
         _tabCtrl.dispose();
         _tabCtrl = TabController(length: categories.length, vsync: this);
+
+        // Cek apakah ada selectedCategory yang pending
+        final currentSelected = menuC.selectedCategory.value;
+        if (currentSelected.isNotEmpty) {
+          final index = categories.indexOf(currentSelected);
+          if (index != -1) {
+            _tabCtrl.index = index;
+          }
+          menuC.selectedCategory.value = '';
+        }
       }
 
       final currentCategories = List<String>.from(categories);

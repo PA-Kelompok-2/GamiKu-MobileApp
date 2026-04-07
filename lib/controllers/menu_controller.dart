@@ -8,6 +8,8 @@ class MenuC extends GetxController {
   var categories = <Map<String, dynamic>>[].obs;
   var isLoading = true.obs;
 
+  RxString selectedCategory = ''.obs;
+
   @override
   void onInit() {
     fetchMenus();
