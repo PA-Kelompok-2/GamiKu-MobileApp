@@ -1,234 +1,145 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../controllers/menu_controller.dart';
 import '../customer/controllers/cart_controller.dart';
 
-class MenuCard extends StatelessWidget {
+class MenuCard extends StatefulWidget {
   final Map<String, dynamic> item;
   final String? role;
   final VoidCallback? onChanged;
 
-  const MenuCard({super.key, required this.item, this.role, this.onChanged});
+  const MenuCard({
+    super.key,
+    required this.item,
+    this.role,
+    this.onChanged,
+  });
+
+  @override
+  State<MenuCard> createState() => _MenuCardState();
+}
+
+class _MenuCardState extends State<MenuCard> {
+
+  bool isFav = false;
 
   @override
   Widget build(BuildContext context) {
     final cartC = Get.find<CartController>();
-    final tag = item['tag'] as String?;
-    final isOwner = role == 'owner';
-    final isKaryawan = role == 'karyawan'; 
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 12,
+            color: AppColors.shadow.withOpacity(.15),
+            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: Image.network(
-                  item['image_url'] ?? 'https://via.placeholder.com/300',
-                  height: 130,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.image, size: 50);
-                  },
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// IMAGE (dibesarkan)
+             ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
               ),
-              if (tag != null)
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+              child: Image.network(
+                widget.item['image_url'] ?? '',
+                width: double.infinity,
+                height: 120,
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            /// NAME
+            Text(
+              widget.item['name'],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 2),
+
+            /// CATEGORY
+            Text(
+              widget.item['cat'] ?? '',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+              ),
+            ),
+
+            /// BIAR HARGA DI BAWAH
+            const Spacer(),
+
+            /// PRICE + CART BUTTON
+            Row(
+              children: [
+
+                Expanded(
+                  child: Text(
+                    "Rp ${widget.item['price']}",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.tagGreen,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      tag,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.white,
+                  ),
+                ),
+
+                Obx(() {
+
+                  final id = widget.item['id'].toString();
+                  final qty = cartC.qtyOf(id);
+
+                  if (qty == 0) {
+                    return GestureDetector(
+                      onTap: () {
+                        cartC.add(widget.item);
+                        widget.onChanged?.call();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['name'] as String,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Rp ${item['price']}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (isKaryawan)
-                    Obx(() {
-                      final menuC = Get.find<MenuC>();
-                      final idx = menuC.menus.indexWhere(
-                        (m) => m['id'].toString() == item['id'].toString(),
-                      );
-                      final isAvailable = idx != -1
-                          ? menuC.menus[idx]['is_available'] as bool? ?? true
-                          : item['is_available'] as bool? ?? true;
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            isAvailable ? 'Tersedia' : 'Habis',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isAvailable ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Switch(
-                            value: isAvailable,
-                            thumbColor: WidgetStateProperty.resolveWith(
-                            (states) => states.contains(WidgetState.selected)
-                                ? AppColors.primary
-                                : null,
-                            ),
-                            onChanged: (val) {
-                              menuC.updateAvailability(
-                                item['id'].toString(),
-                                val,
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    })
-                    else if (!isOwner)
-                      Obx(() {
-                        final menuC = Get.find<MenuC>();
-                        final id = item['id'] is String
-                            ? item['id']
-                            : item['id'].toString();
-                        final qty = cartC.qtyOf(id);
-                        final idx = menuC.menus.indexWhere((m) => m['id'].toString() == id);
-                        final isAvailable = idx != -1
-                            ? menuC.menus[idx]['is_available'] as bool? ?? true
-                            : item['is_available'] as bool? ?? true;
-                        if (!isAvailable) {
-                          return Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Habis',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                        return qty == 0
-                            ? _AddBtn(
-                                onTap: () {
-                                  cartC.add(item);
-                                  onChanged?.call();
-                                },
-                              )
-                            : _Counter(
-                                qty: qty,
-                                onAdd: () {
-                                  cartC.add(item);
-                                  onChanged?.call();
-                                },
-                                onRemove: () {
-                                  cartC.remove(item['id']);
-                                  onChanged?.call();
-                                },
-                              );
-                      }),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                    );
+                  }
 
-class _AddBtn extends StatelessWidget {
-  final VoidCallback onTap;
-  const _AddBtn({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.primary, AppColors.primaryDark],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(
-          child: Text(
-            '+ Tambah',
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+                  return _Counter(
+                    qty: qty,
+                    onAdd: () {
+                      cartC.add(widget.item);
+                      widget.onChanged?.call();
+                    },
+                    onRemove: () {
+                      cartC.remove(id);
+                      widget.onChanged?.call();
+                    },
+                  );
+                }),
+              ],
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -236,8 +147,10 @@ class _AddBtn extends StatelessWidget {
 }
 
 class _Counter extends StatelessWidget {
+
   final int qty;
-  final VoidCallback onAdd, onRemove;
+  final VoidCallback onAdd;
+  final VoidCallback onRemove;
 
   const _Counter({
     required this.qty,
@@ -247,28 +160,40 @@ class _Counter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.chipRed,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _CBtn(icon: Icons.remove, filled: false, onTap: onRemove),
-          Expanded(
-            child: Center(
-              child: Text(
-                '$qty',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
-                ),
+
+          _CBtn(
+            icon: Icons.remove,
+            filled: false,
+            onTap: onRemove,
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Text(
+              '$qty',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
             ),
           ),
-          _CBtn(icon: Icons.add, filled: true, onTap: onAdd),
+
+          _CBtn(
+            icon: Icons.add,
+            filled: true,
+            onTap: onAdd,
+          ),
         ],
       ),
     );
@@ -276,27 +201,33 @@ class _Counter extends StatelessWidget {
 }
 
 class _CBtn extends StatelessWidget {
+
   final IconData icon;
   final bool filled;
   final VoidCallback onTap;
 
-  const _CBtn({required this.icon, required this.filled, required this.onTap});
+  const _CBtn({
+    required this.icon,
+    required this.filled,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 22,
+        height: 22,
         decoration: BoxDecoration(
           color: filled ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6),
         ),
         child: Icon(
           icon,
-          size: 16,
-          color: filled ? AppColors.white : AppColors.primary,
+          size: 13,
+          color: filled ? Colors.white : AppColors.primary,
         ),
       ),
     );

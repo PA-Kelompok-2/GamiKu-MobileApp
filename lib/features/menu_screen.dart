@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/menu_controller.dart';
 import '../core/constants/app_colors.dart';
 import 'widgets/menu_card.dart';
-import '../controllers/menu_controller.dart';
-import '../core/services/supabase_services.dart';
-import 'owner/pages/menu_management_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -13,176 +11,185 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-String? selectedCategory;
-
-class _MenuScreenState extends State<MenuScreen>
-    with TickerProviderStateMixin {
-
-  late TabController _tabCtrl;
-
-  List<String> categories = ['Semua'];
-
-  String? _role;
-
-  /// CATEGORY DARI HOME
-  String? selectedCategory;
-
-  @override
-  void initState() {
-    super.initState();
-
-    selectedCategory = Get.arguments;
-
-    _tabCtrl = TabController(length: categories.length, vsync: this);
-
-    if (selectedCategory != null) {
-      final index = categories.indexOf(selectedCategory!);
-      if (index != -1) {
-        _tabCtrl.index = index;
-      }
-    }
-    _loadRole();
-  }
-
-  Future<void> _loadRole() async {
-    final role = await SupabaseService().getUserRole();
-    if (mounted) setState(() => _role = role);
-  }
-
-  @override
-  void dispose() {
-    _tabCtrl.dispose();
-    super.dispose();
-  }
+class _MenuScreenState extends State<MenuScreen> {
+  final MenuC menuC = Get.find<MenuC>();
 
   @override
   Widget build(BuildContext context) {
-
-    final menuC = Get.find<MenuC>();
-
-    return Obx(() {
-
-      /// GENERATE CATEGORY DARI MENU
-      final newCategories = [
-        'Semua',
-        ...menuC.menus.map((m) => m['cat'] as String).toSet(),
-      ];
-
-      /// UPDATE TAB JIKA CATEGORY BERUBAH
-      if (categories.join('|') != newCategories.join('|')) {
-
-        categories = newCategories;
-
-        _tabCtrl.dispose();
-
-        _tabCtrl = TabController(
-          length: categories.length,
-          vsync: this,
-        );
-
-        /// PINDAH TAB JIKA CATEGORY DARI HOMETAB ADA
-        if (selectedCategory != null) {
-
-          final index = categories.indexOf(selectedCategory!);
-
-          if (index != -1) {
-            _tabCtrl.index = index;
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: SafeArea(
+        child: Obx(() {
+          if (menuC.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
           }
-        }
-      }
 
-      final currentCategories = List<String>.from(categories);
+          final categories = [
+            'Semua',
+            ...menuC.menus.map((m) => m['cat'] as String).toSet()
+          ];
 
-      return Scaffold(
-        backgroundColor: AppColors.bg,
+          final selected = menuC.selectedCategory.value;
 
-        appBar: AppBar(
-          title: const Text('Menu'),
-          backgroundColor: AppColors.primary,
-        ),
+          final items = selected == '' || selected == 'Semua'
+              ? menuC.menus
+              : menuC.menus.where((m) => m['cat'] == selected).toList();
 
-        body: Column(
-          children: [
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-            /// TAB CATEGORY
-            TabBar(
-              controller: _tabCtrl,
-              isScrollable: true,
-              tabs: currentCategories
-                  .map((c) => Tab(text: c))
-                  .toList(),
-            ),
+              const SizedBox(height: 20),
 
-            Expanded(
-              child: menuC.isLoading.value
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : TabBarView(
-                      controller: _tabCtrl,
-                      children: currentCategories.map((cat) {
-
-                        final selected = menuC.selectedCategory.value;
-
-                        if (selected.isNotEmpty) {
-                          final index = categories.indexOf(selected);
-                          if (index != -1) {
-                            _tabCtrl.index = index;
-                          }
-                        }
-
-                        /// FILTER MENU
-                        final items = cat == 'Semua'
-                            ? menuC.menus
-                            : menuC.menus
-                                .where((m) => m['cat'] == cat)
-                                .toList();
-
-                        if (items.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              'Belum ada menu di kategori ini',
-                            ),
-                          );
-                        }
-
-                        return GridView.builder(
-                          padding: const EdgeInsets.all(16),
-
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-
-                          itemCount: items.length,
-
-                          itemBuilder: (_, i) => MenuCard(
-                            item: items[i],
-                            role: _role,
-                            onChanged: () => setState(() {}),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-            ),
-          ],
-        ),
-
-        /// BUTTON EDIT UNTUK OWNER
-        floatingActionButton: _role == 'owner'
-            ? FloatingActionButton(
-                backgroundColor: AppColors.primary,
-                onPressed: () => Get.to(() => const MenuManagementScreen()),
-                child: const Icon(
-                  Icons.edit_note,
-                  color: AppColors.white,
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "Choose",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Your Favorite ",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "Food",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // 🔥 warna background search bar
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+
+                      Icon(
+                        Icons.search,
+                        color: Colors.grey.shade500,
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      Expanded(
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            hintText: "Search",
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            menuC.searchMenu(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                height: 45,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+
+                    final cat = categories[index];
+                    final isSelected =
+                        menuC.selectedCategory.value == cat ||
+                        (menuC.selectedCategory.value == '' && cat == 'Semua');
+
+                    return GestureDetector(
+                      onTap: () {
+                        menuC.selectedCategory.value = cat;
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary
+                              : Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              Expanded(
+                child: items.isEmpty
+                    ? const Center(
+                        child: Text("Menu tidak ditemukan"),
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(16),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: 0.80,
+                        ),
+                        itemCount: items.length,
+                        itemBuilder: (_, i) => MenuCard(
+                          item: items[i],
+                          onChanged: () => setState(() {}),
+                        ),
+                      ),
               )
-            : null,
-      );
-    });
+            ],
+          );
+        }),
+      ),
+    );
   }
 }
