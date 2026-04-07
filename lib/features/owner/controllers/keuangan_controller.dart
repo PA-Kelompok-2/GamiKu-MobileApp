@@ -50,10 +50,10 @@ class KeuanganController extends GetxController {
     await supabase
         .from('bahan_baku')
         .update({
-          if (name != null) 'name': name,
-          if (stock != null) 'stock': stock,
-          if (unit != null) 'unit': unit,
-          if (price != null) 'price': price,
+          'name': ?name,
+          'stock': ?stock,
+          'unit': ?unit,
+          'price': ?price,
         })
         .eq('id', id);
 

@@ -37,23 +37,32 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
   Future<void> _save() async {
     if (nameC.text.isEmpty || emailC.text.isEmpty) {
-      Get.snackbar('Error', 'Nama dan email tidak boleh kosong',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Nama dan email tidak boleh kosong',
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return;
     }
     setState(() => isSaving = true);
     try {
       final user = service.currentUser;
       if (user == null) return;
-      await service.supabase.from('profiles').update({
-        'name': nameC.text,
-        'email': emailC.text,
-      }).eq('id', user.id);
-      Get.snackbar('Sukses', 'Profil berhasil diperbarui',
-          snackPosition: SnackPosition.BOTTOM);
+      await service.supabase
+          .from('profiles')
+          .update({'name': nameC.text, 'email': emailC.text})
+          .eq('id', user.id);
+      Get.snackbar(
+        'Sukses',
+        'Profil berhasil diperbarui',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menyimpan: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Gagal menyimpan: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       setState(() => isSaving = false);
     }
@@ -82,9 +91,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Password Lama',
                       suffixIcon: IconButton(
-                        icon: Icon(showOld
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          showOld ? Icons.visibility_off : Icons.visibility,
+                        ),
                         onPressed: () => setState(() => showOld = !showOld),
                       ),
                     ),
@@ -96,9 +105,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Password Baru',
                       suffixIcon: IconButton(
-                        icon: Icon(showNew
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          showNew ? Icons.visibility_off : Icons.visibility,
+                        ),
                         onPressed: () => setState(() => showNew = !showNew),
                       ),
                     ),
@@ -110,9 +119,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     decoration: InputDecoration(
                       labelText: 'Konfirmasi Password Baru',
                       suffixIcon: IconButton(
-                        icon: Icon(showConfirm
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          showConfirm ? Icons.visibility_off : Icons.visibility,
+                        ),
                         onPressed: () =>
                             setState(() => showConfirm = !showConfirm),
                       ),
@@ -131,13 +140,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   if (oldPassC.text.isEmpty ||
                       newPassC.text.isEmpty ||
                       confirmPassC.text.isEmpty) {
-                    Get.snackbar('Error', 'Semua field harus diisi',
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      'Error',
+                      'Semua field harus diisi',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                     return;
                   }
                   if (newPassC.text != confirmPassC.text) {
-                    Get.snackbar('Error', 'Password baru tidak cocok',
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      'Error',
+                      'Password baru tidak cocok',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                     return;
                   }
                   Get.back();
@@ -150,11 +165,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     await service.supabase.auth.updateUser(
                       UserAttributes(password: newPassC.text),
                     );
-                    Get.snackbar('Sukses', 'Password berhasil diubah',
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      'Sukses',
+                      'Password berhasil diubah',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                   } catch (e) {
-                    Get.snackbar('Error', 'Password lama salah',
-                        snackPosition: SnackPosition.BOTTOM);
+                    Get.snackbar(
+                      'Error',
+                      'Password lama salah',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
                   }
                 },
                 child: const Text('Simpan'),
@@ -178,24 +199,26 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: AppColors.bg,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          'My Profile',
+          'Edit Profil',
           style: TextStyle(
-            color: AppColors.textDark,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            color: AppColors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
         centerTitle: true,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -203,17 +226,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   const SizedBox(height: 16),
                   _buildField('Nama', nameC, Icons.person_outline),
                   const SizedBox(height: 12),
-                  _buildField('Email', emailC, Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress),
+                  _buildField(
+                    'Email',
+                    emailC,
+                    Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                   const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.lock_outline,
-                          color: AppColors.textGrey),
+                      leading: const Icon(
+                        Icons.lock_outline,
+                        color: AppColors.textGrey,
+                      ),
                       title: const Text('Password'),
                       subtitle: const Text(
                         '••••••••',
@@ -221,8 +251,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       trailing: TextButton(
                         onPressed: _showChangePasswordDialog,
-                        child: const Text('Ubah',
-                            style: TextStyle(color: AppColors.primary)),
+                        child: const Text(
+                          'Ubah',
+                          style: TextStyle(color: AppColors.primary),
+                        ),
                       ),
                     ),
                   ),
@@ -240,13 +272,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       onPressed: isSaving ? null : _save,
                       child: isSaving
                           ? const CircularProgressIndicator(
-                              color: Colors.white)
+                              color: AppColors.white,
+                            )
                           : const Text(
                               'Simpan',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                     ),
@@ -267,6 +300,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
       ),
       child: TextField(
         controller: controller,
@@ -275,8 +309,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           labelText: label,
           prefixIcon: Icon(icon, color: AppColors.textGrey),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
