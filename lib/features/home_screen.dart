@@ -1,4 +1,5 @@
 import 'package:application_gamiku/features/menu_screen.dart';
+import 'package:application_gamiku/controllers/menu_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -56,7 +57,13 @@ class _HomeScreenState extends State<HomeScreen>
         body: IndexedStack(
           index: _navIdx,
           children: [
-            HomeTab(onCartChanged: () => setState(() {})),
+            HomeTab(
+              onCartChanged: () => setState(() {}),
+              onOpenMenu: (cat) {
+                Get.find<MenuC>().selectedCategory.value = cat;
+                _onNavTap(1);
+              },
+            ),
             const MenuScreen(),
             OrderScreen(key: ValueKey('order-$_navIdx')),
             const ProfileScreen(),
