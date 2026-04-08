@@ -19,6 +19,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String role = '';
   bool isLoading = true;
 
+    void confirmLogout() {
+    Get.defaultDialog(
+      radius: 12,
+      title: "Logout",
+      middleText: "Yakin mau logout dari akun ini?",
+      textConfirm: "Logout",
+      textCancel: "Batal",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      onConfirm: () async {
+        await service.logout();
+        Get.offAllNamed('/login');
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -103,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
@@ -111,204 +127,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            color: AppColors.primary,
-                            child: SafeArea(
-                              bottom: false,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  24,
-                                  24,
-                                  24,
-                                  0,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'PROFIL SAYA',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            letterSpacing: 1.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.white70,
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () => Get.to(
-                                            () => const MyProfileScreen(),
-                                          ),
-                                          child: Container(
-                                            width: 32,
-                                            height: 32,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.bannerCircle,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.edit_outlined,
-                                              size: 15,
-                                              color: AppColors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: AppColors.white,
-                                                  width: 4,
-                                                ),
-                                              ),
-                                              child: ClipOval(
-                                                child: Image.network(
-                                                  getRandomAvatarUrl(),
-                                                  width: 88,
-                                                  height: 88,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder:
-                                                      (
-                                                        context,
-                                                        error,
-                                                        stackTrace,
-                                                      ) => Container(
-                                                        width: 88,
-                                                        height: 88,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                              color: AppColors
-                                                                  .chipRed,
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                            ),
-                                                        child: const Icon(
-                                                          Icons.person,
-                                                          color:
-                                                              AppColors.primary,
-                                                          size: 44,
-                                                        ),
-                                                      ),
-                                                ),
-                                              ),
-                                            ),
-                                            if (role == 'owner')
-                                              Positioned(
-                                                bottom: 2,
-                                                right: 2,
-                                                child: Container(
-                                                  width: 22,
-                                                  height: 22,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.accent,
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                      color: AppColors.white,
-                                                      width: 2,
-                                                    ),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.star,
-                                                    size: 11,
-                                                    color: AppColors.textDark,
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  name,
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 10,
-                                                        vertical: 3,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        AppColors.bannerCircle,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.person_outline,
-                                                        size: 11,
-                                                        color:
-                                                            AppColors.white70,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        role,
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                          color:
-                                                              AppColors.white70,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 44),
-                                  ],
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                    child: Column(
+                      children: [
+
+                        /// AVATAR + EDIT BUTTON
+                        Stack(
+                          children: [
+
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color.fromARGB(255, 255, 255, 255), width: 4),
+                              ),
+                              child: ClipOval(
+                                child: Image.network(
+                                  getRandomAvatarUrl(),
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
+
+                            /// EDIT ICON
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: () => Get.to(() => const MyProfileScreen()),
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        /// NAME
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 0, 0, 0),
                           ),
-                          Container(
-                            width: double.infinity,
-                            height: 0,
-                            color: AppColors.bg,
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        /// EMAIL
+                        Text(
+                          "$name@gmail.com",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color.fromARGB(179, 0, 0, 0),
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -405,19 +298,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _buildMenuItem(
                                 Icons.description_outlined,
                                 'Terms of Services',
+                                iconBg: AppColors.statusDiprosesBg,
+                                iconColor: AppColors.statusDiprosesFg,
                                 onTap: () => Get.toNamed(Routes.terms),
                               ),
                               _divider(),
                               _buildMenuItem(
                                 Icons.privacy_tip_outlined,
                                 'Privacy Policy',
+                                iconBg: AppColors.statusDiprosesBg,
+                                iconColor: AppColors.statusDiprosesFg,
+
                                 onTap: () => Get.toNamed(Routes.privacyPolicy),
                               ),
                               _divider(),
                               _buildMenuItem(
                                 Icons.settings_outlined,
                                 'Settings',
+                                iconBg: AppColors.statusDiprosesBg,
+                                iconColor: AppColors.statusDiprosesFg,
                                 onTap: () => Get.toNamed(Routes.settings),
+                              ),
+                              _buildMenuItem(
+                                Icons.logout,
+                                'Logout',
+                                iconBg: const Color(0xFFFFEBEE),
+                                iconColor: Colors.red,
+                                onTap: confirmLogout,
                               ),
                             ],
                           ),

@@ -45,27 +45,65 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Tambah Karyawan'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameC,
-                decoration: const InputDecoration(labelText: 'Nama'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          "Tambah Karyawan",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// NAME
+            TextField(
+              controller: nameC,
+              decoration: InputDecoration(
+                hintText: "Nama",
+                prefixIcon: const Icon(Icons.person_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-              TextField(
-                controller: emailC,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// EMAIL
+            TextField(
+              controller: emailC,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: "Email",
+                prefixIcon: const Icon(Icons.email_outlined),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-              TextField(
-                controller: passC,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// PASSWORD
+            TextField(
+              controller: passC,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: "Password",
+                prefixIcon: const Icon(Icons.lock_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
@@ -115,18 +153,38 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
     Get.dialog(
       AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Edit Karyawan'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameC,
-              decoration: const InputDecoration(labelText: 'Nama'),
+              decoration: InputDecoration(
+                hintText: 'Nama',
+                prefixIcon: const Icon(Icons.person_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
+            const SizedBox(height: 12),
             TextField(
               controller: emailC,
-              decoration: const InputDecoration(labelText: 'Email'),
               keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: 'Email',
+                prefixIcon: const Icon(Icons.email_outlined),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ],
         ),
@@ -213,16 +271,11 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => Get.back(),
-        ),
         title: const Text(
           'Manajemen Karyawan',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(color: Colors.white),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
