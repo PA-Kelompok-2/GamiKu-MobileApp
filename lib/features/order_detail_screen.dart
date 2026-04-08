@@ -4,32 +4,85 @@ import '../core/constants/app_colors.dart';
 import '../core/services/supabase_services.dart';
 import '../controllers/menu_controller.dart';
 
-class OrderDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> order;
-  final bool showActionButtons;
+class OrderDetailScreen extends StatefulWidget {
+  const OrderDetailScreen({super.key});
 
-  const OrderDetailScreen({
-    super.key,
-    required this.order,
-    this.showActionButtons = true,
-  });
+  @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  final SupabaseService _service = SupabaseService();
+
+  late Map<String, dynamic> resolvedOrder;
+  late String resolvedRole;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments as Map;
+    resolvedOrder = Map<String, dynamic>.from(args['order']);
+    resolvedRole = args['userRole'] as String? ?? '';
+  }
 
   Future<bool> _isCustomer() async {
-    final service = SupabaseService();
-    final data = await service.getProfile();
+    final data = await _service.getProfile();
     final role = data?['role'] ?? '';
     return role != 'owner' && role != 'karyawan';
   }
 
+  Future<void> _updateStatus() async {
+    final currentStatus = resolvedOrder['status'] as String;
+    String nextStatus;
+
+    if (currentStatus == 'pending') {
+      nextStatus = 'paid';
+    } else if (currentStatus == 'paid') {
+      nextStatus = 'completed';
+    } else {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _service.updateOrderStatus(resolvedOrder['id'], nextStatus);
+      setState(() {
+        resolvedOrder = {...resolvedOrder, 'status': nextStatus};
+      });
+      Get.snackbar(
+        'Berhasil',
+        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.primary,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Gagal update status: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final items = order['order_items'] as List;
+    final items = resolvedOrder['order_items'] as List;
+    final status = resolvedOrder['status'] as String;
+    final isKaryawan = resolvedRole == 'karyawan';
+    final canUpdateStatus =
+        isKaryawan && (status == 'pending' || status == 'paid');
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            // Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -70,6 +123,7 @@ class OrderDetailScreen extends StatelessWidget {
               ),
             ),
 
+            // Info Pesanan
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,13 +137,16 @@ class OrderDetailScreen extends StatelessWidget {
                     children: [
                       _buildInfoRow(
                         'No. Pesanan',
-                        order['order_code'] ?? '-',
+                        resolvedOrder['order_code'] ?? '-',
                         copyable: true,
                       ),
                       const Divider(height: 16, color: AppColors.border),
-                      _buildInfoRow('Tanggal', order['created_at'] ?? '-'),
+                      _buildInfoRow(
+                        'Tanggal',
+                        resolvedOrder['created_at'] ?? '-',
+                      ),
                       const Divider(height: 16, color: AppColors.border),
-                      _buildStatusRow('Status', order['status']),
+                      _buildStatusRow('Status', status),
                     ],
                   ),
                 ),
@@ -98,6 +155,7 @@ class OrderDetailScreen extends StatelessWidget {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
+            // Daftar Item
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -140,7 +198,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) =>
+                                    errorBuilder: (context, error, stack) =>
                                         _buildPlaceholder(),
                                   ),
                                 )
@@ -188,7 +246,7 @@ class OrderDetailScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Rp ${order['total_price']}',
+                            'Rp ${resolvedOrder['total_price']}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -205,6 +263,7 @@ class OrderDetailScreen extends StatelessWidget {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
+            // Rincian Pembayaran
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -226,7 +285,10 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildPriceRow('Subtotal', 'Rp ${order['total_price']}'),
+                      _buildPriceRow(
+                        'Subtotal',
+                        'Rp ${resolvedOrder['total_price']}',
+                      ),
                       const SizedBox(height: 8),
                       _buildPriceRow('Diskon', '-Rp0', isDiscount: true),
                       const Padding(
@@ -235,7 +297,7 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                       _buildPriceRow(
                         'Total Pembayaran',
-                        'Rp ${order['total_price']}',
+                        'Rp ${resolvedOrder['total_price']}',
                         isTotal: true,
                       ),
                     ],
@@ -248,82 +310,137 @@ class OrderDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: showActionButtons
-          ? FutureBuilder<bool>(
-              future: _isCustomer(),
-              builder: (context, snapshot) {
-                // Sembunyikan jika role bukan customer
-                if (!snapshot.hasData || !snapshot.data!) {
-                  return const SizedBox.shrink();
-                }
+      bottomNavigationBar: _buildBottomBar(context, status, canUpdateStatus),
+    );
+  }
 
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadow,
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
+  Widget? _buildBottomBar(
+    BuildContext context,
+    String status,
+    bool canUpdateStatus,
+  ) {
+    // Tombol untuk karyawan — langsung panggil _updateStatus
+    if (canUpdateStatus) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _isLoading ? null : _updateStatus,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    status == 'pending'
+                        ? 'Proses Pesanan'
+                        : 'Selesaikan Pesanan',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.primary),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Kembali',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
+          ),
+        ),
+      );
+    }
+
+    // Tombol kembali & pesan lagi untuk customer
+    return FutureBuilder<bool>(
+      future: _isCustomer(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || !snapshot.data!) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadow,
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Kembali',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.find<MenuC>().selectedCategory.value = 'Semua';
-                            Get.find<MenuC>().searchMenu('');
-                            Get.until((route) => route.isFirst);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Pesan Lagi',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            )
-          : null,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Get.find<MenuC>().selectedCategory.value = 'Semua';
+                    Get.find<MenuC>().searchMenu('');
+                    Get.until((route) => route.isFirst);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Pesan Lagi',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -347,7 +464,7 @@ class OrderDetailScreen extends StatelessWidget {
             ),
             if (copyable) ...[
               const SizedBox(width: 8),
-              Icon(Icons.copy, size: 16, color: AppColors.primary),
+              const Icon(Icons.copy, size: 16, color: AppColors.primary),
             ],
           ],
         ),

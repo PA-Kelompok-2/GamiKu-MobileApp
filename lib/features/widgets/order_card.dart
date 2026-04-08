@@ -8,6 +8,7 @@ class OrderCard extends StatelessWidget {
   final bool showButton;
   final String? userRole;
   final void Function(String id, String status) onUpdateStatus;
+  final VoidCallback onRefresh;
 
   const OrderCard({
     super.key,
@@ -15,6 +16,7 @@ class OrderCard extends StatelessWidget {
     required this.showButton,
     required this.userRole,
     required this.onUpdateStatus,
+    required this.onRefresh,
   });
 
   @override
@@ -24,7 +26,14 @@ class OrderCard extends StatelessWidget {
     final menu = firstItem?['menus'];
 
     return GestureDetector(
-      onTap: () => Get.toNamed(Routes.orderDetail, arguments: order),
+      onTap: () async {
+        await Get.toNamed(
+          Routes.orderDetail,
+          arguments: {'order': order, 'userRole': userRole},
+        );
+        // Refresh list saat kembali dari detail screen
+        onRefresh();
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -94,7 +103,8 @@ class OrderCard extends StatelessWidget {
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => _buildPlaceholder(),
+                            errorBuilder: (context, error, stack) =>
+                                _buildPlaceholder(),
                           ),
                         )
                       else
@@ -172,7 +182,7 @@ class OrderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "Rp ${order['total_price']}",
+                        'Rp ${order['total_price']}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
