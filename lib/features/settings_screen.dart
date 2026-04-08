@@ -9,24 +9,6 @@ class SettingsScreen extends StatelessWidget {
 
   final service = SupabaseService();
 
-  void confirmLogout() {
-    Get.defaultDialog(
-      title: "Logout",
-      titleStyle: const TextStyle(color: AppColors.textDark),
-      middleText: "Yakin mau logout?",
-      middleTextStyle: const TextStyle(color: AppColors.textGrey),
-      textConfirm: "Ya",
-      textCancel: "Batal",
-      confirmTextColor: AppColors.white,
-      cancelTextColor: AppColors.textGrey,
-      buttonColor: AppColors.primary,
-      onConfirm: () async {
-        await service.logout();
-        Get.offAllNamed('/login');
-      },
-    );
-  }
-
   void _showDeleteAccountDialog() {
     Get.defaultDialog(
       title: 'Delete Account',
@@ -98,14 +80,6 @@ class SettingsScreen extends StatelessWidget {
             iconColor: AppColors.primary,
             textColor: AppColors.textDark,
             onTap: _showDeleteAccountDialog,
-          ),
-
-          _buildMenuItem(
-            icon: Icons.logout,
-            title: 'Logout',
-            iconColor: AppColors.textDark,
-            textColor: AppColors.textDark,
-            onTap: confirmLogout,
           ),
         ],
       ),

@@ -41,61 +41,158 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
     final passC = TextEditingController();
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('Tambah Karyawan'),
-        content: SingleChildScrollView(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+
+              /// TITLE
+              const Text(
+                "Tambah Karyawan",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// NAME
               TextField(
                 controller: nameC,
-                decoration: const InputDecoration(labelText: 'Nama'),
+                decoration: InputDecoration(
+                  hintText: "Nama",
+                  prefixIcon: const Icon(Icons.person_outline),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
+
+              const SizedBox(height: 12),
+
+              /// EMAIL
               TextField(
                 controller: emailC,
-                decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: "Email",
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
+
+              const SizedBox(height: 12),
+
+              /// PASSWORD
               TextField(
                 controller: passC,
-                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
+                decoration: InputDecoration(
+                  hintText: "Password",
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// BUTTONS
+              Row(
+                children: [
+
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text("Batal"),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+
+                        if (nameC.text.isEmpty ||
+                            emailC.text.isEmpty ||
+                            passC.text.isEmpty) {
+
+                          Get.snackbar(
+                            'Error',
+                            'Semua field harus diisi',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        Get.back();
+
+                        try {
+                          await service.addKaryawan(
+                            name: nameC.text,
+                            email: emailC.text,
+                            password: passC.text,
+                          );
+
+                          await _fetchKaryawan();
+
+                          Get.snackbar(
+                            'Sukses',
+                            'Karyawan berhasil ditambahkan',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+
+                        } catch (e) {
+
+                          Get.snackbar(
+                            'Error',
+                            'Gagal menambah karyawan: $e',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text("Simpan", 
+                      style: TextStyle(color: Colors.white)
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nameC.text.isEmpty ||
-                  emailC.text.isEmpty ||
-                  passC.text.isEmpty) {
-                Get.snackbar('Error', 'Semua field harus diisi',
-                    snackPosition: SnackPosition.BOTTOM);
-                return;
-              }
-              Get.back();
-              try {
-                await service.addKaryawan(
-                  name: nameC.text,
-                  email: emailC.text,
-                  password: passC.text,
-                );
-                await _fetchKaryawan();
-                Get.snackbar('Sukses', 'Karyawan berhasil ditambahkan',
-                    snackPosition: SnackPosition.BOTTOM);
-              } catch (e) {
-                Get.snackbar('Error', 'Gagal menambah karyawan: $e',
-                    snackPosition: SnackPosition.BOTTOM);
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
       ),
     );
   }
@@ -191,8 +288,18 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: const Text('Manajemen Karyawan'),
         backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
+          onPressed: () => Get.offNamed('/profile'),
+        ),
+        title: const Text('Manajemen Karyawan', 
+        style: TextStyle(
+          color: Colors.white
+          ),
+          ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
