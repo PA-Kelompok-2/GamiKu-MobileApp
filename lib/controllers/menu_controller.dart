@@ -42,7 +42,6 @@ class MenuC extends GetxController {
 
       menus.value = mappedMenus;
       allMenus = mappedMenus;
-
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -58,20 +57,17 @@ class MenuC extends GetxController {
   /// SEARCH MENU
   /// ========================
   void searchMenu(String query) {
-
     if (query.isEmpty) {
       menus.value = allMenus;
       return;
     }
 
     final filtered = allMenus.where((menu) {
-
       final name = menu['name'].toString().toLowerCase();
       final cat = menu['cat'].toString().toLowerCase();
 
       return name.contains(query.toLowerCase()) ||
-             cat.contains(query.toLowerCase());
-
+          cat.contains(query.toLowerCase());
     }).toList();
 
     menus.value = filtered;
@@ -176,7 +172,7 @@ class MenuC extends GetxController {
       );
     }
   }
-  
+
   Future<void> updateAvailability(String id, bool isAvailable) async {
     try {
       await service.updateMenuAvailability(id, isAvailable);
@@ -184,14 +180,10 @@ class MenuC extends GetxController {
       final index = menus.indexWhere((m) => m['id'].toString() == id);
 
       if (index != -1) {
-        menus[index] = {
-          ...menus[index],
-          'is_available': isAvailable,
-        };
+        menus[index] = {...menus[index], 'is_available': isAvailable};
 
         menus.refresh();
       }
-
     } catch (e) {
       Get.snackbar(
         'Error',

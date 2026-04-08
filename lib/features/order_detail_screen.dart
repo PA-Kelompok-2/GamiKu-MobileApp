@@ -1,0 +1,427 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../core/constants/app_colors.dart';
+import '../controllers/menu_controller.dart';
+
+class OrderDetailScreen extends StatelessWidget {
+  final Map<String, dynamic> order;
+
+  const OrderDetailScreen({super.key, required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = order['order_items'] as List;
+
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadow,
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Detail Pesanan',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildInfoRow(
+                        'No. Pesanan',
+                        order['order_code'] ?? '-',
+                        copyable: true,
+                      ),
+                      const Divider(height: 16, color: AppColors.border),
+                      _buildInfoRow('Tanggal', order['created_at'] ?? '-'),
+                      const Divider(height: 16, color: AppColors.border),
+                      _buildStatusRow('Status', order['status']),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset('assets/logo.png', width: 32, height: 32),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'GAMIKU',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ...items.map<Widget>((item) {
+                        final menu = item['menus'];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (menu['image_url'] != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    menu['image_url'],
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) =>
+                                        _buildPlaceholder(),
+                                  ),
+                                )
+                              else
+                                _buildPlaceholder(),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      menu['name'],
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textDark,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${item['quantity']} pcs x Rp${menu['price']}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textGrey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      const Divider(height: 24, color: AppColors.border),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textGrey,
+                            ),
+                          ),
+                          Text(
+                            'Rp ${order['total_price']}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Rincian Pembayaran',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildPriceRow('Subtotal', 'Rp ${order['total_price']}'),
+                      const SizedBox(height: 8),
+                      _buildPriceRow('Diskon', '-Rp0', isDiscount: true),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Divider(height: 1, color: AppColors.border),
+                      ),
+                      _buildPriceRow(
+                        'Total Pembayaran',
+                        'Rp ${order['total_price']}',
+                        isTotal: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primary),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Kembali',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Get.find<MenuC>().selectedCategory.value = 'Semua';
+                  Get.find<MenuC>().searchMenu('');
+
+                  // Solusi 2: Pop ke HomeScreen dan switch tab via callback
+                  Get.until((route) => route.isFirst);
+
+                  // Trigger rebuild HomeScreen dengan mengubah selectedCategory
+                  // MenuScreen akan otomatis terbuka karena selectedCategory berubah
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Pesan Lagi',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {bool copyable = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: AppColors.textGrey),
+        ),
+        Row(
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+            ),
+            if (copyable) ...[
+              const SizedBox(width: 8),
+              Icon(Icons.copy, size: 16, color: AppColors.primary),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusRow(String label, String status) {
+    Color bg;
+    Color fg;
+    String text;
+
+    switch (status) {
+      case 'pending':
+        bg = const Color(0xFFFFF3E0);
+        fg = const Color(0xFFF57C00);
+        text = 'Menunggu';
+        break;
+      case 'paid':
+        bg = const Color(0xFFE3F2FD);
+        fg = const Color(0xFF1976D2);
+        text = 'Diproses';
+        break;
+      case 'completed':
+      default:
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF388E3C);
+        text = 'Selesai';
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: AppColors.textGrey),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: fg,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceRow(
+    String label,
+    String value, {
+    bool isDiscount = false,
+    bool isTotal = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isTotal ? 14 : 13,
+            fontWeight: isTotal ? FontWeight.w700 : FontWeight.normal,
+            color: AppColors.textDark,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: isTotal ? 16 : 13,
+            fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
+            color: isDiscount ? Colors.green : AppColors.textDark,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: AppColors.chipRed,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(Icons.fastfood, color: AppColors.primary, size: 28),
+    );
+  }
+}

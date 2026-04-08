@@ -16,6 +16,7 @@ import '../features/privacy_policy_screen.dart';
 import '../features/owner/pages/keuangan_screen.dart';
 import '../features/owner/pages/bahan_baku_screen.dart';
 import '../features/owner/pages/karyawan_management_screen.dart';
+import '../features/order_detail_screen.dart';
 
 class AppPages {
   static final pages = [
@@ -90,6 +91,12 @@ class AppPages {
     GetPage(
       name: Routes.karyawanManagement,
       page: () => const KaryawanManagementScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
+
+    GetPage(
+      name: Routes.orderDetail,
+      page: () => OrderDetailScreen(order: Get.arguments),
       middlewares: [StartupMiddleware()],
     ),
   ];

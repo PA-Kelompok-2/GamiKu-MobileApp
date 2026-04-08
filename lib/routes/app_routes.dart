@@ -12,4 +12,5 @@ abstract class Routes {
   static const bahanBaku = '/bahan-baku';
   static const keuangan = '/keuangan';
   static const karyawanManagement = '/karyawan-management';
+  static const orderDetail = '/order-detail';
 }

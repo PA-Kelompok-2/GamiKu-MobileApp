@@ -13,7 +13,10 @@ import 'widgets/bottom_cart_bar.dart';
 import 'widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int? initialTab;
+
+  const HomeScreen({super.key, this.initialTab});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -28,6 +31,16 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _homeTabCtrl = TabController(length: categories.length, vsync: this);
+
+    if (widget.initialTab != null) {
+      _navIdx = widget.initialTab!;
+    }
+
+    ever(Get.find<MenuC>().selectedCategory, (_) {
+      if (_navIdx != 1) {
+        setState(() => _navIdx = 1);
+      }
+    });
   }
 
   @override
