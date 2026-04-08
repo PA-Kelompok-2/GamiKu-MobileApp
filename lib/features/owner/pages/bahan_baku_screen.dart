@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../controllers/keuangan_controller.dart';
 import '../models/bahan_baku_model.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 class BahanBakuScreen extends StatefulWidget {
   const BahanBakuScreen({super.key});
@@ -16,220 +18,304 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
       ? Get.find<KeuanganController>()
       : Get.put(KeuanganController());
   final List<String> units = ['kg', 'gram', 'liter', 'ml', 'pcs', 'botol'];
+  final _rupiah = NumberFormat.currency(
+  locale: 'id_ID',
+  symbol: 'Rp ',
+  decimalDigits: 0,
+);
 
-  void _showFormTambah({BahanBaku? existing}) {
-    final namaC = TextEditingController(text: existing?.name ?? '');
-    final stokC = TextEditingController(
-      text: existing != null ? existing.stock.toString() : '',
-    );
-    final satuanC = TextEditingController(text: existing?.unit ?? '');
-    final hargaC = TextEditingController(
-      text: existing != null ? existing.price.toString() : '',
-    );
+void _showFormTambah({BahanBaku? existing}) {
+  final namaC = TextEditingController(text: existing?.name ?? '');
+  final stokC = TextEditingController(
+    text: existing?.stock.toString() ?? '',
+  );
+  final satuanC = TextEditingController(
+    text: existing?.unit ?? '',
+  );
+  final hargaC = TextEditingController(
+    text: existing?.price.toString() ?? '',
+  );
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (_, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: SingleChildScrollView(
-                controller: scrollController,
-                padding: EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                  top: 24,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => StatefulBuilder(
+      builder: (context, setModalState) {
+        return Container(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(24),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                /// drag handle
+                Center(
+                  child: Container(
+                    width: 45,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                const SizedBox(height: 20),
+
+                /// title
+                Row(
                   children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppColors.border,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.chipRed,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.chipRed,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            existing == null ? Icons.add : Icons.edit_outlined,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          existing == null
-                              ? 'Tambah Bahan Baku'
-                              : 'Edit Bahan Baku',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    _inputField(
-                      namaC,
-                      'Nama Bahan Baku',
-                      Icons.inventory_2_outlined,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    _inputField(
-                      stokC,
-                      'Stok Awal',
-                      Icons.scale_outlined,
-                      isNumber: true,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    DropdownButtonFormField<String>(
-                      initialValue: satuanC.text.isNotEmpty
-                          ? satuanC.text
-                          : null,
-                      isExpanded: true,
-                      items: units.map((u) {
-                        return DropdownMenuItem(value: u, child: Text(u));
-                      }).toList(),
-                      onChanged: (val) {
-                        satuanC.text = val!;
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Unit',
-                        prefixIcon: Icon(
-                          Icons.straighten_outlined,
-                          color: AppColors.primary,
-                        ),
-                        filled: true,
-                        fillColor: AppColors.bg,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+                      child: Icon(
+                        existing == null
+                            ? Icons.add
+                            : Icons.edit_outlined,
+                        color: AppColors.primary,
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(width: 12),
 
-                    _inputField(
-                      hargaC,
-                      'Harga per Satuan (Rp)',
-                      Icons.payments_outlined,
-                      isNumber: true,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (namaC.text.isEmpty ||
-                              stokC.text.isEmpty ||
-                              satuanC.text.isEmpty ||
-                              hargaC.text.isEmpty) {
-                            Get.snackbar(
-                              'Error',
-                              'Semua field wajib diisi',
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                            return;
-                          }
-
-                          final stok = int.tryParse(stokC.text);
-                          final harga = int.tryParse(hargaC.text);
-
-                          if (stok == null || harga == null) {
-                            Get.snackbar(
-                              'Error',
-                              'Stok dan harga harus berupa angka',
-                              snackPosition: SnackPosition.BOTTOM,
-                            );
-                            return;
-                          }
-
-                          final total = stok * harga;
-
-                          if (existing == null) {
-                            keuanganC.tambahBahan(
-                              name: namaC.text,
-                              stock: stok,
-                              unit: satuanC.text,
-                              price: harga,
-                            );
-
-                            keuanganC.tambah(
-                              nama: 'Beli ${namaC.text}',
-                              nominal: total,
-                            );
-                          } else {
-                            keuanganC.updateBahan(
-                              existing.id,
-                              name: namaC.text,
-                              stock: stok,
-                              unit: satuanC.text,
-                              price: harga,
-                            );
-                          }
-
-                          Navigator.pop(ctx);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: const Text(
-                          'Simpan',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                          ),
-                        ),
+                    Text(
+                      existing == null
+                          ? "Tambah Bahan Baku"
+                          : "Edit Bahan Baku",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textDark,
                       ),
                     ),
                   ],
                 ),
-              ),
-            );
-          },
+
+                const SizedBox(height: 22),
+
+                /// nama bahan
+                _inputField(
+                  namaC,
+                  "Nama Bahan Baku",
+                  Icons.inventory_2_outlined,
+                ),
+
+                const SizedBox(height: 12),
+
+                /// stok
+                _inputField(
+                  stokC,
+                  "Stok Awal",
+                  Icons.scale_outlined,
+                  isNumber: true,
+                ),
+
+                const SizedBox(height: 12),
+
+                /// dropdown unit
+                DropdownButtonFormField<String>(
+                  value: satuanC.text.isNotEmpty
+                      ? satuanC.text
+                      : null,
+                  items: units
+                      .map(
+                        (u) => DropdownMenuItem(
+                          value: u,
+                          child: Text(u),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    satuanC.text = val!;
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Unit",
+                    prefixIcon: Icon(
+                      Icons.straighten_outlined,
+                      color: AppColors.primary,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.bg,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// harga
+                TextField(
+                  controller: hargaC,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (value) {
+                    if (value.isEmpty) return;
+
+                    final number = int.parse(value.replaceAll('.', ''));
+                    final newText = NumberFormat.decimalPattern('id').format(number);
+
+                    hargaC.value = TextEditingValue(
+                      text: newText,
+                      selection: TextSelection.collapsed(offset: newText.length),
+                    );
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Harga per Satuan (Rp)",
+                    prefixIcon: const Icon(Icons.payments_outlined),
+                    filled: true,
+                    fillColor: AppColors.bg,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// tombol simpan
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+
+                      if (namaC.text.isEmpty ||
+                          stokC.text.isEmpty ||
+                          satuanC.text.isEmpty ||
+                          hargaC.text.isEmpty) {
+                        Get.snackbar(
+                          "Error",
+                          "Semua field wajib diisi",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
+
+                      final sudahAda = keuanganC.bahanBakuList.any(
+                        (b) =>
+                            b.name.toLowerCase() ==
+                                namaC.text.toLowerCase() &&
+                            b.id != existing?.id,
+                      );
+
+                      if (sudahAda) {
+                        Get.snackbar(
+                          "Error",
+                          "Nama bahan baku sudah ada",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
+
+                      final stok =
+                          int.tryParse(stokC.text);
+
+                      final harga = int.tryParse(
+                        hargaC.text.replaceAll('.', ''),
+                      );
+
+                      if (stok == null || harga == null) {
+                        Get.snackbar(
+                          "Error",
+                          "Stok dan harga harus berupa angka",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
+
+                      if (stok <= 0) {
+                        Get.snackbar(
+                          "Error",
+                          "Stok harus lebih dari 0",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
+
+                      final total = stok * harga;
+
+                      if (existing == null) {
+
+                        keuanganC.tambahBahan(
+                          name: namaC.text,
+                          stock: stok,
+                          unit: satuanC.text,
+                          price: harga,
+                        );
+
+                        keuanganC.tambah(
+                          nama: "Beli ${namaC.text}",
+                          nominal: total,
+                        );
+
+                      } else {
+
+                        keuanganC.updateBahan(
+                          existing.id,
+                          name: namaC.text,
+                          stock: stok,
+                          unit: satuanC.text,
+                          price: harga,
+                        );
+                      }
+
+                      Navigator.pop(ctx);
+
+                      Get.snackbar(
+                        "Berhasil",
+                        existing == null
+                            ? "Bahan baku berhasil ditambahkan"
+                            : "Bahan baku berhasil diperbarui",
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    },
+
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(14),
+                      ),
+                    ),
+
+                    child: const Text(
+                      "Simpan",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 
   void _showMasuk(BahanBaku b) {
     final jumlahC = TextEditingController();
