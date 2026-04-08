@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/constants/app_colors.dart';
+import '../core/services/supabase_services.dart';
 import '../controllers/menu_controller.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final Map<String, dynamic> order;
+  final bool showActionButtons;
 
-  const OrderDetailScreen({super.key, required this.order});
+  const OrderDetailScreen({
+    super.key,
+    required this.order,
+    this.showActionButtons = true,
+  });
+
+  Future<bool> _isCustomer() async {
+    final service = SupabaseService();
+    final data = await service.getProfile();
+    final role = data?['role'] ?? '';
+    return role != 'owner' && role != 'karyawan';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +140,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) =>
+                                    errorBuilder: (_, __, ___) =>
                                         _buildPlaceholder(),
                                   ),
                                 )
@@ -235,75 +248,82 @@ class OrderDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.primary),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Kembali',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Get.find<MenuC>().selectedCategory.value = 'Semua';
-                  Get.find<MenuC>().searchMenu('');
+      bottomNavigationBar: showActionButtons
+          ? FutureBuilder<bool>(
+              future: _isCustomer(),
+              builder: (context, snapshot) {
+                // Sembunyikan jika role bukan customer
+                if (!snapshot.hasData || !snapshot.data!) {
+                  return const SizedBox.shrink();
+                }
 
-                  // Solusi 2: Pop ke HomeScreen dan switch tab via callback
-                  Get.until((route) => route.isFirst);
-
-                  // Trigger rebuild HomeScreen dengan mengubah selectedCategory
-                  // MenuScreen akan otomatis terbuka karena selectedCategory berubah
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                return Container(
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadow,
+                        blurRadius: 8,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
                   ),
-                  child: const Text(
-                    'Pesan Lagi',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.primary),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Kembali',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.find<MenuC>().selectedCategory.value = 'Semua';
+                            Get.find<MenuC>().searchMenu('');
+                            Get.until((route) => route.isFirst);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Pesan Lagi',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+                );
+              },
+            )
+          : null,
     );
   }
 
