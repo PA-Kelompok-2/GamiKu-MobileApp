@@ -77,22 +77,6 @@ void _showFormTambah({BahanBaku? existing}) {
                 /// title
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.chipRed,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        existing == null
-                            ? Icons.add
-                            : Icons.edit_outlined,
-                        color: AppColors.primary,
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
                     Text(
                       existing == null
                           ? "Tambah Bahan Baku"
@@ -178,7 +162,9 @@ void _showFormTambah({BahanBaku? existing}) {
                   },
                   decoration: InputDecoration(
                     labelText: "Harga per Satuan (Rp)",
-                    prefixIcon: const Icon(Icons.payments_outlined),
+                    prefixIcon: const Icon(
+                      Icons.payments_outlined,
+                      color: AppColors.primary,),
                     filled: true,
                     fillColor: AppColors.bg,
                     border: OutlineInputBorder(
