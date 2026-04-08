@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../core/services/supabase_services.dart';
+import '../controllers/profile_controller.dart';
 import '../core/constants/app_colors.dart';
 import '../routes/app_routes.dart';
 import 'my_profile_screen.dart';
@@ -13,28 +13,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final service = SupabaseService();
-
-  String name = '';
-  String role = '';
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    loadProfile();
-  }
-
-  void loadProfile() async {
-    final data = await service.getProfile();
-    if (data != null) {
-      setState(() {
-        name = data['name'] ?? '-';
-        role = data['role'] ?? '-';
-        isLoading = false;
-      });
-    }
-  }
+  final profileC = Get.find<ProfileController>();
 
   String getRandomAvatarUrl() {
     final randomSeed = DateTime.now().millisecondsSinceEpoch % 1000;
@@ -102,9 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Obx(() => Scaffold(
       backgroundColor: AppColors.bg,
-      body: isLoading
+      body: profileC.isLoading.value
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             )
@@ -122,18 +101,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: SafeArea(
                               bottom: false,
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  24,
-                                  24,
-                                  24,
-                                  0,
-                                ),
+                                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         const Text(
                                           'PROFIL SAYA',
@@ -145,9 +118,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
                                         GestureDetector(
-                                          onTap: () => Get.to(
-                                            () => const MyProfileScreen(),
-                                          ),
+                                          onTap: () async {
+                                            final result = await Get.to(
+                                              () => const MyProfileScreen(),
+                                            );
+                                            if (result == true) {
+                                              profileC.loadProfile();
+                                            }
+                                          },
                                           child: Container(
                                             width: 32,
                                             height: 32,
@@ -166,8 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     const SizedBox(height: 20),
                                     Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Stack(
                                           children: [
@@ -185,32 +162,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   width: 88,
                                                   height: 88,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder:
-                                                      (
-                                                        context,
-                                                        error,
-                                                        stackTrace,
-                                                      ) => Container(
+                                                  errorBuilder: (context, error, stackTrace) =>
+                                                      Container(
                                                         width: 88,
                                                         height: 88,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                              color: AppColors
-                                                                  .chipRed,
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                            ),
+                                                        decoration: const BoxDecoration(
+                                                          color: AppColors.chipRed,
+                                                          shape: BoxShape.circle,
+                                                        ),
                                                         child: const Icon(
                                                           Icons.person,
-                                                          color:
-                                                              AppColors.primary,
+                                                          color: AppColors.primary,
                                                           size: 44,
                                                         ),
                                                       ),
                                                 ),
                                               ),
                                             ),
-                                            if (role == 'owner')
+                                            if (profileC.role.value == 'owner')
                                               Positioned(
                                                 bottom: 2,
                                                 right: 2,
@@ -237,15 +206,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         const SizedBox(width: 16),
                                         Expanded(
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8,
-                                            ),
+                                            padding: const EdgeInsets.only(bottom: 8),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  name,
+                                                  profileC.name.value,
                                                   style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w500,
@@ -254,36 +220,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                                 const SizedBox(height: 6),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 10,
-                                                        vertical: 3,
-                                                      ),
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 3,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        AppColors.bannerCircle,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
+                                                    color: AppColors.bannerCircle,
+                                                    borderRadius: BorderRadius.circular(20),
                                                   ),
                                                   child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
+                                                    mainAxisSize: MainAxisSize.min,
                                                     children: [
                                                       const Icon(
                                                         Icons.person_outline,
                                                         size: 11,
-                                                        color:
-                                                            AppColors.white70,
+                                                        color: AppColors.white70,
                                                       ),
                                                       const SizedBox(width: 4),
                                                       Text(
-                                                        role,
+                                                        profileC.role.value,
                                                         style: const TextStyle(
                                                           fontSize: 12,
-                                                          color:
-                                                              AppColors.white70,
+                                                          color: AppColors.white70,
                                                         ),
                                                       ),
                                                     ],
@@ -312,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                if (role == 'owner' || role == 'karyawan')
+                if (profileC.role.value == 'owner' || profileC.role.value == 'karyawan')
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -343,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   iconColor: AppColors.statusMenungguFg,
                                   onTap: () => Get.toNamed(Routes.bahanBaku),
                                 ),
-                                if (role == 'owner') ...[
+                                if (profileC.role.value == 'owner') ...[
                                   _divider(),
                                   _buildMenuItem(
                                     Icons.account_balance_wallet_outlined,
@@ -360,8 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     subtitle: 'Data & jadwal tim',
                                     iconBg: AppColors.statusDiprosesBg,
                                     iconColor: AppColors.statusDiprosesFg,
-                                    onTap: () =>
-                                        Get.toNamed(Routes.karyawanManagement),
+                                    onTap: () => Get.toNamed(Routes.karyawanManagement),
                                   ),
                                 ],
                               ],
@@ -373,54 +330,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _sectionTitle('UMUM'),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: AppColors.shadow,
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                        _buildMenuItem(
+                          Icons.help_outline,
+                          'Help Center',
+                          onTap: () => Get.toNamed(Routes.helpCenter),
+                        ),
+                        _divider(),
+                        _buildMenuItem(
+                          Icons.description_outlined,
+                          'Terms of Services',
+                          onTap: () => Get.toNamed(Routes.terms),
+                        ),
+                        _divider(),
+                        _buildMenuItem(
+                          Icons.privacy_tip_outlined,
+                          'Privacy Policy',
+                          onTap: () => Get.toNamed(Routes.privacyPolicy),
+                        ),
+                        _divider(),
+
+                        if (profileC.role.value == 'owner' || profileC.role.value == 'karyawan') ...[
+                          _buildMenuItem(
+                            Icons.countertops_outlined,
+                            'Manajemen Bahan Baku',
+                            onTap: () => Get.toNamed(Routes.bahanBaku),
                           ),
-                          child: Column(
-                            children: [
-                              _buildMenuItem(
-                                Icons.help_outline,
-                                'Help Center',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.helpCenter),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.description_outlined,
-                                'Terms of Services',
-                                onTap: () => Get.toNamed(Routes.terms),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.privacy_tip_outlined,
-                                'Privacy Policy',
-                                onTap: () => Get.toNamed(Routes.privacyPolicy),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.settings_outlined,
-                                'Settings',
-                                onTap: () => Get.toNamed(Routes.settings),
-                              ),
-                            ],
+                          _divider(),
+                        ],
+
+                        if (profileC.role.value == 'owner') ...[
+                          _buildMenuItem(
+                            Icons.account_balance_wallet_outlined,
+                            'Manajemen Keuangan',
+                            onTap: () => Get.toNamed(Routes.keuangan),
                           ),
+                          _divider(),
+                          _buildMenuItem(
+                            Icons.people_outline,
+                            'Manajemen Karyawan',
+                            onTap: () => Get.toNamed(Routes.karyawanManagement),
+                          ),
+                          _divider(),
+                        ],
+
+                        _buildMenuItem(
+                          Icons.settings_outlined,
+                          'Settings',
+                          onTap: () async {
+                            final result = await Get.toNamed(Routes.settings);
+                            if (result == true) {
+                              profileC.loadProfile();
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -430,6 +406,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),
-    );
+    ));
   }
 }

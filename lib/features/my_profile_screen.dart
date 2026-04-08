@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constants/app_colors.dart';
 import '../core/services/supabase_services.dart';
+import '../controllers/profile_controller.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -35,38 +36,52 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     }
   }
 
-  Future<void> _save() async {
-    if (nameC.text.isEmpty || emailC.text.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Nama dan email tidak boleh kosong',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
+    Future<void> _save() async {
+      if (nameC.text.isEmpty || emailC.text.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Nama dan email tidak boleh kosong',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      setState(() => isSaving = true);
+
+      try {
+        final user = service.currentUser;
+        if (user == null) {
+          Get.snackbar('Error', 'User Tidak Ditemukan');
+          return;
+        }
+
+        await service.supabase.from('profiles').update({
+          'name': nameC.text.trim(),
+          'email': emailC.text.trim(),
+        }).eq('id', user.id);
+
+        Get.find<ProfileController>().loadProfile();
+        Get.snackbar(
+          'Sukses',
+          'Profil berhasil diperbarui',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+        Get.back(result: true); 
+        
+      } catch (e) {
+        Get.snackbar(
+          'Error',
+          'Gagal menyimpan: $e',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } finally {
+        if (mounted) { 
+          setState(() => isSaving = false);
+        }
+      }
     }
-    setState(() => isSaving = true);
-    try {
-      final user = service.currentUser;
-      if (user == null) return;
-      await service.supabase
-          .from('profiles')
-          .update({'name': nameC.text, 'email': emailC.text})
-          .eq('id', user.id);
-      Get.snackbar(
-        'Sukses',
-        'Profil berhasil diperbarui',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Gagal menyimpan: $e',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      setState(() => isSaving = false);
-    }
-  }
 
   void _showChangePasswordDialog() {
     final oldPassC = TextEditingController();

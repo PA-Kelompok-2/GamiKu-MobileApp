@@ -4,10 +4,16 @@ import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
 import '../core/constants/app_colors.dart';
 
-class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   final service = SupabaseService();
+  bool profileUpdated = false;
 
   void confirmLogout() {
     Get.defaultDialog(
@@ -40,7 +46,6 @@ class SettingsScreen extends StatelessWidget {
       onConfirm: () {
         Get.back();
       },
-      onCancel: () {},
     );
   }
 
@@ -53,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(result: profileUpdated),
         ),
         title: const Text(
           'Settings',
@@ -72,7 +77,15 @@ class SettingsScreen extends StatelessWidget {
           _buildMenuItem(
             icon: Icons.person_outline,
             title: 'My Profile',
-            onTap: () => Get.toNamed(Routes.myProfile)
+            onTap: () async {
+              final result = await Get.toNamed(Routes.myProfile);
+
+              if (result == true) {
+                setState(() {
+                  profileUpdated = true;
+                });
+              }
+            },
           ),
 
           _buildMenuItem(
@@ -89,7 +102,6 @@ class SettingsScreen extends StatelessWidget {
                 Icon(Icons.chevron_right, color: AppColors.textLight),
               ],
             ),
-            onTap: () {},
           ),
 
           _buildMenuItem(
