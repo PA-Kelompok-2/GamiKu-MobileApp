@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/constants/app_colors.dart';
 import 'controllers/cart_controller.dart';
-import '../core/services/supabase_services.dart';
 import 'models/order_model.dart';
+import 'payment_gateway_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final VoidCallback? onOrderPlaced;
@@ -22,91 +22,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.dispose();
   }
 
-  void _placeOrder() async {
-    final cartC = Get.find<CartController>();
-    final service = SupabaseService();
-
-    try {
-      await service.createOrder(
-        total: cartC.grandTotal,
-        items: cartC.entries.map((e) {
-          return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
-        }).toList(),
-      );
-
-      cartC.clear();
-      _showSuccessDialog();
-    } catch (e) {
-      Get.snackbar("Error", "Gagal membuat pesanan");
-    }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: AppColors.tagGreenBg,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle_rounded,
-                  color: AppColors.tagGreen,
-                  size: 44,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Pesanan Masuk!',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Pesanan kamu sedang diproses oleh dapur. Harap tunggu ya!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                      ..pop()
-                      ..pop();
-                    widget.onOrderPlaced?.call();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Lihat Status Pesanan',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  void _goToPaymentGateway() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            PaymentGatewayScreen(onOrderPlaced: widget.onOrderPlaced),
       ),
     );
   }
@@ -131,7 +52,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: entries.isEmpty ? _buildEmptyState() : _buildContent(entries),
+      body: entries.isEmpty
+          ? _buildEmptyState()
+          : _buildContent(entries, cartC),
     );
   }
 
@@ -172,9 +95,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Widget _buildContent(List<OrderItem> entries) {
-    final cartC = Get.find<CartController>();
-
+  Widget _buildContent(List<OrderItem> entries, CartController cartC) {
     final subtotal = cartC.subtotal;
     final serviceFee = CartController.serviceFee;
     final grandTotal = cartC.grandTotal;
@@ -424,7 +345,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             child: SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: _placeOrder,
+                onPressed: _goToPaymentGateway,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
