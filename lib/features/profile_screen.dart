@@ -15,6 +15,12 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final profileC = Get.find<ProfileController>();
 
+  @override
+  void initState() {
+    super.initState();
+    profileC.loadProfile(); 
+  }
+
   String getRandomAvatarUrl() {
     final randomSeed = DateTime.now().millisecondsSinceEpoch % 1000;
     return 'https://api.dicebear.com/7.x/avataaars/png?seed=$randomSeed&backgroundColor=f5f5f5';
@@ -402,7 +408,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
                 const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),

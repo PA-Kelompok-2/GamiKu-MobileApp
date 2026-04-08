@@ -1,6 +1,8 @@
+import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
+
 
 class AuthController extends GetxController {
   final service = SupabaseService();
@@ -10,8 +12,15 @@ class AuthController extends GetxController {
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
-      await service.login(email, password);
-      Get.offAllNamed(Routes.home); // semua role ke home
+
+      final res = await service.login(email, password);
+
+      if (res.user == null) {
+        Get.snackbar('Login Gagal', 'Email atau password salah');
+        return;
+      }
+      Get.put(ProfileController());
+      Get.offAllNamed(Routes.home);
     } catch (e) {
       Get.snackbar('Login Gagal', e.toString());
     } finally {
@@ -21,6 +30,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     await service.logout();
+    Get.delete<ProfileController>();
     Get.offAllNamed(Routes.login);
   }
 

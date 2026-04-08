@@ -3,8 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final supabase = Supabase.instance.client;
 
-  Future<AuthResponse> login(String email, String password) {
-    return supabase.auth.signInWithPassword(email: email, password: password);
+  Future<AuthResponse> login(String email, String password) async {
+    await supabase.auth.signOut(); 
+    return await supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
   }
 
   Future<AuthResponse> register(String email, String password) {
@@ -58,7 +62,7 @@ class SupabaseService {
         .from('profiles')
         .select()
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
     return data;
   }
