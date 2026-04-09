@@ -17,6 +17,7 @@ import '../features/owner/pages/keuangan_screen.dart';
 import '../features/owner/pages/bahan_baku_screen.dart';
 import '../features/owner/pages/karyawan_management_screen.dart';
 import '../features/order_detail_screen.dart';
+import '../features/owner/pages/menu_management_screen.dart';
 
 class AppPages {
   static final pages = [
@@ -94,11 +95,15 @@ class AppPages {
       middlewares: [StartupMiddleware()],
     ),
 
-    // FIX: OrderDetailScreen tidak lagi menerima parameter apapun
-    // semua data diambil dari Get.arguments di dalam initState
     GetPage(
       name: Routes.orderDetail,
       page: () => const OrderDetailScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
+
+    GetPage(
+      name: Routes.menuManagement,
+      page: () => const MenuManagementScreen(),
       middlewares: [StartupMiddleware()],
     ),
   ];

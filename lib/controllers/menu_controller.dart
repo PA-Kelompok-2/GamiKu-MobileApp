@@ -10,7 +10,6 @@ class MenuC extends GetxController {
 
   RxString selectedCategory = ''.obs;
 
-  /// menyimpan semua menu asli
   List<Map<String, dynamic>> allMenus = [];
 
   @override
@@ -20,9 +19,6 @@ class MenuC extends GetxController {
     super.onInit();
   }
 
-  /// ========================
-  /// FETCH MENUS
-  /// ========================
   Future<void> fetchMenus() async {
     try {
       isLoading.value = true;
@@ -53,9 +49,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ========================
-  /// SEARCH MENU
-  /// ========================
   void searchMenu(String query) {
     if (query.isEmpty) {
       menus.value = allMenus;
@@ -73,9 +66,6 @@ class MenuC extends GetxController {
     menus.value = filtered;
   }
 
-  /// ========================
-  /// FETCH CATEGORIES
-  /// ========================
   Future<void> fetchCategories() async {
     try {
       final data = await service.getCategories();
@@ -89,9 +79,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ========================
-  /// ADD MENU
-  /// ========================
   Future<void> addMenu({
     required String name,
     required int price,
@@ -119,9 +106,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ========================
-  /// UPDATE MENU
-  /// ========================
   Future<void> updateMenu({
     required dynamic id,
     required String name,
@@ -151,9 +135,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ========================
-  /// DELETE MENU
-  /// ========================
   Future<void> deleteMenu(dynamic id) async {
     try {
       await service.deleteMenu(id);
