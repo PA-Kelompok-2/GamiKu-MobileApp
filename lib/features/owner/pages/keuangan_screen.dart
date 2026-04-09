@@ -280,7 +280,7 @@ void _tambahPengeluaran() {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
             onPressed: () =>
-                Get.back(), // ✅ diubah dari Get.offNamed('/profile')
+                Get.back(),
           ),
           title: const Text(
             'Manajemen Keuangan',

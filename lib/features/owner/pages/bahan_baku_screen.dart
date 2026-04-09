@@ -18,11 +18,6 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
       ? Get.find<KeuanganController>()
       : Get.put(KeuanganController());
   final List<String> units = ['kg', 'gram', 'liter', 'ml', 'pcs', 'botol'];
-  final _rupiah = NumberFormat.currency(
-  locale: 'id_ID',
-  symbol: 'Rp ',
-  decimalDigits: 0,
-);
 
 void _showFormTambah({BahanBaku? existing}) {
   final namaC = TextEditingController(text: existing?.name ?? '');
@@ -623,7 +618,7 @@ void _showFormTambah({BahanBaku? existing}) {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => Get.back(), // ✅ diubah dari Get.offNamed('/profile')
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'Manajemen Bahan Baku',

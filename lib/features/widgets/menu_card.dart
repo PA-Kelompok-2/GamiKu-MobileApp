@@ -24,41 +24,11 @@ class MenuCard extends StatefulWidget {
 
 class _MenuCardState extends State<MenuCard> {
   late bool _isAvailable;
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _isAvailable = widget.item['is_available'] ?? true;
-  }
-
-  Future<void> _toggleAvailability() async {
-    if (_isLoading) return;
-
-    setState(() => _isLoading = true);
-
-    final newValue = !_isAvailable;
-    final itemId = widget.item['id'].toString();
-
-    try {
-      // Update ke backend jika ada callback
-      if (widget.onToggleAvailability != null) {
-        await widget.onToggleAvailability!(itemId, newValue);
-      }
-
-      // Update state lokal
-      setState(() => _isAvailable = newValue);
-      widget.onChanged?.call();
-    } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        'Tidak dapat mengubah status menu',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
   }
 
   @override
@@ -165,63 +135,17 @@ class _MenuCardState extends State<MenuCard> {
                   ),
                 ),
 
-                // TOMBOL UNTUK OWNER/KARYAWAN (ON/OFF TOGGLE)
+                // OWNER/KARYAWAN: TIDAK ADA TOMBOL (KOSONG)
                 if (isOwnerOrEmployee)
-                  _buildAvailabilityToggle()
-                // TOMBOL UNTUK PEMBELI JIKA MENU AVAILABLE
+                  const SizedBox.shrink()
+                // PEMBELI JIKA MENU AVAILABLE: TOMBOL ADD
                 else if (_isAvailable)
                   _buildAddButton(cartC)
-                // TOMBOL OFF UNTUK PEMBELI JIKA MENU TIDAK AVAILABLE
+                // PEMBELI JIKA MENU OFF: LABEL OFF
                 else
                   _buildOffLabel(),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // TOMBOL ON/OFF UNTUK OWNER/KARYAWAN
-  Widget _buildAvailabilityToggle() {
-    return GestureDetector(
-      onTap: _isLoading ? null : _toggleAvailability,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: _isLoading
-              ? Colors.grey
-              : (_isAvailable ? Colors.green : Colors.red.shade400),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_isLoading)
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            else ...[
-              Icon(
-                _isAvailable ? Icons.check_circle : Icons.cancel,
-                size: 16,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                _isAvailable ? 'ON' : 'OFF',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
           ],
         ),
       ),
