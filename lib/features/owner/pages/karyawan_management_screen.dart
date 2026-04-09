@@ -28,8 +28,11 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       final data = await service.getKaryawan();
       setState(() => karyawanList = data);
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data: $e',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        'Gagal memuat data: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       setState(() => isLoading = false);
     }
@@ -42,40 +45,78 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Tambah Karyawan'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameC,
-                decoration: const InputDecoration(labelText: 'Nama'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          "Tambah Karyawan",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// NAME
+            TextField(
+              controller: nameC,
+              decoration: InputDecoration(
+                hintText: "Nama",
+                prefixIcon: const Icon(Icons.person_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-              TextField(
-                controller: emailC,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// EMAIL
+            TextField(
+              controller: emailC,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: "Email",
+                prefixIcon: const Icon(Icons.email_outlined),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-              TextField(
-                controller: passC,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// PASSWORD
+            TextField(
+              controller: passC,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: "Password",
+                prefixIcon: const Icon(Icons.lock_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () async {
               if (nameC.text.isEmpty ||
                   emailC.text.isEmpty ||
                   passC.text.isEmpty) {
-                Get.snackbar('Error', 'Semua field harus diisi',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Error',
+                  'Semua field harus diisi',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
                 return;
               }
               Get.back();
@@ -86,11 +127,17 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                   password: passC.text,
                 );
                 await _fetchKaryawan();
-                Get.snackbar('Sukses', 'Karyawan berhasil ditambahkan',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Sukses',
+                  'Karyawan berhasil ditambahkan',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               } catch (e) {
-                Get.snackbar('Error', 'Gagal menambah karyawan: $e',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Error',
+                  'Gagal menambah karyawan: $e',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               }
             },
             child: const Text('Simpan'),
@@ -106,31 +153,51 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
     Get.dialog(
       AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Edit Karyawan'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameC,
-              decoration: const InputDecoration(labelText: 'Nama'),
+              decoration: InputDecoration(
+                hintText: 'Nama',
+                prefixIcon: const Icon(Icons.person_outline),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
+            const SizedBox(height: 12),
             TextField(
               controller: emailC,
-              decoration: const InputDecoration(labelText: 'Email'),
               keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: 'Email',
+                prefixIcon: const Icon(Icons.email_outlined),
+                filled: true,
+                fillColor: const Color(0xFFF5F6FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () async {
               if (nameC.text.isEmpty || emailC.text.isEmpty) {
-                Get.snackbar('Error', 'Semua field harus diisi',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Error',
+                  'Semua field harus diisi',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
                 return;
               }
               Get.back();
@@ -141,11 +208,17 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                   email: emailC.text,
                 );
                 await _fetchKaryawan();
-                Get.snackbar('Sukses', 'Data karyawan diperbarui',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Sukses',
+                  'Data karyawan diperbarui',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               } catch (e) {
-                Get.snackbar('Error', 'Gagal update: $e',
-                    snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Error',
+                  'Gagal update: $e',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               }
             },
             child: const Text('Simpan'),
@@ -177,11 +250,17 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       try {
         await service.deleteKaryawan(karyawan['id']);
         await _fetchKaryawan();
-        Get.snackbar('Sukses', 'Karyawan berhasil dihapus',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'Sukses',
+          'Karyawan berhasil dihapus',
+          snackPosition: SnackPosition.BOTTOM,
+        );
       } catch (e) {
-        Get.snackbar('Error', 'Gagal menghapus: $e',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'Error',
+          'Gagal menghapus: $e',
+          snackPosition: SnackPosition.BOTTOM,
+        );
       }
     }
   }
@@ -191,63 +270,73 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: const Text('Manajemen Karyawan'),
         backgroundColor: AppColors.primary,
+        title: const Text(
+          'Manajemen Karyawan',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : karyawanList.isEmpty
-              ? const Center(child: Text('Belum ada karyawan'))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: karyawanList.length,
-                  itemBuilder: (context, i) {
-                    final k = karyawanList[i];
-                    final initials = (k['name'] as String)
-                        .trim()
-                        .split(' ')
-                        .take(2)
-                        .map((w) => w[0].toUpperCase())
-                        .join();
+          ? const Center(child: Text('Belum ada karyawan'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: karyawanList.length,
+              itemBuilder: (context, i) {
+                final k = karyawanList[i];
+                final initials = (k['name'] as String)
+                    .trim()
+                    .split(' ')
+                    .take(2)
+                    .map((w) => w[0].toUpperCase())
+                    .join();
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Text(
+                        initials,
+                        style: TextStyle(
+                          color: Colors.blue.shade800,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
                       ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.blue.shade100,
-                          child: Text(
-                            initials,
-                            style: TextStyle(
-                              color: Colors.blue.shade800,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
+                    ),
+                    title: Text(k['name'] ?? '-'),
+                    subtitle: Text(k['email'] ?? '-'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                            size: 20,
                           ),
+                          onPressed: () => _showEditDialog(k),
                         ),
-                        title: Text(k['name'] ?? '-'),
-                        subtitle: Text(k['email'] ?? '-'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit,
-                                  color: Colors.blue, size: 20),
-                              onPressed: () => _showEditDialog(k),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete,
-                                  color: Colors.red, size: 20),
-                              onPressed: () => _deleteKaryawan(k),
-                            ),
-                          ],
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          onPressed: () => _deleteKaryawan(k),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: _showAddDialog,

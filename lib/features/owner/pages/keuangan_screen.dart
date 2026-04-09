@@ -198,7 +198,8 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
           foregroundColor: AppColors.white,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-            onPressed: () => Get.offNamed('/profile'),
+            onPressed: () =>
+                Get.back(), // ✅ diubah dari Get.offNamed('/profile')
           ),
           title: const Text(
             'Manajemen Keuangan',

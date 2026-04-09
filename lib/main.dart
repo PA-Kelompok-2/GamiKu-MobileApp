@@ -1,4 +1,4 @@
-import 'package:application_gamiku/features/controllers/cart_controller.dart';
+import 'package:application_gamiku/controllers/cart_controller.dart';
 import 'package:application_gamiku/controllers/menu_controller.dart';
 import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';

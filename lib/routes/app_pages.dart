@@ -94,9 +94,11 @@ class AppPages {
       middlewares: [StartupMiddleware()],
     ),
 
+    // FIX: OrderDetailScreen tidak lagi menerima parameter apapun
+    // semua data diambil dari Get.arguments di dalam initState
     GetPage(
       name: Routes.orderDetail,
-      page: () => OrderDetailScreen(order: Get.arguments),
+      page: () => const OrderDetailScreen(),
       middlewares: [StartupMiddleware()],
     ),
   ];

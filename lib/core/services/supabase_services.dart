@@ -4,7 +4,6 @@ class SupabaseService {
   final supabase = Supabase.instance.client;
 
   Future<AuthResponse> login(String email, String password) async {
-    await supabase.auth.signOut(); 
     return await supabase.auth.signInWithPassword(
       email: email,
       password: password,
@@ -203,18 +202,23 @@ class SupabaseService {
     required String email,
     required String password,
   }) async {
-    final res = await supabase.auth.signUp(
-      email: email,
-      password: password,
-    );
-    final uid = res.user?.id;
-    if (uid != null) {
-      await supabase.from('profiles').insert({
-        'id': uid,
+    final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+      throw Exception("User belum login (session null)");
+      }
+    final res = await supabase.functions.invoke(
+      'create-karyawan',
+      body: {
         'name': name,
         'email': email,
-        'role': 'karyawan',
-      });
+        'password': password,
+      },
+    );
+    if (res.status != 200) {
+      final msg = res.data is Map<String, dynamic>
+          ? (res.data['error'] ?? 'Gagal tambah karyawan')
+          : 'Gagal tambah karyawan';
+      throw Exception(msg);
     }
   }
 
