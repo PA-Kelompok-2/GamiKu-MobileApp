@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 
 class SummaryCard extends StatelessWidget {
@@ -12,6 +13,10 @@ class SummaryCard extends StatelessWidget {
     required this.totalPengeluaran,
     required this.saldo,
   });
+
+  String formatRupiah(int value) {
+    return 'Rp ${NumberFormat.decimalPattern('id').format(value)}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,7 @@ class SummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryItem(
               label: 'Pemasukan',
-              nominal: totalPemasukan,
+              nominal: formatRupiah(totalPemasukan),
               color: Colors.green,
               icon: Icons.arrow_downward_rounded,
             ),
@@ -43,7 +48,7 @@ class SummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryItem(
               label: 'Pengeluaran',
-              nominal: totalPengeluaran,
+              nominal: formatRupiah(totalPengeluaran),
               color: AppColors.primary,
               icon: Icons.arrow_upward_rounded,
             ),
@@ -52,7 +57,7 @@ class SummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryItem(
               label: 'Saldo',
-              nominal: saldo,
+              nominal: formatRupiah(saldo),
               color: saldo >= 0 ? Colors.green : AppColors.primary,
               icon: Icons.account_balance_wallet_rounded,
             ),
@@ -65,7 +70,7 @@ class SummaryCard extends StatelessWidget {
 
 class _SummaryItem extends StatelessWidget {
   final String label;
-  final int nominal;
+  final String nominal;
   final Color color;
   final IconData icon;
 
@@ -84,11 +89,14 @@ class _SummaryItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textGrey),
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.textGrey,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
-          'Rp $nominal',
+          nominal,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w800,

@@ -14,4 +14,5 @@ abstract class Routes {
   static const karyawanManagement = '/karyawan-management';
   static const orderDetail = '/order-detail';
   static const menuManagement = '/menu-management';
+  static const bahanBakuMutasi = '/bahan-baku-mutasi';
 }

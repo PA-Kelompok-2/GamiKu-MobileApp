@@ -6,12 +6,14 @@ import 'package:application_gamiku/features/owner/controllers/keuangan_controlle
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id');
   await dotenv.load(fileName: ".env");
 
   await Supabase.initialize(
@@ -25,7 +27,6 @@ void main() async {
   Get.put(ProfileController());
   Get.put(KeuanganController());
 
-
   runApp(const GamikuApp());
 }
 
@@ -38,7 +39,6 @@ class GamikuApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: Routes.splash,
       getPages: AppPages.pages,
-      
     );
   }
 }
