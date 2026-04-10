@@ -11,6 +11,8 @@ import 'profile_screen.dart';
 import 'widgets/home_tab.dart';
 import 'widgets/bottom_cart_bar.dart';
 import 'widgets/bottom_nav.dart';
+import 'owner/pages/home_tab_owner_screen.dart';
+import '../core/services/supabase_services.dart';
 
 class HomeScreen extends StatefulWidget {
   final int? initialTab;
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen>
   late TabController _homeTabCtrl;
   List<String> categories = [];
   int _navIdx = 0;
+  String? role;
+  bool isLoadingRole = true;
 
   @override
   void initState() {
@@ -36,10 +40,22 @@ class _HomeScreenState extends State<HomeScreen>
       _navIdx = widget.initialTab!;
     }
 
+    loadRole();
+
     ever(Get.find<MenuC>().selectedCategory, (_) {
       if (_navIdx != 1) {
-          setState(() => _navIdx = 1);
+        setState(() => _navIdx = 1);
       }
+    });
+  }
+
+  void loadRole() async {
+    final service = SupabaseService();
+    final r = await service.getUserRole();
+
+    setState(() {
+      role = r;
+      isLoadingRole = false;
     });
   }
 
@@ -70,14 +86,18 @@ class _HomeScreenState extends State<HomeScreen>
         body: IndexedStack(
           index: _navIdx,
           children: [
-            HomeTab(
-              onCartChanged: () => setState(() {}),
-              onOpenMenu: (cat) {
-                Get.find<MenuC>().selectedCategory.value = cat;
-                _onNavTap(1);
-              },
-              onOpenOrders: () => _onNavTap(2),
-            ),
+            isLoadingRole
+                ? const Center(child: CircularProgressIndicator())
+                : (role == 'karyawan' || role == 'owner'
+                      ? const HomeTabKaryawan()
+                      : HomeTab(
+                          onCartChanged: () => setState(() {}),
+                          onOpenMenu: (cat) {
+                            Get.find<MenuC>().selectedCategory.value = cat;
+                            _onNavTap(1);
+                          },
+                          onOpenOrders: () => _onNavTap(2),
+                        )),
             const MenuScreen(),
             OrderScreen(key: ValueKey('order-$_navIdx')),
             const ProfileScreen(),
