@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '/controllers/menu_controller.dart';
 import '/controllers/profile_controller.dart';
 import '/core/constants/app_colors.dart';
+import '/core/services/supabase_services.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -612,6 +613,7 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (_selectedCategoryId == null) {
       Get.snackbar(
         'Perhatian',
@@ -624,9 +626,16 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     setState(() => _isSaving = true);
 
     final menuC = Get.find<MenuC>();
-    final String imageUrl = _isEdit ? (widget.item!['image_url'] ?? '') : '';
+    final service = SupabaseService();
+
+    String imageUrl = _isEdit ? (widget.item!['image_url'] ?? '') : '';
 
     try {
+      // 🔥 UPLOAD GAMBAR JIKA ADA
+      if (_pickedImage != null) {
+        imageUrl = await service.uploadMenuImage(_pickedImage!);
+      }
+
       if (_isEdit) {
         await menuC.updateMenu(
           id: widget.item!['id'],
@@ -647,6 +656,13 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
       Navigator.pop(widget.ctx);
     } catch (e) {
       setState(() => _isSaving = false);
+
+      Get.snackbar(
+        'Error',
+        'Gagal upload gambar / simpan menu',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 

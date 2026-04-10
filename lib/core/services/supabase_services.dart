@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:math';
+import 'dart:io';
+import 'package:path/path.dart';
 
 class SupabaseService {
   final supabase = Supabase.instance.client;
@@ -262,5 +264,18 @@ class SupabaseService {
         .from('orders')
         .update({'status': 'paid'})
         .eq('qr_token', token);
+  }
+
+  Future<String> uploadMenuImage(File file) async {
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${basename(file.path)}';
+
+    final path = fileName;
+
+    await supabase.storage.from('menu-images').upload(path, file);
+
+    final publicUrl = supabase.storage.from('menu-images').getPublicUrl(path);
+
+    return publicUrl;
   }
 }
