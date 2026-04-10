@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:math';
 
 class SupabaseService {
   final supabase = Supabase.instance.client;
@@ -131,10 +132,10 @@ class SupabaseService {
   }
 
   Future<void> updateMenuAvailability(String id, bool isAvailable) async {
-  await supabase
-      .from('menus')
-      .update({'is_available': isAvailable})
-      .eq('id', id);
+    await supabase
+        .from('menus')
+        .update({'is_available': isAvailable})
+        .eq('id', id);
   }
 
   Future<List<Map<String, dynamic>>> getOrders() async {
@@ -150,11 +151,20 @@ class SupabaseService {
     await supabase.from('orders').update({'status': status}).eq('id', id);
   }
 
-  Future<void> createOrder({
+  String generateToken() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    return List.generate(
+      20,
+      (index) => chars[Random().nextInt(chars.length)],
+    ).join();
+  }
+
+  Future<Map<String, dynamic>> createOrder({
     required int total,
     required List<Map<String, dynamic>> items,
   }) async {
     final user = supabase.auth.currentUser;
+    final token = generateToken();
 
     final order = await supabase
         .from('orders')
@@ -162,6 +172,7 @@ class SupabaseService {
           'user_id': user!.id,
           'total_price': total,
           'status': 'pending',
+          'qr_token': token,
         })
         .select()
         .single();
@@ -178,6 +189,8 @@ class SupabaseService {
     }).toList();
 
     await supabase.from('order_items').insert(orderItems);
+
+    return order;
   }
 
   Future<List<Map<String, dynamic>>> getOrdersWithItems() async {
@@ -188,7 +201,8 @@ class SupabaseService {
 
     return List<Map<String, dynamic>>.from(res);
   }
-    Future<List<Map<String, dynamic>>> getKaryawan() async {
+
+  Future<List<Map<String, dynamic>>> getKaryawan() async {
     final res = await supabase
         .from('profiles')
         .select()
@@ -203,16 +217,12 @@ class SupabaseService {
     required String password,
   }) async {
     final session = Supabase.instance.client.auth.currentSession;
-      if (session == null) {
+    if (session == null) {
       throw Exception("User belum login (session null)");
-      }
+    }
     final res = await supabase.functions.invoke(
       'create-karyawan',
-      body: {
-        'name': name,
-        'email': email,
-        'password': password,
-      },
+      body: {'name': name, 'email': email, 'password': password},
     );
     if (res.status != 200) {
       final msg = res.data is Map<String, dynamic>
@@ -235,5 +245,22 @@ class SupabaseService {
 
   Future<void> deleteKaryawan(String id) async {
     await supabase.from('profiles').delete().eq('id', id);
+  }
+
+  Future<Map<String, dynamic>?> getOrderByToken(String token) async {
+    final data = await supabase
+        .from('orders')
+        .select()
+        .eq('qr_token', token)
+        .maybeSingle();
+
+    return data;
+  }
+
+  Future<void> markAsPaid(String token) async {
+    await supabase
+        .from('orders')
+        .update({'status': 'paid'})
+        .eq('qr_token', token);
   }
 }

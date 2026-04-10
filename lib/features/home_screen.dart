@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     ever(Get.find<MenuC>().selectedCategory, (_) {
       if (_navIdx != 1) {
-        setState(() => _navIdx = 1);
+          setState(() => _navIdx = 1);
       }
     });
   }

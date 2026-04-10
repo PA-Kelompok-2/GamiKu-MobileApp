@@ -4,6 +4,7 @@ import '../core/constants/app_colors.dart';
 import '../controllers/cart_controller.dart';
 import '../core/services/supabase_services.dart';
 import 'models/order_model.dart';
+import 'qr_screen.dart';
 
 class PaymentGatewayScreen extends StatefulWidget {
   final VoidCallback? onOrderPlaced;
@@ -18,7 +19,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
   final _phoneCtrl = TextEditingController();
   final _tableCtrl = TextEditingController();
   final String _orderType = 'Dine In';
-  String _paymentMethod = 'QRIS';
+  String _paymentMethod = 'online';
 
   @override
   void dispose() {
@@ -33,7 +34,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     final service = SupabaseService();
 
     try {
-      await service.createOrder(
+      final order = await service.createOrder(
         total: cartC.grandTotal,
         items: cartC.entries.map((e) {
           return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
@@ -41,7 +42,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       );
 
       cartC.clear();
-      _showSuccessDialog();
+
+      final token = order['qr_token'];
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => QRScreen(token: token)),
+      );
     } catch (e) {
       Get.snackbar("Error", "Gagal membuat pesanan");
     }
@@ -325,8 +332,8 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             child: _paymentMethodChip(
               label: 'Online Payment',
               icon: Icons.payment,
-              isSelected: _paymentMethod == 'Online',
-              onTap: () => setState(() => _paymentMethod = 'Online'),
+              isSelected: _paymentMethod == 'online',
+              onTap: () => setState(() => _paymentMethod = 'online'),
             ),
           ),
           const SizedBox(width: 12),
@@ -334,8 +341,8 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             child: _paymentMethodChip(
               label: 'Pay at Cashier',
               icon: Icons.storefront,
-              isSelected: _paymentMethod == 'Cashier',
-              onTap: () => setState(() => _paymentMethod = 'Cashier'),
+              isSelected: _paymentMethod == 'cashier',
+              onTap: () => setState(() => _paymentMethod = 'cashier'),
             ),
           ),
         ],
@@ -403,33 +410,41 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                 color: AppColors.chipRed,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.qr_code, color: AppColors.primary),
+              child: Icon(
+                _paymentMethod == 'online' ? Icons.qr_code : Icons.storefront,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'QRIS',
-                    style: TextStyle(
+                    _paymentMethod == 'online' ? 'QRIS' : 'Bayar di Kasir',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
+
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.check_circle,
                         size: 14,
                         color: AppColors.primary,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
+
                       Text(
-                        'I agree to the Terms & Conditions',
-                        style: TextStyle(
+                        _paymentMethod == 'online'
+                            ? 'Scan QR untuk bayar langsung'
+                            : 'Tunjukkan QR ke kasir',
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textGrey,
                         ),
@@ -439,6 +454,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                 ],
               ),
             ),
+
             Container(
               width: 24,
               height: 24,
