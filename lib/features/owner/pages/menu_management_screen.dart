@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '/controllers/menu_controller.dart';
-import '/controllers/profile_controller.dart'; // Tambahkan ini
+import '/controllers/profile_controller.dart';
 import '/core/constants/app_colors.dart';
 
 class MenuManagementScreen extends StatefulWidget {
@@ -16,13 +16,19 @@ class MenuManagementScreen extends StatefulWidget {
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   String selectedCategory = 'Semua';
   final TextEditingController _searchController = TextEditingController();
-  final profileC = Get.find<ProfileController>(); // Ambil profile controller
+  final profileC = Get.find<ProfileController>();
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(() {
       Get.find<MenuC>().searchMenu(_searchController.text);
+    });
+
+    // Refresh role setiap kali screen dibuka,
+    // agar tidak terbaca role akun lama saat ganti akun
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      profileC.loadProfile();
     });
   }
 
@@ -45,184 +51,185 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             ? menuC.menus
             : menuC.menus.where((m) => m['cat'] == selectedCategory).toList();
 
-        // Cek role user
-        final isOwner = profileC.role.value == 'owner';
-        final isEmployee = profileC.role.value == 'karyawan';
+        // Obx agar isOwner reaktif saat fetchProfile selesai
+        return Obx(() {
+          final isOwner = profileC.role.value == 'owner';
 
-        return Scaffold(
-          backgroundColor: AppColors.bg,
-          body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
+          return Scaffold(
+            backgroundColor: AppColors.bg,
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Get.back(),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 20,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      RichText(
-                        text: const TextSpan(
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Get.back(),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            size: 20,
                             color: AppColors.textDark,
                           ),
-                          children: [
-                            TextSpan(text: 'Kelola\nMenu '),
-                            TextSpan(
-                              text: 'Restoran',
-                              style: TextStyle(color: AppColors.primary),
+                        ),
+                        const SizedBox(width: 12),
+                        RichText(
+                          text: const TextSpan(
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textDark,
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadow,
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Cari menu...',
-                        hintStyle: TextStyle(color: AppColors.textGrey),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: AppColors.textGrey,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final cat = categories[index];
-                      final isSelected = cat == selectedCategory;
-
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedCategory = cat),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.shadow,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                            children: [
+                              TextSpan(text: 'Kelola\nMenu '),
+                              TextSpan(
+                                text: 'Restoran',
+                                style: TextStyle(color: AppColors.primary),
                               ),
                             ],
                           ),
-                          child: Text(
-                            cat,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? AppColors.white
-                                  : AppColors.textDark,
-                              fontSize: 14,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                Expanded(
-                  child: menuC.isLoading.value
-                      ? const Center(child: CircularProgressIndicator())
-                      : items.isEmpty
-                      ? const Center(
-                          child: Text('Belum ada menu di kategori ini'),
-                        )
-                      : GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.72,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                              ),
-                          itemCount: items.length,
-                          itemBuilder: (_, i) => _ManageMenuCard(
-                            item: items[i],
-                            role: profileC.role.value, // Pass role ke card
-                            onEdit: () => _showMenuForm(item: items[i]),
-                            onDelete: () => _confirmDelete(menuC, items[i]),
-                            onToggleAvailability: (id, isAvailable) async {
-                              await menuC.updateAvailability(id, isAvailable);
-                            },
-                          ),
-                        ),
-                ),
-              ],
-            ),
-          ),
-
-          // FAB Tambah Menu hanya untuk Owner
-          floatingActionButton: isOwner
-              ? FloatingActionButton.extended(
-                  backgroundColor: AppColors.primary,
-                  onPressed: () => _showMenuForm(),
-                  icon: const Icon(Icons.add, color: AppColors.white),
-                  label: const Text(
-                    'Tambah Menu',
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
+                      ],
                     ),
                   ),
-                )
-              : null, // Karyawan tidak melihat FAB
-        );
+
+                  const SizedBox(height: 16),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.shadow,
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Cari menu...',
+                          hintStyle: TextStyle(color: AppColors.textGrey),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: AppColors.textGrey,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final cat = categories[index];
+                        final isSelected = cat == selectedCategory;
+
+                        return GestureDetector(
+                          onTap: () => setState(() => selectedCategory = cat),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadow,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              cat,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? AppColors.white
+                                    : AppColors.textDark,
+                                fontSize: 14,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Expanded(
+                    child: menuC.isLoading.value
+                        ? const Center(child: CircularProgressIndicator())
+                        : items.isEmpty
+                        ? const Center(
+                            child: Text('Belum ada menu di kategori ini'),
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.72,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                ),
+                            itemCount: items.length,
+                            itemBuilder: (_, i) => _ManageMenuCard(
+                              item: items[i],
+                              role: profileC.role.value,
+                              onEdit: () => _showMenuForm(item: items[i]),
+                              onDelete: () => _confirmDelete(menuC, items[i]),
+                              onToggleAvailability: (id, isAvailable) async {
+                                await menuC.updateAvailability(id, isAvailable);
+                              },
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+
+            // FAB Tambah Menu hanya untuk owner
+            floatingActionButton: isOwner
+                ? FloatingActionButton.extended(
+                    backgroundColor: AppColors.primary,
+                    onPressed: () => _showMenuForm(),
+                    icon: const Icon(Icons.add, color: AppColors.white),
+                    label: const Text(
+                      'Tambah Menu',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                : null,
+          );
+        }); // tutup Obx
       },
     );
   }
@@ -277,7 +284,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
 class _ManageMenuCard extends StatefulWidget {
   final Map<String, dynamic> item;
-  final String? role; // Tambahkan role
+  final String? role;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final Future<void> Function(String itemId, bool isAvailable)
@@ -285,7 +292,7 @@ class _ManageMenuCard extends StatefulWidget {
 
   const _ManageMenuCard({
     required this.item,
-    this.role, // Role nullable
+    this.role,
     required this.onEdit,
     required this.onDelete,
     required this.onToggleAvailability,
@@ -330,9 +337,16 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Cek role
     final isOwner = widget.role == 'owner';
     final isEmployee = widget.role == 'karyawan';
+
+    // ===== DEBUG =====
+    debugPrint('============================================');
+    debugPrint('ROLE VALUE   : "${widget.role}"');
+    debugPrint('isOwner      : $isOwner');
+    debugPrint('isEmployee   : $isEmployee');
+    debugPrint('============================================');
+    // ===== END DEBUG =====
 
     return Container(
       decoration: BoxDecoration(
@@ -351,6 +365,7 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Gambar menu
             Stack(
               children: [
                 ClipRRect(
@@ -388,7 +403,10 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                   ),
               ],
             ),
+
             const SizedBox(height: 6),
+
+            // Nama menu
             Text(
               widget.item['name'] ?? '',
               maxLines: 1,
@@ -400,12 +418,18 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                 decoration: _isAvailable ? null : TextDecoration.lineThrough,
               ),
             ),
+
             const SizedBox(height: 2),
+
+            // Kategori
             Text(
               widget.item['cat'] ?? '',
               style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
             ),
+
             const SizedBox(height: 4),
+
+            // Harga
             Text(
               'Rp ${widget.item['price']}',
               style: TextStyle(
@@ -414,11 +438,14 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                 color: _isAvailable ? AppColors.textDark : Colors.grey,
               ),
             ),
+
             const Spacer(),
-            Row(
-              children: [
-                // EDIT & DELETE: Hanya untuk Owner
-                if (isOwner) ...[
+
+            // Action buttons
+            if (isOwner)
+              // Owner: Edit + Delete + Toggle ON/OFF
+              Row(
+                children: [
                   Expanded(
                     child: GestureDetector(
                       onTap: widget.onEdit,
@@ -450,7 +477,7 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   GestureDetector(
                     onTap: widget.onDelete,
                     child: Container(
@@ -466,63 +493,58 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
+                  _toggleButton(),
                 ],
+              )
+            else if (isEmployee)
+              // Karyawan: hanya Toggle ON/OFF, rata kiri
+              _toggleButton(),
+          ],
+        ),
+      ),
+    );
+  }
 
-                // Spacer untuk karyawan agar tombol ON/OFF di kanan
-                if (isEmployee) const Spacer(),
-
-                // ON/OFF: Untuk Owner dan Karyawan
-                if (isOwner || isEmployee)
-                  GestureDetector(
-                    onTap: _isLoading ? null : _toggleAvailability,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _isLoading
-                            ? Colors.grey
-                            : (_isAvailable
-                                  ? Colors.green
-                                  : Colors.red.shade400),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (_isLoading)
-                            const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          else ...[
-                            Icon(
-                              _isAvailable ? Icons.check_circle : Icons.cancel,
-                              size: 14,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _isAvailable ? 'ON' : 'OFF',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+  Widget _toggleButton() {
+    return GestureDetector(
+      onTap: _isLoading ? null : _toggleAvailability,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: _isLoading
+              ? Colors.grey
+              : (_isAvailable ? Colors.green : Colors.red.shade400),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isLoading)
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            else ...[
+              Icon(
+                _isAvailable ? Icons.check_circle : Icons.cancel,
+                size: 14,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _isAvailable ? 'ON' : 'OFF',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -696,7 +718,7 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                                 widget.item!['image_url'],
                                 width: double.infinity,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) =>
+                                errorBuilder: (_, __, ___) =>
                                     _pickerPlaceholder(),
                               ),
                             ),
