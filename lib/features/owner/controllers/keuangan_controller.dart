@@ -14,9 +14,19 @@ class KeuanganController extends GetxController {
   Future<void> getBahan() async {
     final res = await supabase.from('bahan_baku').select();
 
-    bahanBakuList.value = (res as List)
-        .map((e) => BahanBaku.fromJson(e))
-        .toList();
+    bahanBakuList.value =
+        (res as List).map((e) => BahanBaku.fromJson(e)).toList();
+  }
+
+  Future<void> getPengeluaran() async {
+    final res = await supabase
+        .from('keuangan')
+        .select()
+        .eq('jenis', 'pengeluaran')
+        .order('tanggal', ascending: false);
+
+    pengeluaranList.value =
+        (res as List).map((e) => Pengeluaran.fromJson(e)).toList();
   }
 
   Future<void> tambahBahan({
@@ -25,6 +35,8 @@ class KeuanganController extends GetxController {
     required String unit,
     required int price,
   }) async {
+    final total = stock * price;
+
     await supabase.from('bahan_baku').insert({
       'name': name,
       'stock': stock,
@@ -32,7 +44,15 @@ class KeuanganController extends GetxController {
       'price': price,
     });
 
+    await supabase.from('keuangan').insert({
+      'jenis': 'pengeluaran',
+      'nama': 'Pembelian bahan baku: $name',
+      'nominal': total,
+      'tanggal': DateTime.now().toIso8601String(),
+    });
+
     await getBahan();
+    await getPengeluaran();
   }
 
   Future<void> hapusBahan(String id) async {
@@ -47,28 +67,36 @@ class KeuanganController extends GetxController {
     String? unit,
     int? price,
   }) async {
-    await supabase
-        .from('bahan_baku')
-        .update({
-          'name': ?name,
-          'stock': ?stock,
-          'unit': ?unit,
-          'price': ?price,
-        })
-        .eq('id', id);
+    final data = <String, dynamic>{};
+
+    if (name != null) data['name'] = name;
+    if (stock != null) data['stock'] = stock;
+    if (unit != null) data['unit'] = unit;
+    if (price != null) data['price'] = price;
+
+    await supabase.from('bahan_baku').update(data).eq('id', id);
 
     await getBahan();
   }
 
   Future<void> tambahStok(String id, int jumlah) async {
     final current = bahanBakuList.firstWhere((b) => b.id == id);
+    final total = current.price * jumlah;
 
     await supabase
         .from('bahan_baku')
         .update({'stock': current.stock + jumlah})
         .eq('id', id);
 
+    await supabase.from('keuangan').insert({
+      'jenis': 'pengeluaran',
+      'nama': 'Tambah stok bahan baku: ${current.name}',
+      'nominal': total,
+      'tanggal': DateTime.now().toIso8601String(),
+    });
+
     await getBahan();
+    await getPengeluaran();
   }
 
   Future<void> kurangiStok(String id, int jumlah) async {
@@ -82,25 +110,30 @@ class KeuanganController extends GetxController {
     await getBahan();
   }
 
-  void tambah({required String nama, required int nominal, DateTime? tanggal}) {
-    pengeluaranList.insert(
-      0,
-      Pengeluaran(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        nama: nama,
-        nominal: nominal,
-        tanggal: tanggal ?? DateTime.now(),
-      ),
-    );
+  Future<void> tambah({
+    required String nama,
+    required int nominal,
+    DateTime? tanggal,
+  }) async {
+    await supabase.from('keuangan').insert({
+      'jenis': 'pengeluaran',
+      'nama': nama,
+      'nominal': nominal,
+      'tanggal': (tanggal ?? DateTime.now()).toIso8601String(),
+    });
+
+    await getPengeluaran();
   }
 
-  void hapus(String id) {
-    pengeluaranList.removeWhere((p) => p.id == id);
+  Future<void> hapus(String id) async {
+    await supabase.from('keuangan').delete().eq('id', id);
+    await getPengeluaran();
   }
 
   @override
   void onInit() {
     super.onInit();
     getBahan();
+    getPengeluaran();
   }
 }
