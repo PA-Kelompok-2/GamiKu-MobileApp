@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/menu_controller.dart';
-import '../../core/constants/app_colors.dart';
+import '/controllers/menu_controller.dart';
+import '/core/constants/app_colors.dart';
 import 'banner_slider.dart';
 
 class HomeTab extends StatefulWidget {

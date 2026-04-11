@@ -263,6 +263,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onTap: () =>
                                         Get.toNamed(Routes.karyawanManagement),
                                   ),
+                                  _divider(),
+                                  _buildMenuItem(
+                                    Icons.restaurant_menu,
+                                    'Kelola Menu',
+                                    subtitle: 'Kelola Menu Usaha',
+                                    iconBg: AppColors.statusMenungguBg,
+                                    iconColor: AppColors.statusMenungguFg,
+                                    onTap: () =>
+                                        Get.toNamed(Routes.menuManagement),
+                                  ),
                                 ],
                               ],
                             ),
