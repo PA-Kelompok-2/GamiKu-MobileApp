@@ -243,6 +243,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   iconColor: AppColors.statusMenungguFg,
                                   onTap: () => Get.toNamed(Routes.bahanBaku),
                                 ),
+                                _divider(),
+                                  _buildMenuItem(
+                                    Icons.restaurant_menu,
+                                    'Kelola Menu',
+                                    subtitle: 'Kelola Menu Usaha',
+                                    iconBg: AppColors.statusMenungguBg,
+                                    iconColor: AppColors.statusMenungguFg,
+                                    onTap: () =>
+                                        Get.toNamed(Routes.menuManagement),
+                                  ),
                                 if (role == 'owner') ...[
                                   _divider(),
                                   _buildMenuItem(
@@ -262,16 +272,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     iconColor: AppColors.statusDiprosesFg,
                                     onTap: () =>
                                         Get.toNamed(Routes.karyawanManagement),
-                                  ),
-                                  _divider(),
-                                  _buildMenuItem(
-                                    Icons.restaurant_menu,
-                                    'Kelola Menu',
-                                    subtitle: 'Kelola Menu Usaha',
-                                    iconBg: AppColors.statusMenungguBg,
-                                    iconColor: AppColors.statusMenungguFg,
-                                    onTap: () =>
-                                        Get.toNamed(Routes.menuManagement),
                                   ),
                                 ],
                               ],

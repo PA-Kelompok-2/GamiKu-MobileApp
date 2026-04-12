@@ -1,15 +1,113 @@
 import 'package:flutter/material.dart';
 import '/core/constants/app_colors.dart';
+import '/core/services/supabase_services.dart';
+
 import 'bahan_baku_screen.dart';
+import 'menu_management_screen.dart';
 import 'keuangan_screen.dart';
 import 'karyawan_management_screen.dart';
-import 'menu_management_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomeTabKaryawan extends StatelessWidget {
-  const HomeTabKaryawan({super.key});
+class HomeTabKaryawan extends StatefulWidget {
+
+  final VoidCallback? onOpenOrders;
+
+  const HomeTabKaryawan({
+    super.key,
+    this.onOpenOrders,
+  });
+
+  @override
+  State<HomeTabKaryawan> createState() => _HomeTabKaryawanState();
+}
+
+class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
+
+  final service = SupabaseService();
+
+  String role = '';
+  bool isLoading = true;
+
+  int pending = 0;
+  int processed = 0;
+  int completed = 0;
+
+  int pemasukan = 0;
+  int pengeluaran = 0;
+  int saldo = 0;
+  int totalMenu = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfile();
+    loadOrders();
+    loadStatistik();
+  }
+
+  Future<void> loadProfile() async {
+    final data = await service.getProfile();
+
+    if (data != null) {
+      setState(() {
+        role = data['role'];
+        isLoading = false;
+      });
+    }
+  }
+
+  /// PESANAN (UNTUK KARYAWAN)
+  Future<void> loadOrders() async {
+
+    final data = await service.getOrdersWithItems();
+
+    pending = data.where((o) => o['status'] == 'pending').length;
+    processed = data.where((o) => o['status'] == 'paid').length;
+    completed = data.where((o) => o['status'] == 'completed').length;
+
+    setState(() {});
+  }
+
+  /// STATISTIK OWNER
+  Future<void> loadStatistik() async {
+
+    final menu = await Supabase.instance.client.from('menu').select();
+    totalMenu = menu.length;
+
+    final pemasukanData = await Supabase.instance.client
+        .from('keuangan')
+        .select()
+        .eq('type', 'pemasukan');
+
+    pemasukan = pemasukanData.fold<int>(
+      0,
+      (sum, item) => sum + ((item['amount'] ?? 0) as num).toInt(),
+    );
+
+    final pengeluaranData = await Supabase.instance.client
+        .from('keuangan')
+        .select()
+        .eq('type', 'pengeluaran');
+
+    pengeluaran = pengeluaranData.fold<int>(
+      0,
+      (sum, item) => sum + ((item['amount'] ?? 0) as num).toInt(),
+    );
+
+    saldo = pemasukan - pengeluaran;
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
@@ -50,7 +148,6 @@ class HomeTabKaryawan extends StatelessWidget {
                             color: AppColors.primary,
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 1.5,
                           ),
                         ),
                       ],
@@ -61,204 +158,125 @@ class HomeTabKaryawan extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// LOCATION CARD
+              /// WELCOME CARD
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
 
-                    /// TEXT
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: const [
-                              Icon(
-                                Icons.location_on,
-                                color: AppColors.primary,
-                                size: 18,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Lokasi Saat Ini',
-                                style: TextStyle(
-                                  color: AppColors.textGrey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Big Mall Samarinda',
-                            style: TextStyle(
-                              color: AppColors.textDark,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
+
                           Text(
-                            'Jl. Ahmad Yani, Sungai Pinang Luar',
-                            style: TextStyle(
-                              color: AppColors.textGrey,
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    Row(
-                      children: [
-                        _iconButton(Icons.notifications_outlined),
-                        const SizedBox(width: 8),
-                        _iconButton(Icons.history),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// WELCOME CARD
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 20,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-
-                    /// TEXT
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Welcome Owner!",
-                            style: TextStyle(
+                            role == "owner"
+                                ? "Welcome Owner!"
+                                : "Welcome Karyawan!",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(height: 6),
-                          Text(
+
+                          const SizedBox(height: 6),
+
+                          const Text(
                             "Kelola semua data usaha kamu disini",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(color: Colors.grey),
                           ),
+
                         ],
                       ),
                     ),
 
-                    const SizedBox(width: 12),
-
                     Image.asset(
                       'assets/owner.png',
-                      width: 110,
-                      fit: BoxFit.contain,
+                      width: 100,
                     ),
+
                   ],
                 ),
               ),
 
               const SizedBox(height: 28),
 
+              /// STATISTIK OWNER
+              if(role == "owner") ...[
+
+                const Text(
+                  "Statistik Hari Ini",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 2.2,
+                  children: [
+
+                    _statCard("Pemasukan", "Rp $pemasukan", Icons.payments_outlined, Colors.green),
+                    _statCard("Pengeluaran", "Rp $pengeluaran", Icons.money_off_csred_outlined, Colors.red),
+                    _statCard("Saldo", "Rp $saldo", Icons.account_balance_wallet_outlined, AppColors.primary),
+                    _statCard("Total Menu", "$totalMenu Menu", Icons.restaurant_menu, Colors.orange),
+
+                  ],
+                ),
+
+                const SizedBox(height: 28),
+
+              ],
+
+              /// PESANAN KARYAWAN
+              if(role == "karyawan") ...[
+
+                const Text(
+                  "Pesanan Hari Ini",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+
+                    Expanded(child: _orderCard("Menunggu", pending, Colors.orange)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _orderCard("Diproses", processed, Colors.blue)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _orderCard("Selesai", completed, Colors.green)),
+
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+              ],
+
               const Text(
-                "Statistik Hari Ini",
+                "Kelola Usaha",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 2.2,
-                children: [
-
-                  _statCard(
-                    title: "Pemasukan",
-                    value: "Rp 1.250.000",
-                    icon: Icons.payments_outlined,
-                    color: Colors.green,
-                  ),
-
-                  _statCard(
-                    title: "Pengeluaran",
-                    value: "Rp 300.000",
-                    icon: Icons.money_off_csred_outlined,
-                    color: Colors.red,
-                  ),
-
-                  _statCard(
-                    title: "Saldo",
-                    value: "Rp 950.000",
-                    icon: Icons.account_balance_wallet_outlined,
-                    color: AppColors.primary,
-                  ),
-
-                  _statCard(
-                    title: "Total Menu",
-                    value: "12 Menu",
-                    icon: Icons.restaurant_menu,
-                    color: Colors.orange,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 28),
-
-              const Text(
-                "Kelola Usaha Kamu",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              /// GRID MENU
               GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
@@ -268,61 +286,30 @@ class HomeTabKaryawan extends StatelessWidget {
                 childAspectRatio: 1.05,
                 children: [
 
-                  _menuCard(
-                    title: "Bahan Baku",
-                    subtitle: "Kelola stok bahan baku",
-                    icon: Icons.countertops_outlined,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BahanBakuScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  if(role == "owner") ...[
 
-                  _menuCard(
-                    title: "Keuangan",
-                    subtitle: "Laporan pemasukan usaha",
-                    icon: Icons.account_balance_wallet_outlined,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const KeuanganScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                    _menuCard("Bahan Baku","Kelola stok bahan",Icons.countertops_outlined,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const BahanBakuScreen()))),
 
-                  _menuCard(
-                    title: "Karyawan",
-                    subtitle: "Kelola data karyawan",
-                    icon: Icons.people_outline,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const KaryawanManagementScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                    _menuCard("Keuangan","Laporan usaha",Icons.account_balance_wallet_outlined,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const KeuanganScreen()))),
 
-                  _menuCard(
-                    title: "Kelola Menu",
-                    subtitle: "Kelola menu makanan",
-                    icon: Icons.restaurant_menu,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MenuManagementScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                    _menuCard("Karyawan","Kelola tim",Icons.people_outline,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const KaryawanManagementScreen()))),
+
+                    _menuCard("Kelola Menu","Kelola menu makanan",Icons.restaurant_menu,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const MenuManagementScreen()))),
+
+                  ] else ...[
+
+                    _menuCard("Kelola Menu","Kelola menu makanan",Icons.restaurant_menu,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const MenuManagementScreen()))),
+
+                    _menuCard("Bahan Baku","Kelola stok bahan",Icons.countertops_outlined,
+                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const BahanBakuScreen()))),
+
+                  ],
+
                 ],
               ),
 
@@ -334,153 +321,60 @@ class HomeTabKaryawan extends StatelessWidget {
     );
   }
 
-  /// MENU CARD
-    Widget _menuCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: AppColors.red55,
-      borderRadius: BorderRadius.circular(24),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: onTap,
-        splashColor: AppColors.primary.withOpacity(0.2),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// TITLE + ICON
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                  ),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.white.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              /// SUBTITLE
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textDark,
-                ),
-              ),
-
-              const Spacer(),
-
-              /// CHECK ROW
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Buka",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ],
-          ),
+  Widget _orderCard(String title, int value, Color color) {
+    return GestureDetector(
+      onTap: widget.onOpenOrders,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Text("$value",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: color)),
+            const SizedBox(height: 4),
+            Text(title,style: const TextStyle(fontSize: 12,color: AppColors.textGrey)),
+          ],
         ),
       ),
     );
   }
 
-  Widget _statCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
+  Widget _statCard(String title,String value,IconData icon,Color color){
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: AppColors.shadow,blurRadius: 6,offset: const Offset(0,2)),
         ],
       ),
       child: Row(
         children: [
-
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 22,
-            ),
+            child: Icon(icon,color: color,size: 22),
           ),
-
           const SizedBox(width: 10),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textGrey,
-                ),
-              ),
-
+              Text(title,style: const TextStyle(fontSize: 12,color: AppColors.textGrey)),
               const SizedBox(height: 2),
-
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              Text(value,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w800)),
             ],
           ),
         ],
@@ -488,15 +382,44 @@ class HomeTabKaryawan extends StatelessWidget {
     );
   }
 
-  /// ICON BUTTON
-  Widget _iconButton(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: AppColors.chipRed,
-        borderRadius: BorderRadius.circular(8),
+  Widget _menuCard(String title,String subtitle,IconData icon,VoidCallback onTap){
+    return Material(
+      color: AppColors.red55,
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: Text(title,style: const TextStyle(fontSize: 16,fontWeight: FontWeight.bold))),
+                  Icon(icon,color: AppColors.primary),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(subtitle,style: const TextStyle(fontSize: 13)),
+
+              const Spacer(),
+
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Buka",style: TextStyle(fontWeight: FontWeight.w600,color: AppColors.primary)),
+                  Icon(Icons.arrow_forward,color: AppColors.primary),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
-      child: Icon(icon, color: AppColors.primary),
     );
   }
 }
