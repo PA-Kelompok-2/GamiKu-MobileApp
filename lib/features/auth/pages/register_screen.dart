@@ -21,17 +21,87 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isObscure = true;
 
   void register() {
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      Get.snackbar("Error", "Semua field wajib diisi");
-    } else {
-      authC.register(
-        email: emailController.text,
-        password: passwordController.text,
-        name: nameController.text,
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    // Validasi field kosong
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Semua field wajib diisi.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(
+          Icons.cancel,
+          color: Colors.red,
+          size: 28,
+        ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
       );
+      return;
     }
+
+    // Validasi format email
+    if (!GetUtils.isEmail(email)) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Format email tidak valid.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(
+          Icons.cancel,
+          color: Colors.red,
+          size: 28,
+        ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+      return;
+    }
+
+    // Validasi password
+    if (password.length < 6) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Password minimal 6 karakter.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(
+          Icons.cancel,
+          color: Colors.red,
+          size: 28,
+        ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+      return;
+    }
+
+    // Jika semua valid
+    authC.register(
+      email: email,
+      password: password,
+      name: name,
+    );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -134,6 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                     TextField(
                       controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: "Email",
                         prefixIcon: const Icon(
