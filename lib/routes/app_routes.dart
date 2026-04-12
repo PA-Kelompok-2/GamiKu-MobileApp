@@ -11,6 +11,7 @@ abstract class Routes {
   static const privacyPolicy = '/privacy-policy';
   static const bahanBaku = '/bahan-baku';
   static const keuangan = '/keuangan';
+  static const keuanganDetail = '/keuangan-detail';
   static const karyawanManagement = '/karyawan-management';
   static const orderDetail = '/order-detail';
   static const menuManagement = '/menu-management';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '/controllers/menu_controller.dart';
 import '/core/constants/app_colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'banner_slider.dart';
 
 class HomeTab extends StatefulWidget {
@@ -49,6 +50,10 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
+  void _goToLogin() {
+    Get.toNamed('/login');
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -66,6 +71,8 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     final menuC = Get.find<MenuC>();
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    final isGuest = currentUser == null;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -110,6 +117,28 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                         ),
                         const Spacer(),
+                        if (isGuest)
+                          GestureDetector(
+                            onTap: _goToLogin,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.chipRed,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
 
@@ -173,9 +202,7 @@ class _HomeTabState extends State<HomeTab> {
                               ],
                             ),
                           ),
-
                           const SizedBox(width: 8),
-
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -204,11 +231,9 @@ class _HomeTabState extends State<HomeTab> {
                               ),
                             ],
                           ),
-
                           const SizedBox(width: 8),
-
                           GestureDetector(
-                            onTap: widget.onOpenOrders,
+                            onTap: isGuest ? _goToLogin : widget.onOpenOrders,
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -244,6 +269,7 @@ class _HomeTabState extends State<HomeTab> {
                         focusNode: _searchFocus,
                         textInputAction: TextInputAction.search,
                         onSubmitted: _handleSearch,
+                        onChanged: (_) => setState(() {}),
                         decoration: InputDecoration(
                           hintText: 'Cari menu favoritmu...',
                           hintStyle: TextStyle(
@@ -264,6 +290,7 @@ class _HomeTabState extends State<HomeTab> {
                                   onPressed: () {
                                     _searchController.clear();
                                     menuC.searchMenu('');
+                                    setState(() {});
                                   },
                                 )
                               : null,
@@ -281,7 +308,6 @@ class _HomeTabState extends State<HomeTab> {
             ),
 
             const SliverToBoxAdapter(child: BannerSlider()),
-
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
             SliverToBoxAdapter(
@@ -322,9 +348,7 @@ class _HomeTabState extends State<HomeTab> {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: _categories
-                      .map((cat) => _categoryItem(cat))
-                      .toList(),
+                  children: _categories.map((cat) => _categoryItem(cat)).toList(),
                 ),
               ),
             ),

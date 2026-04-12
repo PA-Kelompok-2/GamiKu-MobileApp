@@ -6,19 +6,20 @@
   import '../features/auth/pages/login_screen.dart';
   import '../features/auth/pages/register_screen.dart';
   import '../features/auth/pages/splash_screen.dart';
-  import '../features/home_screen.dart';
-  import '../features/settings_screen.dart';
-  import '../features/my_profile_screen.dart';
-  import '../features/profile_screen.dart';
-  import '../features/help_center_screen.dart';
-  import '../features/terms_of_services_screen.dart';
-  import '../features/privacy_policy_screen.dart';
+  import '../features/common/pages/home_screen.dart';
+  import '../features/common/pages/settings_screen.dart';
+  import '../features/common/pages/my_profile_screen.dart';
+  import '../features/common/pages/profile_screen.dart';
+  import '../features/common/pages/help_center_screen.dart';
+  import '../features/common/pages/terms_of_services_screen.dart';
+  import '../features/common/pages/privacy_policy_screen.dart';
   import '../features/owner/pages/keuangan_screen.dart';
   import '../features/owner/pages/bahan_baku_screen.dart';
   import '../features/owner/pages/karyawan_management_screen.dart';
-  import '../features/order_detail_screen.dart';
+  import '../features/customer/pages/order_detail_screen.dart';
   import '../features/owner/pages/menu_management_screen.dart';
   import '../features/owner/pages/bahan_baku_mutasi_screen.dart';
+  import '../features/owner/pages/keuangan_detail_screen.dart';
 
   class AppPages {
     static final pages = [
@@ -111,6 +112,14 @@
       GetPage(
         name: Routes.bahanBakuMutasi,
         page: () => const BahanBakuMutasiScreen(),
+        middlewares: [StartupMiddleware()],
+      ),
+      
+      GetPage(
+        name: Routes.keuanganDetail,
+        page: () => KeuanganDetailScreen(
+          completedOrders: List<Map<String, dynamic>>.from(Get.arguments ?? []),
+        ),
         middlewares: [StartupMiddleware()],
       ),
     ];

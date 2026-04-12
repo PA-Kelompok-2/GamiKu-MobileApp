@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import '/controllers/menu_controller.dart';
 import '/controllers/profile_controller.dart';
 import '/core/constants/app_colors.dart';
@@ -26,8 +28,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       Get.find<MenuC>().searchMenu(_searchController.text);
     });
 
-    // Refresh role setiap kali screen dibuka,
-    // agar tidak terbaca role akun lama saat ganti akun
     WidgetsBinding.instance.addPostFrameCallback((_) {
       profileC.loadProfile();
     });
@@ -52,7 +52,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             ? menuC.menus
             : menuC.menus.where((m) => m['cat'] == selectedCategory).toList();
 
-        // Obx agar isOwner reaktif saat fetchProfile selesai
         return Obx(() {
           final isOwner = profileC.role.value == 'owner';
 
@@ -63,7 +62,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -96,9 +94,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Container(
@@ -128,9 +124,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   SizedBox(
                     height: 40,
                     child: ListView.builder(
@@ -179,42 +173,43 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       },
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Expanded(
                     child: menuC.isLoading.value
                         ? const Center(child: CircularProgressIndicator())
                         : items.isEmpty
-                        ? const Center(
-                            child: Text('Belum ada menu di kategori ini'),
-                          )
-                        : GridView.builder(
-                            padding: const EdgeInsets.all(16),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 0.72,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
+                            ? const Center(
+                                child: Text('Belum ada menu di kategori ini'),
+                              )
+                            : GridView.builder(
+                                padding: const EdgeInsets.all(16),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.72,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                    ),
+                                itemCount: items.length,
+                                itemBuilder: (_, i) => _ManageMenuCard(
+                                  item: items[i],
+                                  role: profileC.role.value,
+                                  onEdit: () => _showMenuForm(item: items[i]),
+                                  onDelete: () =>
+                                      _confirmDelete(menuC, items[i]),
+                                  onToggleAvailability:
+                                      (id, isAvailable) async {
+                                    await menuC.updateAvailability(
+                                      id,
+                                      isAvailable,
+                                    );
+                                  },
                                 ),
-                            itemCount: items.length,
-                            itemBuilder: (_, i) => _ManageMenuCard(
-                              item: items[i],
-                              role: profileC.role.value,
-                              onEdit: () => _showMenuForm(item: items[i]),
-                              onDelete: () => _confirmDelete(menuC, items[i]),
-                              onToggleAvailability: (id, isAvailable) async {
-                                await menuC.updateAvailability(id, isAvailable);
-                              },
-                            ),
-                          ),
+                              ),
                   ),
                 ],
               ),
             ),
-
-            // FAB Tambah Menu hanya untuk owner
             floatingActionButton: isOwner
                 ? FloatingActionButton.extended(
                     backgroundColor: AppColors.primary,
@@ -230,7 +225,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                   )
                 : null,
           );
-        }); // tutup Obx
+        });
       },
     );
   }
@@ -289,7 +284,7 @@ class _ManageMenuCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final Future<void> Function(String itemId, bool isAvailable)
-  onToggleAvailability;
+      onToggleAvailability;
 
   const _ManageMenuCard({
     required this.item,
@@ -341,14 +336,6 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
     final isOwner = widget.role == 'owner';
     final isEmployee = widget.role == 'karyawan';
 
-    // ===== DEBUG =====
-    debugPrint('============================================');
-    debugPrint('ROLE VALUE   : "${widget.role}"');
-    debugPrint('isOwner      : $isOwner');
-    debugPrint('isEmployee   : $isEmployee');
-    debugPrint('============================================');
-    // ===== END DEBUG =====
-
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -366,13 +353,11 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar menu
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child:
-                      widget.item['image_url'] != null &&
+                  child: widget.item['image_url'] != null &&
                           widget.item['image_url'].toString().isNotEmpty
                       ? Image.network(
                           widget.item['image_url'],
@@ -404,10 +389,7 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                   ),
               ],
             ),
-
             const SizedBox(height: 6),
-
-            // Nama menu
             Text(
               widget.item['name'] ?? '',
               maxLines: 1,
@@ -419,32 +401,22 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                 decoration: _isAvailable ? null : TextDecoration.lineThrough,
               ),
             ),
-
             const SizedBox(height: 2),
-
-            // Kategori
             Text(
               widget.item['cat'] ?? '',
               style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
             ),
-
             const SizedBox(height: 4),
-
-            // Harga
             Text(
-              'Rp ${widget.item['price']}',
+              'Rp ${NumberFormat.decimalPattern('id').format(widget.item['price'] ?? 0)}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: _isAvailable ? AppColors.textDark : Colors.grey,
               ),
             ),
-
             const Spacer(),
-
-            // Action buttons
             if (isOwner)
-              // Owner: Edit + Delete + Toggle ON/OFF
               Row(
                 children: [
                   Expanded(
@@ -499,7 +471,6 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                 ],
               )
             else if (isEmployee)
-              // Karyawan: hanya Toggle ON/OFF, rata kiri
               _toggleButton(),
           ],
         ),
@@ -588,7 +559,10 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     super.initState();
     if (_isEdit) {
       _nameC.text = widget.item!['name'] ?? '';
-      _priceC.text = widget.item!['price']?.toString() ?? '';
+      final price = widget.item!['price'];
+      if (price != null) {
+        _priceC.text = NumberFormat.decimalPattern('id').format(price);
+      }
       _selectedCategoryId = widget.item!['category_id']?.toString();
     }
   }
@@ -631,38 +605,42 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     String imageUrl = _isEdit ? (widget.item!['image_url'] ?? '') : '';
 
     try {
-      // 🔥 UPLOAD GAMBAR JIKA ADA
       if (_pickedImage != null) {
         imageUrl = await service.uploadMenuImage(_pickedImage!);
       }
+
+      final parsedPrice = int.parse(_priceC.text.replaceAll('.', '').trim());
 
       if (_isEdit) {
         await menuC.updateMenu(
           id: widget.item!['id'],
           name: _nameC.text.trim(),
-          price: int.parse(_priceC.text.trim()),
+          price: parsedPrice,
           imageUrl: imageUrl,
           categoryId: _selectedCategoryId!,
         );
       } else {
         await menuC.addMenu(
           name: _nameC.text.trim(),
-          price: int.parse(_priceC.text.trim()),
+          price: parsedPrice,
           imageUrl: imageUrl,
           categoryId: _selectedCategoryId!,
         );
       }
 
-      Navigator.pop(widget.ctx);
+      if (!mounted) return;
+      Get.back();
     } catch (e) {
-      setState(() => _isSaving = false);
-
       Get.snackbar(
         'Error',
         'Gagal upload gambar / simpan menu',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
@@ -694,7 +672,6 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-
               Text(
                 _isEdit ? 'Edit Menu' : 'Tambah Menu',
                 style: const TextStyle(
@@ -704,7 +681,6 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
@@ -724,54 +700,53 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                           child: Image.file(_pickedImage!, fit: BoxFit.cover),
                         )
                       : _isEdit &&
-                            widget.item!['image_url'] != null &&
-                            widget.item!['image_url'].toString().isNotEmpty
-                      ? Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image.network(
-                                widget.item!['image_url'],
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    _pickerPlaceholder(),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 8,
-                              right: 8,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
+                              widget.item!['image_url'] != null &&
+                              widget.item!['image_url'].toString().isNotEmpty
+                          ? Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Image.network(
+                                    widget.item!['image_url'],
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => _pickerPlaceholder(),
+                                  ),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.55),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.edit,
-                                      size: 13,
-                                      color: Colors.white,
+                                Positioned(
+                                  bottom: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
                                     ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Ganti',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.55),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                  ],
+                                    child: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                          size: 13,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Ganti',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : _pickerPlaceholder(),
+                              ],
+                            )
+                          : _pickerPlaceholder(),
                 ),
               ),
               const SizedBox(height: 6),
@@ -792,9 +767,7 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               _label('Nama Menu'),
               const SizedBox(height: 6),
               _textField(
@@ -804,21 +777,22 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                     v == null || v.isEmpty ? 'Nama tidak boleh kosong' : null,
               ),
               const SizedBox(height: 14),
-
               _label('Harga (Rp)'),
               const SizedBox(height: 6),
               _textField(
                 controller: _priceC,
-                hint: 'Contoh: 25000',
+                hint: 'Contoh: 25.000',
                 keyboardType: TextInputType.number,
+                isPrice: true,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Harga tidak boleh kosong';
-                  if (int.tryParse(v) == null) return 'Masukkan angka valid';
+                  if (int.tryParse(v.replaceAll('.', '')) == null) {
+                    return 'Masukkan angka valid';
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: 14),
-
               _label('Kategori'),
               const SizedBox(height: 6),
               GetBuilder<MenuC>(
@@ -859,9 +833,7 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                   );
                 },
               ),
-
               const SizedBox(height: 28),
-
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -942,11 +914,27 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     required String hint,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    bool isPrice = false,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters:
+          isPrice ? [FilteringTextInputFormatter.digitsOnly] : null,
+      onChanged: isPrice
+          ? (value) {
+              if (value.isEmpty) return;
+
+              final number = int.parse(value.replaceAll('.', ''));
+              final newText = NumberFormat.decimalPattern('id').format(number);
+
+              controller.value = TextEditingValue(
+                text: newText,
+                selection: TextSelection.collapsed(offset: newText.length),
+              );
+            }
+          : null,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.textLight),

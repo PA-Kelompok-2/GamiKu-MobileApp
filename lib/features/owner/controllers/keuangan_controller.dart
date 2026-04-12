@@ -33,7 +33,6 @@ class KeuanganController extends GetxController {
   final pemasukanDetailList = <DetailKeuanganItemModel>[].obs;
   final pengeluaranDetailList = <DetailKeuanganItemModel>[].obs;
 
-  // tambahan untuk halaman detail mutasi
   final isLoadingMutasiBahanBaku = false.obs;
   final selectedMutasiPeriode = 'harian'.obs;
   final mutasiSearchQuery = ''.obs;
@@ -99,8 +98,9 @@ class KeuanganController extends GetxController {
   Future<void> getBahan() async {
     final res = await supabase.from('bahan_baku').select();
 
-    bahanBakuList.value =
-        (res as List).map((e) => BahanBaku.fromJson(e)).toList();
+    bahanBakuList.assignAll(
+      (res as List).map((e) => BahanBaku.fromJson(e)).toList(),
+    );
   }
 
   Future<void> getPengeluaran() async {
@@ -206,6 +206,8 @@ class KeuanganController extends GetxController {
       'price': price,
     });
 
+    await getBahan();
+
     await catatPengeluaranBahanBaku(
       namaBahan: name,
       jumlah: stock,
@@ -214,7 +216,6 @@ class KeuanganController extends GetxController {
       sumber: 'stok_awal',
     );
 
-    await getBahan();
     await getPengeluaran();
     await getSemuaKeuangan();
     await fetchDetailKeuangan();
@@ -271,24 +272,10 @@ class KeuanganController extends GetxController {
 
     await supabase.from('keuangan').insert({
       'jenis': 'pengeluaran',
-      'nama': 'Pembelian stok bahan baku: $namaBahan',
+      'nama': 'Pembelian bahan baku: $namaBahan',
       'nominal': nominal,
       'tanggal': DateTime.now().toIso8601String(),
-      'created_at': DateTime.now().toIso8601String(),
-      'keterangan':
-          'Sumber: $sumber | Qty: $jumlah $unit | Harga satuan: Rp $hargaSatuan',
     });
-  }
-
-  String _buildPengeluaranSubtitle(Map<String, dynamic> data) {
-    final nama = (data['nama'] ?? '').toString().toLowerCase();
-    final keterangan = (data['keterangan'] ?? '').toString();
-
-    if (nama.contains('bahan baku') || nama.contains('stok bahan baku')) {
-      return keterangan.isNotEmpty ? keterangan : 'Pembelian bahan baku';
-    }
-
-    return 'Manual / operasional';
   }
 
   Future<void> tambahStok(String id, int jumlah) async {
@@ -682,6 +669,17 @@ class KeuanganController extends GetxController {
     final list = hasil.values.toList();
     list.sort((a, b) => b.label.compareTo(a.label));
     return list;
+  }
+
+  String _buildPengeluaranSubtitle(Map<String, dynamic> data) {
+    final nama = (data['nama'] ?? '').toString().toLowerCase();
+    final keterangan = (data['keterangan'] ?? '').toString();
+
+    if (nama.contains('bahan baku') || nama.contains('stok bahan baku')) {
+      return keterangan.isNotEmpty ? keterangan : 'Pembelian bahan baku';
+    }
+
+    return 'Manual / operasional';
   }
 
   @override

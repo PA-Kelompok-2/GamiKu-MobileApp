@@ -183,6 +183,9 @@ class _KeuanganDetailScreenState extends State<KeuanganDetailScreen> {
             isIncome: false,
             onDelete: () async {
               await keuanganC.hapus(item.id);
+              if (mounted) {
+                setState(() {});
+              }
             },
           );
         },

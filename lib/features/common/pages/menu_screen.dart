@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../routes/app_routes.dart';
-import '../controllers/menu_controller.dart';
-import '../core/constants/app_colors.dart';
-import '../core/services/supabase_services.dart';
-import 'widgets/menu_card.dart';
-import 'widgets/search_bar.dart';
+import '../../../routes/app_routes.dart';
+import '../../../controllers/menu_controller.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/services/supabase_services.dart';
+import '../../../shared/widgets/menu_card.dart';
+import '../../../shared/widgets/search_bar.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});

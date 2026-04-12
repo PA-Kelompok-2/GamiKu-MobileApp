@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../core/services/supabase_services.dart';
+import '../../../core/services/supabase_services.dart';
 import 'package:get/get.dart';
 import 'package:confetti/confetti.dart';
 

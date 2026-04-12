@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../core/services/supabase_services.dart';
-import '../core/constants/app_colors.dart';
-import 'widgets/order_card.dart';
+import '../../../core/services/supabase_services.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../shared/widgets/order_card.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});

@@ -13,14 +13,6 @@ class SplashController extends GetxController {
 
   Future<void> checkAuth() async {
     await Future.delayed(const Duration(seconds: 2));
-
-    final user = service.supabase.auth.currentUser;
-
-    if (user == null) {
-      Get.offAllNamed(Routes.login);
-      return;
-    }
-
     Get.offAllNamed(Routes.home);
   }
 }

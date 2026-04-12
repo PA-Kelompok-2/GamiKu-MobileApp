@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/constants/app_colors.dart';
-import '../core/services/supabase_services.dart';
-import '../controllers/profile_controller.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/services/supabase_services.dart';
+import '../../../controllers/profile_controller.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -39,8 +39,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       setState(() {
         nameC.text = data['name'] ?? '';
         emailC.text = data['email'] ?? '';
-        phoneC.text = data['phone'] ?? '';
-        dobC.text = data['date_of_birth'] ?? '';
+        phoneC.text = data['phone_number'] ?? '';
+        dobC.text = data['date_of_birth']?.toString() ?? '';
         gender = data['gender'] ?? 'Male';
         isLoading = false;
       });
@@ -69,7 +69,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       await service.supabase.from('profiles').update({
         'name': nameC.text.trim(),
         'email': emailC.text.trim(),
-        'phone': phoneC.text.trim(),
+        'phone_number': phoneC.text.trim(),
         'gender': gender,
         'date_of_birth': dobC.text,
       }).eq('id', user.id);

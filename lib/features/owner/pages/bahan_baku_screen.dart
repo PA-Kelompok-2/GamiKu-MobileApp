@@ -229,7 +229,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                         }
 
                         if (!mounted) return;
-                        Navigator.pop(ctx);
+                        Get.back();
 
                         Get.snackbar(
                           "Berhasil",
@@ -372,7 +372,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                   await keuanganC.tambahStok(b.id, jumlah);
 
                   if (!mounted) return;
-                  Navigator.pop(ctx);
+                  Get.back();
 
                   Get.snackbar(
                     'Berhasil',
@@ -515,7 +515,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                   await keuanganC.kurangiStok(b.id, jumlah);
 
                   if (!mounted) return;
-                  Navigator.pop(ctx);
+                  Get.back();
 
                   Get.snackbar(
                     'Berhasil',

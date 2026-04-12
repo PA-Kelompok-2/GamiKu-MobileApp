@@ -1,8 +1,8 @@
 import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../core/services/supabase_services.dart';
-import '../core/constants/app_colors.dart';
+import '../../../core/services/supabase_services.dart';
+import '../../../core/constants/app_colors.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

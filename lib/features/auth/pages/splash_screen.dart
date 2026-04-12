@@ -1,4 +1,3 @@
-import 'package:application_gamiku/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/splash_controller.dart';
@@ -19,13 +18,9 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnim;
   late Animation<double> _scaleAnim;
 
-  bool isLoggedIn = false;
-
   @override
   void initState() {
     super.initState();
-
-    isLoggedIn = controller.service.supabase.auth.currentUser != null;
 
     _animCtrl = AnimationController(
       vsync: this,
@@ -49,10 +44,6 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _animCtrl.dispose();
     super.dispose();
-  }
-
-  void goToLogin() {
-    Get.offAllNamed(Routes.login);
   }
 
   @override
@@ -90,34 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                 const SizedBox(height: 40),
-                if (!isLoggedIn)
-                  ElevatedButton(
-                    onPressed: goToLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.splashRed,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 6,
-                    ),
-                    child: const Text(
-                      "Masuk",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                if (isLoggedIn)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
+                const CircularProgressIndicator(color: Colors.white),
               ],
             ),
           ),

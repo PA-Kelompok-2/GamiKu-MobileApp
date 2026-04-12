@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:application_gamiku/routes/app_routes.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
 import '../controllers/keuangan_controller.dart';
 import '../widgets/summary_card.dart';
 import 'package:flutter/services.dart';
-import 'keuangan_detail_screen.dart';
 
 class KeuanganScreen extends StatefulWidget {
   const KeuanganScreen({super.key});
@@ -331,10 +331,10 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Get.to(
-                      () => KeuanganDetailScreen(
-                        completedOrders: _completedOrders,
-                      ),
+                      Get.toNamed(
+                        Routes.keuanganDetail,
+                        arguments : _completedOrders,
+
                     );
                   },
                   child: const Text(

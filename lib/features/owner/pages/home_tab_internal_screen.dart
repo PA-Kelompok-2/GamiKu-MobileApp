@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import '/core/constants/app_colors.dart';
 import '/core/services/supabase_services.dart';
-
+import 'package:intl/intl.dart';
 import 'bahan_baku_screen.dart';
 import 'menu_management_screen.dart';
 import 'keuangan_screen.dart';
 import 'karyawan_management_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomeTabKaryawan extends StatefulWidget {
+class HomeTabInternalScreen extends StatefulWidget {
 
   final VoidCallback? onOpenOrders;
 
-  const HomeTabKaryawan({
+  const HomeTabInternalScreen({
     super.key,
     this.onOpenOrders,
   });
 
   @override
-  State<HomeTabKaryawan> createState() => _HomeTabKaryawanState();
+  State<HomeTabInternalScreen> createState() => _HomeTabInternalScreenState();
 }
 
-class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
+class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
 
   final service = SupabaseService();
 
@@ -68,35 +68,31 @@ class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
     setState(() {});
   }
 
-  /// STATISTIK OWNER
   Future<void> loadStatistik() async {
-
-    final menu = await Supabase.instance.client.from('menu').select();
+    final menu = await Supabase.instance.client.from('menus').select();
     totalMenu = menu.length;
-
-    final pemasukanData = await Supabase.instance.client
-        .from('keuangan')
-        .select()
-        .eq('type', 'pemasukan');
-
-    pemasukan = pemasukanData.fold<int>(
+    final completedOrders = await Supabase.instance.client
+        .from('orders')
+        .select('total_price, status')
+        .eq('status', 'completed');
+    pemasukan = completedOrders.fold<int>(
       0,
-      (sum, item) => sum + ((item['amount'] ?? 0) as num).toInt(),
+      (sum, item) => sum + ((item['total_price'] ?? 0) as num).toInt(),
     );
-
     final pengeluaranData = await Supabase.instance.client
         .from('keuangan')
-        .select()
-        .eq('type', 'pengeluaran');
-
+        .select('nominal, jenis')
+        .eq('jenis', 'pengeluaran');
     pengeluaran = pengeluaranData.fold<int>(
       0,
-      (sum, item) => sum + ((item['amount'] ?? 0) as num).toInt(),
+      (sum, item) => sum + ((item['nominal'] ?? 0) as num).toInt(),
     );
-
     saldo = pemasukan - pengeluaran;
-
     setState(() {});
+  }
+
+  String formatRupiah(int value) {
+    return 'Rp ${NumberFormat.decimalPattern('id').format(value)}';
   }
 
   @override
@@ -119,7 +115,6 @@ class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
 
               const SizedBox(height: 10),
 
-              /// LOGO
               Row(
                 children: [
                   Container(
@@ -158,7 +153,6 @@ class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
 
               const SizedBox(height: 20),
 
-              /// WELCOME CARD
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -227,9 +221,9 @@ class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
                   childAspectRatio: 2.2,
                   children: [
 
-                    _statCard("Pemasukan", "Rp $pemasukan", Icons.payments_outlined, Colors.green),
-                    _statCard("Pengeluaran", "Rp $pengeluaran", Icons.money_off_csred_outlined, Colors.red),
-                    _statCard("Saldo", "Rp $saldo", Icons.account_balance_wallet_outlined, AppColors.primary),
+                    _statCard("Pemasukan", formatRupiah(pemasukan), Icons.payments_outlined, Colors.green),
+                    _statCard("Pengeluaran", formatRupiah(pengeluaran), Icons.money_off_csred_outlined, Colors.red),
+                    _statCard("Saldo", formatRupiah(saldo), Icons.account_balance_wallet_outlined, AppColors.primary),
                     _statCard("Total Menu", "$totalMenu Menu", Icons.restaurant_menu, Colors.orange),
 
                   ],
@@ -239,7 +233,6 @@ class _HomeTabKaryawanState extends State<HomeTabKaryawan> {
 
               ],
 
-              /// PESANAN KARYAWAN
               if(role == "karyawan") ...[
 
                 const Text(
