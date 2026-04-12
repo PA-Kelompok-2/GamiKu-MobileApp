@@ -55,7 +55,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         'Berhasil',
         nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.tagGreen,
         colorText: Colors.white,
       );
     } catch (e) {
