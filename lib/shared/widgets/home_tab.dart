@@ -183,29 +183,6 @@ class _HomeTabState extends State<HomeTab> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              const Icon(
-                                Icons.notifications_none,
-                                color: AppColors.textDark,
-                              ),
-
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: isGuest ? _goToLogin : widget.onOpenOrders,
                             child: Container(
