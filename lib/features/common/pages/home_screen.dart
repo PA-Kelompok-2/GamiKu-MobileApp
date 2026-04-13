@@ -147,10 +147,10 @@ class _HomeScreenState extends State<HomeScreen>
                 selected: _navIdx,
                 cartCount: cartCount,
                 onTap: (i) {
-                  if (_isGuest() && (i == 2 || i == 3)) {
-                    _goToLogin();
-                    return;
-                  }
+                  if (_isGuest() && i == 2) {
+                  _goToLogin();
+                  return;
+                }
                   _onNavTap(i);
                 },
               ),

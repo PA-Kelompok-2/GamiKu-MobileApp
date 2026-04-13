@@ -50,18 +50,33 @@ class MenuC extends GetxController {
   }
 
   void searchMenu(String query) {
-    if (query.isEmpty) {
-      menus.value = allMenus;
-      return;
-    }
+    final q = query.toLowerCase();
 
     final filtered = allMenus.where((menu) {
       final name = menu['name'].toString().toLowerCase();
       final cat = menu['cat'].toString().toLowerCase();
 
-      return name.contains(query.toLowerCase()) ||
-          cat.contains(query.toLowerCase());
+      final matchSearch = q.isEmpty || name.contains(q) || cat.contains(q);
+
+      final matchCategory = selectedCategory.value.isEmpty ||
+          menu['cat'] == selectedCategory.value;
+
+      return matchSearch && matchCategory;
     }).toList();
+
+    menus.value = filtered;
+  }
+
+  void filterByCategory(String category) {
+    selectedCategory.value = category;
+
+    if (category == "Semua" || category.isEmpty) {
+      menus.value = allMenus;
+      return;
+    }
+
+    final filtered =
+        allMenus.where((menu) => menu['cat'] == category).toList();
 
     menus.value = filtered;
   }

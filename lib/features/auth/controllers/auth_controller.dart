@@ -66,7 +66,9 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await service.logout();
     Get.delete<ProfileController>();
-    Get.offAllNamed(Routes.login);
+
+    // kembali ke home saja
+    Get.offAllNamed(Routes.home);
   }
 
   Future<void> register({

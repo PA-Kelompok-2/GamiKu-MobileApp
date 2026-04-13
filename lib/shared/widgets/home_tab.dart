@@ -25,29 +25,9 @@ class _HomeTabState extends State<HomeTab> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
-  List<String> _categories = [];
-  List<Map<String, dynamic>> _popularMenus = [];
-
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  void _loadData() {
-    final menuC = Get.find<MenuC>();
-    final allMenus = menuC.allMenus;
-
-    if (allMenus.isEmpty) {
-      final menus = menuC.menus;
-      _categories = menus.map((m) => m['cat'] as String).toSet().toList()
-        ..sort();
-      _popularMenus = menus.take(5).toList();
-    } else {
-      _categories = allMenus.map((m) => m['cat'] as String).toSet().toList()
-        ..sort();
-      _popularMenus = allMenus.take(5).toList();
-    }
   }
 
   void _goToLogin() {
@@ -206,23 +186,17 @@ class _HomeTabState extends State<HomeTab> {
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: AppColors.chipRed,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.notifications_outlined,
-                                  color: AppColors.primary,
-                                ),
+                              const Icon(
+                                Icons.notifications_none,
+                                color: AppColors.textDark,
                               ),
+
                               Positioned(
-                                right: 6,
-                                top: 6,
+                                right: 0,
+                                top: 0,
                                 child: Container(
-                                  width: 6,
-                                  height: 6,
+                                  width: 8,
+                                  height: 8,
                                   decoration: const BoxDecoration(
                                     color: AppColors.primary,
                                     shape: BoxShape.circle,
@@ -263,43 +237,6 @@ class _HomeTabState extends State<HomeTab> {
                             offset: const Offset(0, 2),
                           ),
                         ],
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _searchFocus,
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: _handleSearch,
-                        onChanged: (_) => setState(() {}),
-                        decoration: InputDecoration(
-                          hintText: 'Cari menu favoritmu...',
-                          hintStyle: TextStyle(
-                            color: AppColors.textGrey,
-                            fontSize: 14,
-                          ),
-                          prefixIcon: IconButton(
-                            icon: const Icon(
-                              Icons.search,
-                              color: AppColors.textGrey,
-                            ),
-                            onPressed: () =>
-                                _handleSearch(_searchController.text),
-                          ),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 18),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    menuC.searchMenu('');
-                                    setState(() {});
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                        ),
                       ),
                     ),
                   ],
@@ -343,14 +280,23 @@ class _HomeTabState extends State<HomeTab> {
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 120,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: _categories.map((cat) => _categoryItem(cat)).toList(),
-                ),
-              ),
+              child: Obx(() {
+                final menuC = Get.find<MenuC>();
+
+                final cats = menuC.menus
+                    .map((m) => m['cat']?.toString() ?? '')
+                    .toSet()
+                    .toList();
+
+                return SizedBox(
+                  height: 120,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: cats.map((cat) => _categoryItem(cat)).toList(),
+                  ),
+                );
+              }),
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
@@ -372,14 +318,20 @@ class _HomeTabState extends State<HomeTab> {
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 160,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: _popularMenus.map((m) => _popularCard(m)).toList(),
-                ),
-              ),
+              child: Obx(() {
+                final menuC = Get.find<MenuC>();
+
+                final popularMenus = menuC.menus.take(5).toList();
+
+                return SizedBox(
+                  height: 160,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: popularMenus.map((m) => _popularCard(m)).toList(),
+                  ),
+                );
+              }),
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 100)),

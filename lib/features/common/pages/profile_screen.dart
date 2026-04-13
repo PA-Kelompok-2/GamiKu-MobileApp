@@ -19,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String role = '';
   bool isLoading = true;
 
+  bool isLoggedIn = false;
+
   void confirmLogout() {
     Get.dialog(
       Center(
@@ -136,14 +138,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void loadProfile() async {
-    final data = await service.getProfile();
-    if (data != null) {
+    final user = service.supabase.auth.currentUser;
+
+    if (user == null) {
       setState(() {
-        name = data['name'] ?? '-';
-        role = data['role'] ?? '-';
+        name = "Customer";
+        role = "guest";
+        isLoggedIn = false;
         isLoading = false;
       });
+      return;
     }
+
+    final data = await service.getProfile();
+
+    setState(() {
+      name = data?['name'] ?? 'User';
+      role = data?['role'] ?? 'customer';
+      isLoggedIn = true;
+      isLoading = false;
+    });
   }
 
   String getRandomAvatarUrl() {
@@ -431,11 +445,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 onTap: () => Get.toNamed(Routes.settings),
                               ),
                               _buildMenuItem(
-                                Icons.logout,
-                                'Logout',
+                                isLoggedIn ? Icons.logout : Icons.login,
+                                isLoggedIn ? 'Logout' : 'Login',
                                 iconBg: const Color(0xFFFFEBEE),
                                 iconColor: Colors.red,
-                                onTap: confirmLogout,
+                                onTap: () {
+                                  if (isLoggedIn) {
+                                    confirmLogout();
+                                  } else {
+                                    Get.toNamed('/login');
+                                  }
+                                },
                               ),
                             ],
                           ),

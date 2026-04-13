@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:math';
 import '../../../routes/app_routes.dart';
 import '../../../controllers/menu_controller.dart';
 import '../../../core/constants/app_colors.dart';
@@ -16,25 +17,84 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _catScroll = ScrollController();
   String? _role;
   String selectedCategory = 'Semua';
 
   @override
   void initState() {
     super.initState();
+
     selectedCategory = Get.arguments ?? 'Semua';
+
+    Future<void> _loadRole() async {
+      final role = await SupabaseService().getUserRole();
+
+      if (mounted) {
+        setState(() {
+          _role = role;
+        });
+      }
+    }
+
     _loadRole();
 
-    // Listen to search changes
+    final menuC = Get.find<MenuC>();
+
+    /// LISTEN CATEGORY DARI HOME
+    ever(menuC.selectedCategory, (cat) {
+      setState(() {
+        selectedCategory = cat;
+      });
+
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _scrollToCenter();
+      });
+    });
+
+    /// SEARCH LISTENER
     _searchController.addListener(() {
-      Get.find<MenuC>().searchMenu(_searchController.text);
+      menuC.searchMenu(_searchController.text);
+    });
+
+    /// SCROLL SAAT HALAMAN TERBUKA
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _scrollToCenter();
+      });
     });
   }
 
-  Future<void> _loadRole() async {
-    final role = await SupabaseService().getUserRole();
-    if (mounted) setState(() => _role = role);
+  void _scrollToCenter() {
+    final menuC = Get.find<MenuC>();
+
+    final cats = ['Semua', ...menuC.menus
+        .map((m) => m['cat']?.toString() ?? '')
+        .toSet()];
+
+    final index = cats.indexOf(selectedCategory);
+
+    if (index == -1 || !_catScroll.hasClients) return;
+
+    final position = _catScroll.position;
+
+    final itemWidth = 110.0; // ukuran chip + margin
+
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final offset =
+        (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+
+    final finalOffset =
+        max(0.0, min(offset, position.maxScrollExtent));
+
+    _catScroll.animateTo(
+      finalOffset,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+    );
   }
+  
 
   @override
   void dispose() {
@@ -49,7 +109,7 @@ class _MenuScreenState extends State<MenuScreen> {
     return Obx(() {
       // Extract unique categories from menus
       final Set<String> categorySet = menuC.menus
-          .map((m) => m['cat'] as String)
+          .map((m) => (m['cat'] ?? 'Unknown').toString())
           .toSet();
 
       final List<String> categories = ['Semua', ...categorySet];
@@ -57,7 +117,9 @@ class _MenuScreenState extends State<MenuScreen> {
       // Filter items based on selected category
       final items = selectedCategory == 'Semua'
           ? menuC.menus
-          : menuC.menus.where((m) => m['cat'] == selectedCategory).toList();
+          : menuC.menus
+              .where((m) => (m['cat'] ?? '') == selectedCategory)
+              .toList();
 
       return Scaffold(
         backgroundColor: AppColors.bg,
@@ -91,7 +153,12 @@ class _MenuScreenState extends State<MenuScreen> {
               const SizedBox(height: 16),
 
               // Search Bar
-              MenuSearchBar(controller: _searchController),
+              MenuSearchBar(
+                controller: _searchController,
+                onChanged: (value) {
+                  Get.find<MenuC>().searchMenu(value);
+                },
+                ),
 
               const SizedBox(height: 16),
 
@@ -99,6 +166,7 @@ class _MenuScreenState extends State<MenuScreen> {
               SizedBox(
                 height: 40,
                 child: ListView.builder(
+                  controller: _catScroll,
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: categories.length,
@@ -107,9 +175,17 @@ class _MenuScreenState extends State<MenuScreen> {
                     final isSelected = cat == selectedCategory;
 
                     return GestureDetector(
-                      onTap: () => setState(() => selectedCategory = cat),
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = cat;
+                        });
+
+                        Future.delayed(const Duration(milliseconds: 50), () {
+                          _scrollToCenter();
+                        });
+                      },
                       child: Container(
-                        margin: const EdgeInsets.only(right: 12),
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 8,

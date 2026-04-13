@@ -16,11 +16,24 @@ class ProfileController extends GetxController {
 
   Future<void> loadProfile() async {
     isLoading.value = true;
-    final data = await service.getProfile();
-    if (data != null) {
-      name.value = data['name'] ?? '-';
-      role.value = data['role'] ?? '-';
+
+    final user = service.supabase.auth.currentUser;
+
+    // jika belum login → mode guest
+    if (user == null) {
+      name.value = "Guest User";
+      role.value = "customer";
+      isLoading.value = false;
+      return;
     }
+
+    final data = await service.getProfile();
+
+    if (data != null) {
+      name.value = data['name'] ?? 'User';
+      role.value = data['role'] ?? 'customer';
+    }
+
     isLoading.value = false;
   }
 }
