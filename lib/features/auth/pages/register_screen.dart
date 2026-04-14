@@ -20,7 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isObscure = true;
 
-  void register() {
+  void register() async {
     final name = nameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -65,10 +65,10 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       Get.snackbar(
         "Registrasi Gagal",
-        "Password minimal 6 karakter.",
+        "Password minimal 8 karakter.",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black,
@@ -85,11 +85,34 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    authC.register(
-      email: email,
-      password: password,
-      name: name,
-    );
+    try {
+      await authC.register(
+        email: email,
+        password: password,
+        name: name,
+      );
+    } catch (e) {
+      final errorMsg = e.toString().toLowerCase();
+
+      Get.snackbar(
+        "Registrasi Gagal",
+        errorMsg.contains('email')
+            ? "Email sudah digunakan atau tidak valid."
+            : "Terjadi kesalahan, coba lagi.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(
+          Icons.cancel,
+          color: Colors.red,
+          size: 28,
+        ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+    }
   }
 
   @override
@@ -152,7 +175,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
             ),
           ),
-
           Expanded(
             child: Container(
               width: double.infinity,
@@ -176,9 +198,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 25),
-
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
@@ -195,9 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 15),
-
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -215,9 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 15),
-
                     TextField(
                       controller: passwordController,
                       obscureText: isObscure,
@@ -245,9 +261,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 25),
-
                     Obx(
                       () => SizedBox(
                         width: double.infinity,
@@ -271,9 +285,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -290,7 +302,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 25),
                   ],
                 ),

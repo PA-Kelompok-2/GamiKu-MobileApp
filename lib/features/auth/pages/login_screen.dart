@@ -18,11 +18,39 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isObscure = true;
 
-  void login() {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+  void login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       Get.snackbar("Error", "Email dan Password wajib diisi");
-    } else {
-      authC.login(emailController.text, passwordController.text);
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      Get.snackbar("Error", "Format email tidak valid");
+      return;
+    }
+
+    if (password.length < 8) {
+      Get.snackbar("Error", "Password minimal 8 karakter");
+      return;
+    }
+
+    try {
+      await authC.login(email, password);
+    } catch (e) {
+      final errorMsg = e.toString().toLowerCase();
+
+      Get.snackbar(
+        "Login Gagal",
+        errorMsg.contains('invalid') ||
+                errorMsg.contains('password') ||
+                errorMsg.contains('credential') ||
+                errorMsg.contains('email')
+            ? "Email atau password salah"
+            : "Terjadi kesalahan, coba lagi",
+      );
     }
   }
 
@@ -41,10 +69,8 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: AppColors.splashRed,
       body: Stack(
         children: [
-
           Column(
             children: [
-
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60, bottom: 40),
@@ -65,9 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Image.asset('assets/logo.png', height: 60),
                     ),
-
                     const SizedBox(height: 20),
-
                     const Text(
                       "Hello!",
                       style: TextStyle(
@@ -76,16 +100,12 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.white,
                       ),
                     ),
-
                     const SizedBox(height: 6),
-
                     const Text(
                       "Welcome to GamiKu",
                       style: TextStyle(fontSize: 16, color: Colors.white70),
                     ),
-
                     const SizedBox(height: 6),
-
                     const Text(
                       "Login to order your favorite food",
                       style: TextStyle(fontSize: 14, color: Colors.white60),
@@ -93,7 +113,6 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -109,9 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         const SizedBox(height: 30),
-
                         const Text(
                           "Login",
                           style: TextStyle(
@@ -119,9 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 25),
-
                         TextField(
                           controller: emailController,
                           decoration: InputDecoration(
@@ -138,9 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 15),
-
                         TextField(
                           controller: passwordController,
                           obscureText: isObscure,
@@ -170,9 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 10),
-
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
@@ -183,9 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 25),
-
                         Obx(
                           () => SizedBox(
                             width: double.infinity,
@@ -195,7 +204,8 @@ class _LoginPageState extends State<LoginPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.splashRed,
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 18),
+                                  vertical: 18,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
@@ -214,9 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -233,7 +241,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -242,7 +249,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
-
           Positioned(
             top: 15,
             left: 10,

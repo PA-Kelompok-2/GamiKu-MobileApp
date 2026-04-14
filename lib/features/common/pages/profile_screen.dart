@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../routes/app_routes.dart';
-import 'my_profile_screen.dart';
+import '../../../routes/app_routes.dart'; 
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -258,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 bottom: 0,
                                 right: 0,
                                 child: GestureDetector(
-                                  onTap: () => Get.to(() => const MyProfileScreen()),
+                                  onTap: () => Get.toNamed(Routes.myProfile),
                                   child: Container(
                                     width: 30,
                                     height: 30,
