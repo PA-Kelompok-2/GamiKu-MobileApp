@@ -25,7 +25,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
-    // Validasi field kosong
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       Get.snackbar(
         "Registrasi Gagal",
@@ -46,7 +45,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Validasi format email
     if (!GetUtils.isEmail(email)) {
       Get.snackbar(
         "Registrasi Gagal",
@@ -67,7 +65,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Validasi password
     if (password.length < 6) {
       Get.snackbar(
         "Registrasi Gagal",
@@ -88,7 +85,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Jika semua valid
     authC.register(
       email: email,
       password: password,

@@ -5,6 +5,7 @@ abstract class Routes {
   static const home = '/home';
   static const settings = '/settings';
   static const myProfile = '/my-profile';
+  static const about = '/about';
   static const profile = '/profile';
   static const helpCenter = '/help-center';
   static const terms = '/terms';
@@ -16,4 +17,7 @@ abstract class Routes {
   static const orderDetail = '/order-detail';
   static const menuManagement = '/menu-management';
   static const bahanBakuMutasi = '/bahan-baku-mutasi';
+  static const payment = '/payment';
+  static const paymentGateway = '/payment-gateway';
+  static const qr = '/qr';
 }

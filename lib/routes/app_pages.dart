@@ -1,25 +1,28 @@
-  import 'package:get/get.dart';
-
-  import 'app_routes.dart';
-  import 'startup_middleware.dart';
-
-  import '../features/auth/pages/login_screen.dart';
-  import '../features/auth/pages/register_screen.dart';
-  import '../features/auth/pages/splash_screen.dart';
-  import '../features/common/pages/home_screen.dart';
-  import '../features/common/pages/settings_screen.dart';
-  import '../features/common/pages/my_profile_screen.dart';
-  import '../features/common/pages/profile_screen.dart';
-  import '../features/common/pages/help_center_screen.dart';
-  import '../features/common/pages/terms_of_services_screen.dart';
-  import '../features/common/pages/privacy_policy_screen.dart';
-  import '../features/owner/pages/keuangan_screen.dart';
-  import '../features/owner/pages/bahan_baku_screen.dart';
-  import '../features/owner/pages/karyawan_management_screen.dart';
-  import '../features/customer/pages/order_detail_screen.dart';
-  import '../features/owner/pages/menu_management_screen.dart';
-  import '../features/owner/pages/bahan_baku_mutasi_screen.dart';
-  import '../features/owner/pages/keuangan_detail_screen.dart';
+import 'package:get/get.dart';
+import 'app_routes.dart';
+import 'startup_middleware.dart';
+import 'package:flutter/material.dart';
+import '../features/auth/pages/login_screen.dart';
+import '../features/auth/pages/register_screen.dart';
+import '../features/auth/pages/splash_screen.dart';
+import '../features/common/pages/home_screen.dart';
+import '../features/common/pages/settings_screen.dart';
+import '../features/common/pages/my_profile_screen.dart';
+import '../features/common/pages/about_screen.dart';
+import '../features/common/pages/profile_screen.dart';
+import '../features/common/pages/help_center_screen.dart';
+import '../features/common/pages/terms_of_services_screen.dart';
+import '../features/common/pages/privacy_policy_screen.dart';
+import '../features/owner/pages/keuangan_screen.dart';
+import '../features/owner/pages/bahan_baku_screen.dart';
+import '../features/owner/pages/karyawan_management_screen.dart';
+import '../features/customer/pages/order_detail_screen.dart';
+import '../features/owner/pages/menu_management_screen.dart';
+import '../features/owner/pages/bahan_baku_mutasi_screen.dart';
+import '../features/owner/pages/keuangan_detail_screen.dart';
+import '../features/customer/pages/payment_screen.dart';
+import '../features/customer/pages/payment_gateway_screen.dart';
+import '../features/customer/pages/qr_screen.dart';
 
   class AppPages {
     static final pages = [
@@ -53,6 +56,11 @@
         name: Routes.myProfile,
         page: () => const MyProfileScreen(),
         middlewares: [StartupMiddleware()],
+      ),
+
+      GetPage(
+        name: Routes.about,
+        page: () => const AboutScreen(),
       ),
 
       GetPage(
@@ -120,6 +128,29 @@
         page: () => KeuanganDetailScreen(
           completedOrders: List<Map<String, dynamic>>.from(Get.arguments ?? []),
         ),
+        middlewares: [StartupMiddleware()],
+      ),
+      
+      GetPage(
+        name: Routes.payment,
+        page: () => const PaymentScreen(),
+        middlewares: [StartupMiddleware()],
+      ),
+      GetPage(
+        name: Routes.paymentGateway,
+        page: () {
+          final args = Get.arguments;
+          final onOrderPlaced = args is Map<String, dynamic>
+              ? args['onOrderPlaced'] as VoidCallback?
+              : null;
+
+          return PaymentGatewayScreen(onOrderPlaced: onOrderPlaced);
+        },
+        middlewares: [StartupMiddleware()],
+      ),
+      GetPage(
+        name: Routes.qr,
+        page: () => const QRScreen(),
         middlewares: [StartupMiddleware()],
       ),
     ];

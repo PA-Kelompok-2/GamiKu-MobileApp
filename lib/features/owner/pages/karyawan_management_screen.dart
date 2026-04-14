@@ -66,7 +66,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// drag handle
                   Center(
                     child: Container(
                       width: 45,
@@ -87,7 +86,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 20),
 
-                  /// nama
                   TextField(
                     controller: nameC,
                     decoration: InputDecoration(
@@ -104,7 +102,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// email
                   TextField(
                     controller: emailC,
                     keyboardType: TextInputType.emailAddress,
@@ -122,7 +119,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// password
                   TextField(
                     controller: passC,
                     obscureText: !showPassword,
@@ -152,7 +148,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 24),
 
-                  /// tombol simpan
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -168,7 +163,7 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           return;
                         }
 
-                        Navigator.pop(ctx);
+                        Get.back();
 
                         try {
                           await service.addKaryawan(
@@ -245,7 +240,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// drag handle
                   Center(
                     child: Container(
                       width: 45,
@@ -266,7 +260,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 20),
 
-                  /// nama
                   TextField(
                     controller: nameC,
                     decoration: InputDecoration(
@@ -283,7 +276,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// email
                   TextField(
                     controller: emailC,
                     keyboardType: TextInputType.emailAddress,
@@ -301,7 +293,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// tombol
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -315,7 +306,7 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           return;
                         }
 
-                        Navigator.pop(ctx);
+                        Get.back();
 
                         try {
                           await service.updateKaryawan(

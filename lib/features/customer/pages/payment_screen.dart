@@ -3,11 +3,10 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../models/order_model.dart';
-import 'payment_gateway_screen.dart';
+import '../../../routes/app_routes.dart';
 
 class PaymentScreen extends StatefulWidget {
-  final VoidCallback? onOrderPlaced;
-  const PaymentScreen({super.key, this.onOrderPlaced});
+  const PaymentScreen({super.key});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -16,6 +15,16 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   final _noteCtrl = TextEditingController();
 
+  VoidCallback? get _onOrderPlaced {
+    final args = Get.arguments;
+
+    if (args is Map<String, dynamic>) {
+      return args['onOrderPlaced'] as VoidCallback?;
+    }
+
+    return null;
+  }
+
   @override
   void dispose() {
     _noteCtrl.dispose();
@@ -23,12 +32,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _goToPaymentGateway() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            PaymentGatewayScreen(onOrderPlaced: widget.onOrderPlaced),
-      ),
+    Get.toNamed(
+      Routes.paymentGateway,
+      arguments: {
+        'onOrderPlaced': _onOrderPlaced,
+      },
     );
   }
 
@@ -80,7 +88,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: Get.back,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -355,7 +363,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 child: const Text(
                   '🍽️  Pesan Sekarang',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),

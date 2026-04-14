@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import '/core/constants/app_colors.dart';
 import '/core/services/supabase_services.dart';
 import 'package:intl/intl.dart';
-import 'bahan_baku_screen.dart';
-import 'menu_management_screen.dart';
-import 'keuangan_screen.dart';
-import 'karyawan_management_screen.dart';
+import 'package:get/get.dart';
+import '/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeTabInternalScreen extends StatefulWidget {
@@ -56,7 +54,6 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
     }
   }
 
-  /// PESANAN (UNTUK KARYAWAN)
   Future<void> loadOrders() async {
 
     final data = await service.getOrdersWithItems();
@@ -199,7 +196,6 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
 
               const SizedBox(height: 28),
 
-              /// STATISTIK OWNER
               if(role == "owner") ...[
 
                 const Text(
@@ -278,28 +274,51 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 childAspectRatio: 1.05,
                 children: [
-
                   if(role == "owner") ...[
 
-                    _menuCard("Bahan Baku","Kelola stok bahan",Icons.countertops_outlined,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const BahanBakuScreen()))),
+                    _menuCard(
+                      "Bahan Baku",
+                      "Kelola stok bahan",
+                      Icons.countertops_outlined,
+                      () => Get.toNamed(Routes.bahanBaku),
+                    ),
 
-                    _menuCard("Keuangan","Laporan usaha",Icons.account_balance_wallet_outlined,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const KeuanganScreen()))),
+                    _menuCard(
+                      "Keuangan",
+                      "Laporan usaha",
+                      Icons.account_balance_wallet_outlined,
+                      () => Get.toNamed(Routes.keuangan),
+                    ),
 
-                    _menuCard("Karyawan","Kelola tim",Icons.people_outline,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const KaryawanManagementScreen()))),
+                    _menuCard(
+                      "Karyawan",
+                      "Kelola tim",
+                      Icons.people_outline,
+                      () => Get.toNamed(Routes.karyawanManagement),
+                    ),
 
-                    _menuCard("Kelola Menu","Kelola menu makanan",Icons.restaurant_menu,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const MenuManagementScreen()))),
+                    _menuCard(
+                      "Kelola Menu",
+                      "Kelola menu makanan",
+                      Icons.restaurant_menu,
+                      () => Get.toNamed(Routes.menuManagement),
+                    ),
 
                   ] else ...[
 
-                    _menuCard("Kelola Menu","Kelola menu makanan",Icons.restaurant_menu,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const MenuManagementScreen()))),
+                    _menuCard(
+                      "Kelola Menu",
+                      "Kelola menu makanan",
+                      Icons.restaurant_menu,
+                      () => Get.toNamed(Routes.menuManagement),
+                    ),
 
-                    _menuCard("Bahan Baku","Kelola stok bahan",Icons.countertops_outlined,
-                            () => Navigator.push(context,MaterialPageRoute(builder: (_) => const BahanBakuScreen()))),
+                    _menuCard(
+                      "Bahan Baku",
+                      "Kelola stok bahan",
+                      Icons.countertops_outlined,
+                      () => Get.toNamed(Routes.bahanBaku),
+                    ),
 
                   ],
 
@@ -356,7 +375,7 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon,color: color,size: 22),

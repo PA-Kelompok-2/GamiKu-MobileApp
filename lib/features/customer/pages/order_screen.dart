@@ -211,7 +211,6 @@ class _OrderScreenState extends State<OrderScreen> {
                           showButton: true,
                           userRole: userRole,
                           onUpdateStatus: updateStatus,
-                          // Refresh list saat kembali dari detail screen
                           onRefresh: loadOrders,
                         );
                       },

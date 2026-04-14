@@ -22,8 +22,6 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocus = FocusNode();
 
   @override
   void initState() {
@@ -36,21 +34,11 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _searchFocus.dispose();
     super.dispose();
-  }
-
-  void _handleSearch(String value) {
-    if (value.isNotEmpty) {
-      Get.find<MenuC>().searchMenu(value);
-      widget.onOpenMenu("Semua");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final menuC = Get.find<MenuC>();
     final currentUser = Supabase.instance.client.auth.currentUser;
     final isGuest = currentUser == null;
 
@@ -201,22 +189,7 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
-
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.shadow,
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    const SizedBox(height: 10),     ],
                 ),
               ),
             ),
@@ -259,9 +232,9 @@ class _HomeTabState extends State<HomeTab> {
             SliverToBoxAdapter(
               child: Obx(() {
                 final menuC = Get.find<MenuC>();
-
                 final cats = menuC.menus
                     .map((m) => m['cat']?.toString() ?? '')
+                    .where((cat) => cat.isNotEmpty)
                     .toSet()
                     .toList();
 
@@ -297,7 +270,6 @@ class _HomeTabState extends State<HomeTab> {
             SliverToBoxAdapter(
               child: Obx(() {
                 final menuC = Get.find<MenuC>();
-
                 final popularMenus = menuC.menus.take(5).toList();
 
                 return SizedBox(

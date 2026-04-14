@@ -27,7 +27,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
     selectedCategory = Get.arguments ?? 'Semua';
 
-    Future<void> _loadRole() async {
+    Future<void> loadRole() async {
       final role = await SupabaseService().getUserRole();
 
       if (mounted) {
@@ -37,11 +37,10 @@ class _MenuScreenState extends State<MenuScreen> {
       }
     }
 
-    _loadRole();
+    loadRole();
 
     final menuC = Get.find<MenuC>();
 
-    /// LISTEN CATEGORY DARI HOME
     ever(menuC.selectedCategory, (cat) {
       setState(() {
         selectedCategory = cat;
@@ -52,12 +51,10 @@ class _MenuScreenState extends State<MenuScreen> {
       });
     });
 
-    /// SEARCH LISTENER
     _searchController.addListener(() {
       menuC.searchMenu(_searchController.text);
     });
 
-    /// SCROLL SAAT HALAMAN TERBUKA
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 200), () {
         _scrollToCenter();
@@ -78,7 +75,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
     final position = _catScroll.position;
 
-    final itemWidth = 110.0; // ukuran chip + margin
+    final itemWidth = 110.0; 
 
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -107,14 +104,12 @@ class _MenuScreenState extends State<MenuScreen> {
     final menuC = Get.find<MenuC>();
 
     return Obx(() {
-      // Extract unique categories from menus
       final Set<String> categorySet = menuC.menus
           .map((m) => (m['cat'] ?? 'Unknown').toString())
           .toSet();
 
       final List<String> categories = ['Semua', ...categorySet];
 
-      // Filter items based on selected category
       final items = selectedCategory == 'Semua'
           ? menuC.menus
           : menuC.menus
@@ -129,7 +124,6 @@ class _MenuScreenState extends State<MenuScreen> {
             children: [
               const SizedBox(height: 16),
 
-              // Header Title
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: RichText(
@@ -152,7 +146,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
               const SizedBox(height: 16),
 
-              // Search Bar
               MenuSearchBar(
                 controller: _searchController,
                 onChanged: (value) {
@@ -162,7 +155,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
               const SizedBox(height: 16),
 
-              // Category Chips
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -223,7 +215,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
               const SizedBox(height: 16),
 
-              // Menu Grid
               Expanded(
                 child: menuC.isLoading.value
                     ? const Center(child: CircularProgressIndicator())

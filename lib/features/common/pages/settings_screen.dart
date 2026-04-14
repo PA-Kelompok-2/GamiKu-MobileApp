@@ -33,6 +33,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn = service.supabase.auth.currentUser != null;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
@@ -56,43 +58,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           const SizedBox(height: 16),
 
-          _buildMenuItem(
-            icon: Icons.person_outline,
-            title: 'My Profile',
-            onTap: () async {
-              final result = await Get.toNamed(Routes.myProfile);
+          if (isLoggedIn)
+            _buildMenuItem(
+              icon: Icons.person_outline,
+              title: 'My Profile',
+              onTap: () async {
+                final result = await Get.toNamed(Routes.myProfile);
 
-              if (result == true) {
-                setState(() {
-                  profileUpdated = true;
-                });
-              }
-            },
-          ),
+                if (result == true) {
+                  setState(() {
+                    profileUpdated = true;
+                  });
+                }
+              },
+            ),
 
           _buildMenuItem(
             icon: Icons.info_outline,
             title: 'About',
-            trailing: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Version 3.3.12',
-                  style: TextStyle(color: AppColors.textLight, fontSize: 14),
-                ),
-                SizedBox(width: 4),
-                Icon(Icons.chevron_right, color: AppColors.textLight),
-              ],
-            ),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.textLight),
+            onTap: () => Get.toNamed(Routes.about),
           ),
 
-          _buildMenuItem(
-            icon: Icons.close,
-            title: 'Delete Account',
-            iconColor: AppColors.primary,
-            textColor: AppColors.textDark,
-            onTap: _showDeleteAccountDialog,
-          ),
+          if (isLoggedIn)
+            _buildMenuItem(
+              icon: Icons.close,
+              title: 'Delete Account',
+              iconColor: AppColors.primary,
+              textColor: AppColors.textDark,
+              onTap: _showDeleteAccountDialog,
+            ),
         ],
       ),
     );
@@ -122,9 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: textColor ?? AppColors.textDark,
           ),
         ),
-        trailing:
-            trailing ??
-            const Icon(Icons.chevron_right, color: AppColors.textLight),
+        trailing: trailing,
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         minLeadingWidth: 24,

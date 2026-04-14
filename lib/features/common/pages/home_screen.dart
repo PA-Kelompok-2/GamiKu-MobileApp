@@ -7,8 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../customer/pages/order_screen.dart';
-import '../../customer/pages/payment_screen.dart';
 import 'profile_screen.dart';
+import '../../../routes/app_routes.dart';
 import '../../../shared/widgets/home_tab.dart';
 import '../../../shared/widgets/bottom_cart_bar.dart';
 import '../../../shared/widgets/bottom_nav.dart';
@@ -94,10 +94,11 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
 
-    Get.to(
-      () => PaymentScreen(
-        onOrderPlaced: () => setState(() => _navIdx = 2),
-      ),
+    Get.toNamed(
+      Routes.payment,
+      arguments: {
+        'onOrderPlaced': () => setState(() => _navIdx = 2),
+      },
     )?.then((_) => setState(() {}));
   }
 

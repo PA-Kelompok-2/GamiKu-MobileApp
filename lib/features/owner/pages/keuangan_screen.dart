@@ -219,7 +219,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                         keuanganC.hitungRekapGabungan(_completedOrders);
 
                         if (mounted) {
-                          Navigator.pop(ctx);
+                          Get.back();
                         }
 
                         Get.snackbar(
@@ -308,7 +308,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

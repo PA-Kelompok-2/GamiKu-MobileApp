@@ -82,14 +82,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Header
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Get.back(),
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -123,7 +122,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
             ),
 
-            // Info Pesanan
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -155,7 +153,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-            // Daftar Item
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -263,7 +260,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-            // Rincian Pembayaran
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -319,7 +315,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     String status,
     bool canUpdateStatus,
   ) {
-    // Tombol untuk karyawan — langsung panggil _updateStatus
     if (canUpdateStatus) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -368,7 +363,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       );
     }
 
-    // Tombol kembali & pesan lagi untuk customer
     return FutureBuilder<bool>(
       future: _isCustomer(),
       builder: (context, snapshot) {
@@ -392,7 +386,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Get.back(),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(

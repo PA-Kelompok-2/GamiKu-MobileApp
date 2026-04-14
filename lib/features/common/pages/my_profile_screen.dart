@@ -130,7 +130,6 @@ void _showChangePasswordDialog() {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                /// drag handle
                 Center(
                   child: Container(
                     width: 45,
@@ -155,7 +154,6 @@ void _showChangePasswordDialog() {
 
                 const SizedBox(height: 20),
 
-                /// PASSWORD LAMA
                 _passwordField(
                   label: "Password Lama",
                   controller: oldPassC,
@@ -167,7 +165,6 @@ void _showChangePasswordDialog() {
 
                 const SizedBox(height: 14),
 
-                /// PASSWORD BARU
                 _passwordField(
                   label: "Password Baru",
                   controller: newPassC,
@@ -179,7 +176,6 @@ void _showChangePasswordDialog() {
 
                 const SizedBox(height: 14),
 
-                /// KONFIRM PASSWORD
                 _passwordField(
                   label: "Konfirmasi Password Baru",
                   controller: confirmPassC,
@@ -191,7 +187,6 @@ void _showChangePasswordDialog() {
 
                 const SizedBox(height: 24),
 
-                /// BUTTON
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -217,7 +212,7 @@ void _showChangePasswordDialog() {
                         return;
                       }
 
-                      Navigator.pop(ctx);
+                      Get.back();
 
                       try {
                         final email = service.currentUser?.email ?? '';
@@ -371,7 +366,6 @@ Widget _passwordField({
 
                   const SizedBox(height: 20),
 
-                  /// FULL NAME
                   const Text(
                     "Full Name",
                     style: TextStyle(
@@ -387,7 +381,6 @@ Widget _passwordField({
 
                   const SizedBox(height: 18),
 
-                  /// EMAIL
                   const Text(
                     "Email",
                     style: TextStyle(
@@ -404,7 +397,6 @@ Widget _passwordField({
 
                   const SizedBox(height: 18),
 
-                  /// PHONE NUMBER
                   const Text(
                     "Phone Number",
                     style: TextStyle(
@@ -423,7 +415,6 @@ Widget _passwordField({
 
                   const SizedBox(height: 18),
 
-                  /// GENDER
                   const Text(
                     "Gender",
                     style: TextStyle(
@@ -463,7 +454,6 @@ Widget _passwordField({
 
                   const SizedBox(height: 18),
 
-                  /// DATE OF BIRTH
                   const Text(
                     "Date of Birth",
                     style: TextStyle(
@@ -521,7 +511,6 @@ Widget _passwordField({
                     ),
                   ),
 
-                  /// PASSWORD
                   const Text(
                     "Password",
                     style: TextStyle(
@@ -578,7 +567,6 @@ Widget _passwordField({
             ),
           ),
 
-          /// SAVE BUTTON DI PALING BAWAH
           Container(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             width: double.infinity,

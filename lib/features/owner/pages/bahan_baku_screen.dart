@@ -94,20 +94,20 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     isNumber: true,
                   ),
                   const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: satuanC.text.isNotEmpty ? satuanC.text : null,
-                    items: units
-                        .map(
-                          (u) => DropdownMenuItem(
-                            value: u,
-                            child: Text(u),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (val) {
-                      satuanC.text = val ?? '';
-                      setModalState(() {});
-                    },
+                    DropdownButtonFormField<String>(
+                      initialValue: satuanC.text.isNotEmpty ? satuanC.text : null,
+                      items: units
+                          .map(
+                            (u) => DropdownMenuItem(
+                              value: u,
+                              child: Text(u),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (val) {
+                        satuanC.text = val ?? '';
+                        setModalState(() {});
+                      },
                     decoration: InputDecoration(
                       labelText: "Unit",
                       prefixIcon: const Icon(
@@ -662,8 +662,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                               controller: scrollController,
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                               itemCount: items.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 10),
+                              separatorBuilder: (context, index) => const SizedBox(height: 10),
                               itemBuilder: (_, i) {
                                 final item = items[i];
                                 return _mutasiPerBahanCard(item, b.unit);

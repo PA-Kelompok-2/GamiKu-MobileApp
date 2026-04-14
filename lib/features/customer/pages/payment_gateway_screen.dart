@@ -4,7 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../models/order_model.dart';
-import 'qr_screen.dart';
+import '../../../routes/app_routes.dart';
 
 class PaymentGatewayScreen extends StatefulWidget {
   final VoidCallback? onOrderPlaced;
@@ -18,8 +18,10 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _tableCtrl = TextEditingController();
+
   final String _orderType = 'Dine In';
   String _paymentMethod = 'online';
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -29,100 +31,64 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     super.dispose();
   }
 
-  void _placeOrder() async {
+  Future<void> _placeOrder() async {
+    if (_isSubmitting) return;
+
+    final name = _nameCtrl.text.trim();
+    final tableNumber = _tableCtrl.text.trim();
+
+    if (name.isEmpty) {
+      Get.snackbar('Validasi', 'Nama pelanggan wajib diisi');
+      return;
+    }
+
+    if (tableNumber.isEmpty) {
+      Get.snackbar('Validasi', 'Nomor meja wajib diisi');
+      return;
+    }
+
     final cartC = Get.find<CartController>();
     final service = SupabaseService();
+
+    if (cartC.entries.isEmpty) {
+      Get.snackbar('Info', 'Keranjang masih kosong');
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
 
     try {
       final order = await service.createOrder(
         total: cartC.grandTotal,
         items: cartC.entries.map((e) {
-          return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
+          return {
+            'id': e.id,
+            'name': e.name,
+            'price': e.price,
+            'qty': e.qty,
+          };
         }).toList(),
       );
 
-      cartC.clear();
-
       final token = order['qr_token'];
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => QRScreen(token: token)),
-      );
-    } catch (e) {
-      Get.snackbar("Error", "Gagal membuat pesanan");
-    }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: AppColors.tagGreenBg,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle_rounded,
-                  color: AppColors.tagGreen,
-                  size: 44,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Pesanan Masuk!',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Pesanan kamu sedang diproses oleh dapur. Harap tunggu ya!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                      ..pop()
-                      ..pop()
-                      ..pop();
-                    widget.onOrderPlaced?.call();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Lihat Status Pesanan',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      cartC.clear();
+      widget.onOrderPlaced?.call();
+    Get.toNamed(
+      Routes.qr,
+      arguments: {'token': token},
     );
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal membuat pesanan');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -146,7 +112,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: Get.back,
         ),
       ),
       body: entries.isEmpty
@@ -177,7 +143,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: Get.back,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -416,7 +382,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
               ),
             ),
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,7 +395,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-
                   Row(
                     children: [
                       const Icon(
@@ -439,7 +403,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 4),
-
                       Text(
                         _paymentMethod == 'online'
                             ? 'Scan QR untuk bayar langsung'
@@ -454,7 +417,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                 ],
               ),
             ),
-
             Container(
               width: 24,
               height: 24,
@@ -540,7 +502,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             child: SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: _placeOrder,
+                onPressed: _isSubmitting ? null : _placeOrder,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -548,10 +510,22 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Pay',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Pay',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
               ),
             ),
           ),

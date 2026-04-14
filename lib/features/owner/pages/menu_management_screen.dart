@@ -364,7 +364,7 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
                           width: double.infinity,
                           height: 110,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _imagePlaceholder(),
+                          errorBuilder: (context, error, stackTrace) => _imagePlaceholder(),
                         )
                       : _imagePlaceholder(),
                 ),

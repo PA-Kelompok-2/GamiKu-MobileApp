@@ -42,11 +42,9 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         children: [
 
-          /// BODY ASLI
           Column(
             children: [
 
-              /// HEADER MERAH
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60, bottom: 40),
@@ -96,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              /// FORM LOGIN
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -246,7 +243,6 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
 
-          /// BACK BUTTON (POJOK KIRI ATAS)
           Positioned(
             top: 15,
             left: 10,

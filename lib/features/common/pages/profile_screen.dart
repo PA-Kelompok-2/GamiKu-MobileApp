@@ -32,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               )
@@ -42,12 +42,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
 
-              /// ICON
               Container(
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -83,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Row(
                 children: [
 
-                  /// BUTTON BATAL
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
@@ -104,7 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(width: 12),
 
-                  /// BUTTON LOGOUT
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -240,21 +237,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
                     child: Column(
                       children: [
-                        /// AVATAR + EDIT BUTTON
                         Stack(
                           children: [
                             Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color.fromARGB(
-                                    255,
-                                    255,
-                                    255,
-                                    255,
-                                  ),
-                                  width: 4,
-                                ),
+                                border: Border.all(color: Colors.white, width: 4),
                               ),
                               child: ClipOval(
                                 child: Image.network(
@@ -265,54 +253,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-
-                            /// EDIT ICON
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () =>
-                                    Get.to(() => const MyProfileScreen()),
-                                child: Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    size: 16,
-                                    color: Colors.white,
+                            if (isLoggedIn)
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () => Get.to(() => const MyProfileScreen()),
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.edit,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
 
                         const SizedBox(height: 12),
 
-                        /// NAME
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 0, 0, 0),
+                          Text(
+                            isLoggedIn ? name : "Belum Masuk",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        /// EMAIL
-                        Text(
-                          "$name@gmail.com",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color.fromARGB(179, 0, 0, 0),
+                          const SizedBox(height: 6),
+                          Text(
+                            isLoggedIn
+                                ? "$name@gmail.com"
+                                : "Login untuk melihat profil & pesanan",
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                           ),
-                        ),
 
                         const SizedBox(height: 30),
                       ],
@@ -433,17 +416,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 'Privacy Policy',
                                 iconBg: AppColors.statusDiprosesBg,
                                 iconColor: AppColors.statusDiprosesFg,
-
                                 onTap: () => Get.toNamed(Routes.privacyPolicy),
                               ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.settings_outlined,
-                                'Settings',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.settings),
-                              ),
+                                _divider(),
+                                _buildMenuItem(
+                                  Icons.settings_outlined,
+                                  'Settings',
+                                  iconBg: AppColors.statusDiprosesBg,
+                                  iconColor: AppColors.statusDiprosesFg,
+                                  onTap: () => Get.toNamed(Routes.settings),
+                                ),
                               _buildMenuItem(
                                 isLoggedIn ? Icons.logout : Icons.login,
                                 isLoggedIn ? 'Logout' : 'Login',
