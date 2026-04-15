@@ -14,7 +14,7 @@ class HelpCenterScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () => Get.back()
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'Help Center',

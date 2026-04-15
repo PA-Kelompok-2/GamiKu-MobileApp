@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../routes/app_routes.dart'; 
+import '../../../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,13 +34,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
-              )
+              ),
             ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               Container(
                 width: 70,
                 height: 70,
@@ -48,21 +47,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.logout,
-                  color: Colors.red,
-                  size: 36,
-                ),
+                child: const Icon(Icons.logout, color: Colors.red, size: 36),
               ),
 
               const SizedBox(height: 18),
 
               const Text(
                 "Logout",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 8),
@@ -70,17 +62,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Text(
                 "Yakin ingin keluar dari akun ini?",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
 
               const SizedBox(height: 25),
 
               Row(
                 children: [
-
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
@@ -113,8 +101,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("Logout",
-                      style: TextStyle(color: Colors.white),),
+                      child: const Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],
@@ -241,7 +231,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 4),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
+                                ),
                               ),
                               child: ClipOval(
                                 child: Image.network(
@@ -278,23 +271,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 12),
 
-                          Text(
-                            isLoggedIn ? name : "Belum Masuk",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        Text(
+                          isLoggedIn ? name : "Belum Masuk",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            isLoggedIn
-                                ? "$name@gmail.com"
-                                : "Login untuk melihat profil & pesanan",
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey,
-                            ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          isLoggedIn
+                              ? "$name@gmail.com"
+                              : "Login untuk melihat profil & pesanan",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
                           ),
+                        ),
 
                         const SizedBox(height: 30),
                       ],
@@ -334,15 +327,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onTap: () => Get.toNamed(Routes.bahanBaku),
                                 ),
                                 _divider(),
-                                  _buildMenuItem(
-                                    Icons.restaurant_menu,
-                                    'Kelola Menu',
-                                    subtitle: 'Kelola Menu Usaha',
-                                    iconBg: AppColors.statusMenungguBg,
-                                    iconColor: AppColors.statusMenungguFg,
-                                    onTap: () =>
-                                        Get.toNamed(Routes.menuManagement),
-                                  ),
+                                _buildMenuItem(
+                                  Icons.restaurant_menu,
+                                  'Kelola Menu',
+                                  subtitle: 'Kelola Menu Usaha',
+                                  iconBg: AppColors.statusMenungguBg,
+                                  iconColor: AppColors.statusMenungguFg,
+                                  onTap: () =>
+                                      Get.toNamed(Routes.menuManagement),
+                                ),
                                 if (role == 'owner') ...[
                                   _divider(),
                                   _buildMenuItem(
@@ -417,14 +410,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 iconColor: AppColors.statusDiprosesFg,
                                 onTap: () => Get.toNamed(Routes.privacyPolicy),
                               ),
-                                _divider(),
-                                _buildMenuItem(
-                                  Icons.settings_outlined,
-                                  'Settings',
-                                  iconBg: AppColors.statusDiprosesBg,
-                                  iconColor: AppColors.statusDiprosesFg,
-                                  onTap: () => Get.toNamed(Routes.settings),
-                                ),
+                              _divider(),
+                              _buildMenuItem(
+                                Icons.settings_outlined,
+                                'Settings',
+                                iconBg: AppColors.statusDiprosesBg,
+                                iconColor: AppColors.statusDiprosesFg,
+                                onTap: () => Get.toNamed(Routes.settings),
+                              ),
                               _buildMenuItem(
                                 isLoggedIn ? Icons.logout : Icons.login,
                                 isLoggedIn ? 'Logout' : 'Login',

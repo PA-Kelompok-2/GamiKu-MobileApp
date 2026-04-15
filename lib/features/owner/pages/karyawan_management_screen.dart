@@ -374,13 +374,13 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           );
                         } catch (e) {
                           final errorText = e.toString().toLowerCase();
-                            String message = 'Gagal update data karyawan';
-                            if (errorText.contains('email sudah digunakan') ||
-                                errorText.contains('duplicate key') ||
-                                errorText.contains('already exists') ||
-                                errorText.contains('unique')) {
-                              message = 'Email sudah digunakan';
-                            }
+                          String message = 'Gagal update data karyawan';
+                          if (errorText.contains('email sudah digunakan') ||
+                              errorText.contains('duplicate key') ||
+                              errorText.contains('already exists') ||
+                              errorText.contains('unique')) {
+                            message = 'Email sudah digunakan';
+                          }
                           Get.snackbar(
                             'Error',
                             message,
@@ -471,86 +471,86 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : karyawanList.isEmpty
-              ? const Center(child: Text('Belum ada karyawan'))
-              : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
+          ? const Center(child: Text('Belum ada karyawan'))
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Total Karyawan: ${karyawanList.length} orang",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[700],
                       ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Total Karyawan: ${karyawanList.length} orang",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: karyawanList.length,
+                    itemBuilder: (context, i) {
+                      final k = karyawanList[i];
+                      final initials = (k['name'] as String)
+                          .trim()
+                          .split(' ')
+                          .take(2)
+                          .map((w) => w[0].toUpperCase())
+                          .join();
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Text(
+                              initials,
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          title: Text(k['name'] ?? '-'),
+                          subtitle: Text(k['email'] ?? '-'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                                onPressed: () => _showEditDialog(k),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                onPressed: () => _deleteKaryawan(k),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: karyawanList.length,
-                        itemBuilder: (context, i) {
-                          final k = karyawanList[i];
-                          final initials = (k['name'] as String)
-                              .trim()
-                              .split(' ')
-                              .take(2)
-                              .map((w) => w[0].toUpperCase())
-                              .join();
-
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue.shade100,
-                                child: Text(
-                                  initials,
-                                  style: TextStyle(
-                                    color: Colors.blue.shade800,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              title: Text(k['name'] ?? '-'),
-                              subtitle: Text(k['email'] ?? '-'),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.blue,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => _showEditDialog(k),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => _deleteKaryawan(k),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: _showAddDialog,

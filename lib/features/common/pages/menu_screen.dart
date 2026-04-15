@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math';
+
 import '../../../routes/app_routes.dart';
 import '../../../controllers/menu_controller.dart';
 import '../../../core/constants/app_colors.dart';
@@ -18,6 +19,7 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _catScroll = ScrollController();
+
   String? _role;
   String selectedCategory = 'Semua';
 
@@ -27,17 +29,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
     selectedCategory = Get.arguments ?? 'Semua';
 
-    Future<void> loadRole() async {
-      final role = await SupabaseService().getUserRole();
-
-      if (mounted) {
-        setState(() {
-          _role = role;
-        });
-      }
-    }
-
-    loadRole();
+    _loadRole();
 
     final menuC = Get.find<MenuC>();
 
@@ -62,12 +54,23 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
 
+  Future<void> _loadRole() async {
+    final role = await SupabaseService().getUserRole();
+
+    if (mounted) {
+      setState(() {
+        _role = role;
+      });
+    }
+  }
+
   void _scrollToCenter() {
     final menuC = Get.find<MenuC>();
 
-    final cats = ['Semua', ...menuC.menus
-        .map((m) => m['cat']?.toString() ?? '')
-        .toSet()];
+    final cats = [
+      'Semua',
+      ...menuC.menus.map((m) => m['cat']?.toString() ?? '').toSet(),
+    ];
 
     final index = cats.indexOf(selectedCategory);
 
@@ -75,15 +78,12 @@ class _MenuScreenState extends State<MenuScreen> {
 
     final position = _catScroll.position;
 
-    final itemWidth = 110.0; 
-
+    const itemWidth = 110.0;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    final offset =
-        (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+    final offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
 
-    final finalOffset =
-        max(0.0, min(offset, position.maxScrollExtent));
+    final finalOffset = max(0.0, min(offset, position.maxScrollExtent));
 
     _catScroll.animateTo(
       finalOffset,
@@ -91,7 +91,6 @@ class _MenuScreenState extends State<MenuScreen> {
       curve: Curves.easeOutCubic,
     );
   }
-  
 
   @override
   void dispose() {
@@ -113,8 +112,8 @@ class _MenuScreenState extends State<MenuScreen> {
       final items = selectedCategory == 'Semua'
           ? menuC.menus
           : menuC.menus
-              .where((m) => (m['cat'] ?? '') == selectedCategory)
-              .toList();
+                .where((m) => (m['cat'] ?? '') == selectedCategory)
+                .toList();
 
       return Scaffold(
         backgroundColor: AppColors.bg,
@@ -151,7 +150,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 onChanged: (value) {
                   Get.find<MenuC>().searchMenu(value);
                 },
-                ),
+              ),
 
               const SizedBox(height: 16),
 
@@ -172,9 +171,10 @@ class _MenuScreenState extends State<MenuScreen> {
                           selectedCategory = cat;
                         });
 
-                        Future.delayed(const Duration(milliseconds: 50), () {
-                          _scrollToCenter();
-                        });
+                        Future.delayed(
+                          const Duration(milliseconds: 50),
+                          _scrollToCenter,
+                        );
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -243,12 +243,12 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
         floatingActionButton: (_role == 'owner' || _role == 'karyawan')
-                    ? FloatingActionButton(
-                        backgroundColor: AppColors.primary,
-                        onPressed: () => Get.toNamed(Routes.menuManagement),
-                        child: const Icon(Icons.edit_note, color: AppColors.white),
-                      )
-                    : null,
+            ? FloatingActionButton(
+                backgroundColor: AppColors.primary,
+                onPressed: () => Get.toNamed(Routes.menuManagement),
+                child: const Icon(Icons.edit_note, color: AppColors.white),
+              )
+            : null,
       );
     });
   }

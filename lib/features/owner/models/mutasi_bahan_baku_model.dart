@@ -30,4 +30,4 @@ class MutasiBahanBakuModel {
 
   bool get isMasuk => jenis == 'masuk';
   bool get isKeluar => jenis == 'keluar';
-}      
+}

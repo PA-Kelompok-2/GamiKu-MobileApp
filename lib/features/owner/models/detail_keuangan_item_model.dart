@@ -1,7 +1,4 @@
-enum DetailKeuanganType {
-  pemasukan,
-  pengeluaran,
-}
+enum DetailKeuanganType { pemasukan, pengeluaran }
 
 class DetailKeuanganItemModel {
   final String id;

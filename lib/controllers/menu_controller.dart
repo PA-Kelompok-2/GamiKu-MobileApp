@@ -58,7 +58,8 @@ class MenuC extends GetxController {
 
       final matchSearch = q.isEmpty || name.contains(q) || cat.contains(q);
 
-      final matchCategory = selectedCategory.value.isEmpty ||
+      final matchCategory =
+          selectedCategory.value.isEmpty ||
           menu['cat'] == selectedCategory.value;
 
       return matchSearch && matchCategory;
@@ -75,8 +76,7 @@ class MenuC extends GetxController {
       return;
     }
 
-    final filtered =
-        allMenus.where((menu) => menu['cat'] == category).toList();
+    final filtered = allMenus.where((menu) => menu['cat'] == category).toList();
 
     menus.value = filtered;
   }

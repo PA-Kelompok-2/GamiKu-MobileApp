@@ -7,20 +7,15 @@ import '/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeTabInternalScreen extends StatefulWidget {
-
   final VoidCallback? onOpenOrders;
 
-  const HomeTabInternalScreen({
-    super.key,
-    this.onOpenOrders,
-  });
+  const HomeTabInternalScreen({super.key, this.onOpenOrders});
 
   @override
   State<HomeTabInternalScreen> createState() => _HomeTabInternalScreenState();
 }
 
 class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
-
   final service = SupabaseService();
 
   String role = '';
@@ -55,7 +50,6 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
   }
 
   Future<void> loadOrders() async {
-
     final data = await service.getOrdersWithItems();
 
     pending = data.where((o) => o['status'] == 'pending').length;
@@ -94,11 +88,8 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -109,7 +100,6 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               const SizedBox(height: 10),
 
               Row(
@@ -158,12 +148,10 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                 ),
                 child: Row(
                   children: [
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Text(
                             role == "owner"
                                 ? "Welcome Owner!"
@@ -180,30 +168,21 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                             "Kelola semua data usaha kamu disini",
                             style: TextStyle(color: Colors.grey),
                           ),
-
                         ],
                       ),
                     ),
 
-                    Image.asset(
-                      'assets/owner.png',
-                      width: 100,
-                    ),
-
+                    Image.asset('assets/owner.png', width: 100),
                   ],
                 ),
               ),
 
               const SizedBox(height: 28),
 
-              if(role == "owner") ...[
-
+              if (role == "owner") ...[
                 const Text(
                   "Statistik Hari Ini",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
 
                 const SizedBox(height: 12),
@@ -216,40 +195,57 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   childAspectRatio: 2.2,
                   children: [
-
-                    _statCard("Pemasukan", formatRupiah(pemasukan), Icons.payments_outlined, Colors.green),
-                    _statCard("Pengeluaran", formatRupiah(pengeluaran), Icons.money_off_csred_outlined, Colors.red),
-                    _statCard("Saldo", formatRupiah(saldo), Icons.account_balance_wallet_outlined, AppColors.primary),
-                    _statCard("Total Menu", "$totalMenu Menu", Icons.restaurant_menu, Colors.orange),
-
+                    _statCard(
+                      "Pemasukan",
+                      formatRupiah(pemasukan),
+                      Icons.payments_outlined,
+                      Colors.green,
+                    ),
+                    _statCard(
+                      "Pengeluaran",
+                      formatRupiah(pengeluaran),
+                      Icons.money_off_csred_outlined,
+                      Colors.red,
+                    ),
+                    _statCard(
+                      "Saldo",
+                      formatRupiah(saldo),
+                      Icons.account_balance_wallet_outlined,
+                      AppColors.primary,
+                    ),
+                    _statCard(
+                      "Total Menu",
+                      "$totalMenu Menu",
+                      Icons.restaurant_menu,
+                      Colors.orange,
+                    ),
                   ],
                 ),
 
                 const SizedBox(height: 28),
-
               ],
 
-              if(role == "karyawan") ...[
-
+              if (role == "karyawan") ...[
                 const Text(
                   "Pesanan Hari Ini",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
 
                 const SizedBox(height: 12),
 
                 Row(
                   children: [
-
-                    Expanded(child: _orderCard("Menunggu", pending, Colors.orange)),
+                    Expanded(
+                      child: _orderCard("Menunggu", pending, Colors.orange),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _orderCard("Diproses", processed, Colors.blue)),
+                    Expanded(
+                      child: _orderCard("Diproses", processed, Colors.blue),
+                    ),
                     const SizedBox(width: 10),
-                    Expanded(child: _orderCard("Selesai", completed, Colors.green)),
-
+                    Expanded(
+                      child: _orderCard("Selesai", completed, Colors.green),
+                    ),
                   ],
                 ),
 
@@ -258,10 +254,7 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
 
               const Text(
                 "Kelola Usaha",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
 
               const SizedBox(height: 12),
@@ -274,8 +267,7 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 childAspectRatio: 1.05,
                 children: [
-                  if(role == "owner") ...[
-
+                  if (role == "owner") ...[
                     _menuCard(
                       "Bahan Baku",
                       "Kelola stok bahan",
@@ -303,9 +295,7 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                       Icons.restaurant_menu,
                       () => Get.toNamed(Routes.menuManagement),
                     ),
-
                   ] else ...[
-
                     _menuCard(
                       "Kelola Menu",
                       "Kelola menu makanan",
@@ -319,9 +309,7 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
                       Icons.countertops_outlined,
                       () => Get.toNamed(Routes.bahanBaku),
                     ),
-
                   ],
-
                 ],
               ),
 
@@ -351,23 +339,37 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
         ),
         child: Column(
           children: [
-            Text("$value",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: color)),
+            Text(
+              "$value",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(title,style: const TextStyle(fontSize: 12,color: AppColors.textGrey)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _statCard(String title,String value,IconData icon,Color color){
+  Widget _statCard(String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(color: AppColors.shadow,blurRadius: 6,offset: const Offset(0,2)),
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
@@ -378,15 +380,24 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
               color: Colors.black.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon,color: color,size: 22),
+            child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,style: const TextStyle(fontSize: 12,color: AppColors.textGrey)),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
+              ),
               const SizedBox(height: 2),
-              Text(value,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w800)),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ],
           ),
         ],
@@ -394,7 +405,12 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
     );
   }
 
-  Widget _menuCard(String title,String subtitle,IconData icon,VoidCallback onTap){
+  Widget _menuCard(
+    String title,
+    String subtitle,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return Material(
       color: AppColors.red55,
       borderRadius: BorderRadius.circular(24),
@@ -406,26 +422,39 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(child: Text(title,style: const TextStyle(fontSize: 16,fontWeight: FontWeight.bold))),
-                  Icon(icon,color: AppColors.primary),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Icon(icon, color: AppColors.primary),
                 ],
               ),
 
               const SizedBox(height: 10),
 
-              Text(subtitle,style: const TextStyle(fontSize: 13)),
+              Text(subtitle, style: const TextStyle(fontSize: 13)),
 
               const Spacer(),
 
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Buka",style: TextStyle(fontWeight: FontWeight.w600,color: AppColors.primary)),
-                  Icon(Icons.arrow_forward,color: AppColors.primary),
+                  Text(
+                    "Buka",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward, color: AppColors.primary),
                 ],
               ),
             ],

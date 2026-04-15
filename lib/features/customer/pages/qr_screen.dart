@@ -32,8 +32,9 @@ class _QRScreenState extends State<QRScreen> {
   @override
   void initState() {
     super.initState();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -114,11 +115,7 @@ class _QRScreenState extends State<QRScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 25),
                 const Text(
@@ -173,23 +170,22 @@ class _QRScreenState extends State<QRScreen> {
   Widget build(BuildContext context) {
     if (_token.isEmpty) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Pembayaran QR'),
-        ),
+        appBar: AppBar(title: const Text('Pembayaran QR')),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.qr_code_2_outlined, size: 72, color: Colors.grey),
+                const Icon(
+                  Icons.qr_code_2_outlined,
+                  size: 72,
+                  color: Colors.grey,
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'QR tidak tersedia',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -217,10 +213,7 @@ class _QRScreenState extends State<QRScreen> {
         centerTitle: true,
         title: const Text(
           'Pembayaran QR',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -228,10 +221,7 @@ class _QRScreenState extends State<QRScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(
-              top: 10,
-              bottom: 28,
-            ),
+            padding: const EdgeInsets.only(top: 10, bottom: 28),
             decoration: const BoxDecoration(
               color: Color(0xFFD32F2F),
               borderRadius: BorderRadius.only(
@@ -275,17 +265,11 @@ class _QRScreenState extends State<QRScreen> {
                 ),
               ],
             ),
-            child: QrImageView(
-              data: _token,
-              size: 220,
-            ),
+            child: QrImageView(data: _token, size: 220),
           ),
           const SizedBox(height: 25),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),

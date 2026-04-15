@@ -178,34 +178,29 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     child: menuC.isLoading.value
                         ? const Center(child: CircularProgressIndicator())
                         : items.isEmpty
-                            ? const Center(
-                                child: Text('Belum ada menu di kategori ini'),
-                              )
-                            : GridView.builder(
-                                padding: const EdgeInsets.all(16),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      childAspectRatio: 0.72,
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
-                                    ),
-                                itemCount: items.length,
-                                itemBuilder: (_, i) => _ManageMenuCard(
-                                  item: items[i],
-                                  role: profileC.role.value,
-                                  onEdit: () => _showMenuForm(item: items[i]),
-                                  onDelete: () =>
-                                      _confirmDelete(menuC, items[i]),
-                                  onToggleAvailability:
-                                      (id, isAvailable) async {
-                                    await menuC.updateAvailability(
-                                      id,
-                                      isAvailable,
-                                    );
-                                  },
+                        ? const Center(
+                            child: Text('Belum ada menu di kategori ini'),
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.72,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
                                 ),
-                              ),
+                            itemCount: items.length,
+                            itemBuilder: (_, i) => _ManageMenuCard(
+                              item: items[i],
+                              role: profileC.role.value,
+                              onEdit: () => _showMenuForm(item: items[i]),
+                              onDelete: () => _confirmDelete(menuC, items[i]),
+                              onToggleAvailability: (id, isAvailable) async {
+                                await menuC.updateAvailability(id, isAvailable);
+                              },
+                            ),
+                          ),
                   ),
                 ],
               ),
@@ -284,7 +279,7 @@ class _ManageMenuCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final Future<void> Function(String itemId, bool isAvailable)
-      onToggleAvailability;
+  onToggleAvailability;
 
   const _ManageMenuCard({
     required this.item,
@@ -630,8 +625,9 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     final isFormValid = _formKey.currentState?.validate() ?? false;
 
     setState(() {
-      _categoryError =
-          _selectedCategoryId == null ? 'Kategori wajib dipilih' : null;
+      _categoryError = _selectedCategoryId == null
+          ? 'Kategori wajib dipilih'
+          : null;
     });
 
     if (!isFormValid || _categoryError != null) return;
@@ -744,54 +740,53 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                           ),
                         )
                       : _isEdit && _hasValidImageUrl(widget.item!['image_url'])
-                          ? Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: Image.network(
-                                    widget.item!['image_url'],
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            _pickerPlaceholder(),
-                                  ),
+                      ? Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.network(
+                                widget.item!['image_url'],
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _pickerPlaceholder(),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
                                 ),
-                                Positioned(
-                                  bottom: 8,
-                                  right: 8,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.55),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Row(
-                                      children: [
-                                        Icon(
-                                          Icons.edit,
-                                          size: 13,
-                                          color: Colors.white,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Ganti',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.55),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              ],
-                            )
-                          : _pickerPlaceholder(),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.edit,
+                                      size: 13,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Ganti',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : _pickerPlaceholder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -978,8 +973,9 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
-      inputFormatters:
-          isPrice ? [FilteringTextInputFormatter.digitsOnly] : null,
+      inputFormatters: isPrice
+          ? [FilteringTextInputFormatter.digitsOnly]
+          : null,
       onChanged: isPrice
           ? (value) {
               if (value.isEmpty) return;

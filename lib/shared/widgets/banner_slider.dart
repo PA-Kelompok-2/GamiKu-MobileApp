@@ -146,7 +146,7 @@ class _BannerCard extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 data.gradientStart.withValues(alpha: 0.85),
-                data.gradientEnd.withValues (alpha: 0.5),
+                data.gradientEnd.withValues(alpha: 0.5),
                 AppColors.bannerCircle,
               ],
               begin: Alignment.centerLeft,

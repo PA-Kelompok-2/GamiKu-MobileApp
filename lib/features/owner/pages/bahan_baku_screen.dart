@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
 import '../controllers/keuangan_controller.dart';
@@ -55,9 +54,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: SingleChildScrollView(
               child: Form(
@@ -210,9 +207,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                       controller: hargaC,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (value) {
                         final raw = (value ?? '').replaceAll('.', '').trim();
 
@@ -238,8 +233,9 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                         final number = int.tryParse(raw);
                         if (number == null) return;
 
-                        final newText =
-                            NumberFormat.decimalPattern('id').format(number);
+                        final newText = NumberFormat.decimalPattern(
+                          'id',
+                        ).format(number);
 
                         hargaC.value = TextEditingValue(
                           text: newText,
@@ -293,7 +289,8 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          final isValid = formKey.currentState?.validate() ?? false;
+                          final isValid =
+                              formKey.currentState?.validate() ?? false;
                           if (!isValid) return;
 
                           final nama = namaC.text.trim();
@@ -334,9 +331,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: AppColors.white,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -453,10 +448,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
               const SizedBox(height: 8),
               Text(
                 'Harga per ${b.unit}: Rp ${NumberFormat.decimalPattern('id').format(b.price)}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textGrey,
-                ),
+                style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -491,10 +483,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                   ),
                   child: const Text(
                     'Tambah Stok',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
                   ),
                 ),
               ),
@@ -599,10 +588,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
               const SizedBox(height: 8),
               Text(
                 'Stok saat ini: ${b.stock} ${b.unit}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textGrey,
-                ),
+                style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -636,10 +622,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                   ),
                   child: const Text(
                     'Kurangi Stok',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
                   ),
                 ),
               ),
@@ -806,34 +789,22 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
         prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
         filled: true,
         fillColor: AppColors.bg,
-        labelStyle: const TextStyle(
-          color: AppColors.textGrey,
-          fontSize: 13,
-        ),
+        labelStyle: const TextStyle(color: AppColors.textGrey, fontSize: 13),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 1.2,
-          ),
+          borderSide: const BorderSide(color: Colors.red, width: 1.2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 1.4,
-          ),
+          borderSide: const BorderSide(color: Colors.red, width: 1.4),
         ),
       ),
     );
@@ -953,10 +924,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-          ],
+          colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -989,10 +957,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
             children: [
               const Text(
                 'Total Nilai Bahan Baku',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.white70,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.white70),
               ),
               Text(
                 'Rp ${NumberFormat.decimalPattern('id').format(totalNilai)}',
@@ -1007,10 +972,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
           const Spacer(),
           Text(
             '${keuanganC.bahanBakuList.length} item',
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.white70,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.white70),
           ),
         ],
       ),

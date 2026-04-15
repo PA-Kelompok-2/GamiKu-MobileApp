@@ -1,8 +1,12 @@
 import 'package:get/get.dart';
+
 import '../features/models/order_model.dart';
 
 class CartController extends GetxController {
-  var cart = <String, Map<String, dynamic>>{}.obs;
+  static const int serviceFee = 2000;
+
+  final RxMap<String, Map<String, dynamic>> cart =
+      <String, Map<String, dynamic>>{}.obs;
 
   void add(Map<String, dynamic> item) {
     final String id = item['id'].toString();
@@ -18,15 +22,19 @@ class CartController extends GetxController {
         'qty': 1,
       };
     }
+
     cart.refresh();
   }
 
   void remove(String id) {
-    if ((cart[id]?['qty'] ?? 0) > 1) {
+    final int currentQty = cart[id]?['qty'] ?? 0;
+
+    if (currentQty > 1) {
       cart[id]!['qty'] -= 1;
     } else {
       cart.remove(id);
     }
+
     cart.refresh();
   }
 
@@ -35,25 +43,36 @@ class CartController extends GetxController {
     cart.refresh();
   }
 
-  int qtyOf(String id) => cart[id]?['qty'] ?? 0;
+  int qtyOf(String id) {
+    return cart[id]?['qty'] ?? 0;
+  }
 
-  int get totalItems => cart.values.fold(0, (s, e) => s + (e['qty'] as int));
+  int get totalItems {
+    return cart.values.fold(
+      0,
+      (sum, item) => sum + (item['qty'] as int),
+    );
+  }
 
-  int get subtotal => 
-  cart.values.fold(0, (s, e) => s + (e['price'] as int) * (e['qty'] as int));
+  int get subtotal {
+    return cart.values.fold(
+      0,
+      (sum, item) => sum + (item['price'] as int) * (item['qty'] as int),
+    );
+  }
 
-  static const int serviceFee = 2000;
-
-  int get grandTotal => subtotal + serviceFee;  
+  int get grandTotal {
+    return subtotal + serviceFee;
+  }
 
   List<OrderItem> get entries {
-    return cart.values.map((e) {
+    return cart.values.map((item) {
       return OrderItem(
-        id: e['id'],
-        name: e['name'],
-        emoji: e['emoji'],
-        price: e['price'],
-        qty: e['qty'],
+        id: item['id'],
+        name: item['name'],
+        emoji: item['emoji'],
+        price: item['price'],
+        qty: item['qty'],
       );
     }).toList();
   }

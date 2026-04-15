@@ -76,7 +76,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildMenuItem(
             icon: Icons.info_outline,
             title: 'About',
-            trailing: const Icon(Icons.chevron_right, color: AppColors.textLight),
+            trailing: const Icon(
+              Icons.chevron_right,
+              color: AppColors.textLight,
+            ),
             onTap: () => Get.toNamed(Routes.about),
           ),
 

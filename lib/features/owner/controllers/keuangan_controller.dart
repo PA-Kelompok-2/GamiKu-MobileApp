@@ -6,10 +6,7 @@ import '../models/bahan_baku_model.dart';
 import '../models/rekap_keuangan_model.dart';
 import '../models/mutasi_bahan_baku_model.dart';
 
-enum DetailKeuanganTab {
-  pemasukan,
-  pengeluaran,
-}
+enum DetailKeuanganTab { pemasukan, pengeluaran }
 
 class KeuanganController extends GetxController {
   final supabase = Supabase.instance.client;
@@ -62,13 +59,10 @@ class KeuanganController extends GetxController {
         final start = startOfWeek(now);
         final end = start.add(const Duration(days: 7));
 
-        matchPeriode =
-            !createdAt.isBefore(start) &&
-            createdAt.isBefore(end);
+        matchPeriode = !createdAt.isBefore(start) && createdAt.isBefore(end);
       } else if (selectedMutasiPeriode.value == 'bulanan') {
         matchPeriode =
-            createdAt.year == now.year &&
-            createdAt.month == now.month;
+            createdAt.year == now.year && createdAt.month == now.month;
       }
 
       final query = mutasiSearchQuery.value.trim().toLowerCase();
@@ -110,8 +104,9 @@ class KeuanganController extends GetxController {
         .eq('jenis', 'pengeluaran')
         .order('tanggal', ascending: false);
 
-    pengeluaranList.value =
-        (res as List).map((e) => Pengeluaran.fromJson(e)).toList();
+    pengeluaranList.value = (res as List)
+        .map((e) => Pengeluaran.fromJson(e))
+        .toList();
   }
 
   Future<void> getSemuaKeuangan() async {
@@ -394,8 +389,9 @@ class KeuanganController extends GetxController {
           .select()
           .order('created_at', ascending: false);
 
-      mutasiBahanBakuList.value =
-          (res as List).map((e) => MutasiBahanBakuModel.fromJson(e)).toList();
+      mutasiBahanBakuList.value = (res as List)
+          .map((e) => MutasiBahanBakuModel.fromJson(e))
+          .toList();
 
       hitungRekapMutasiBahanBaku();
     } catch (e) {
@@ -498,10 +494,12 @@ class KeuanganController extends GetxController {
 
       hasil[key] = RekapKeuanganModel(
         label: current.label,
-        pemasukan:
-            item.isMasuk ? current.pemasukan + item.jumlah : current.pemasukan,
-        pengeluaran:
-            item.isKeluar ? current.pengeluaran + item.jumlah : current.pengeluaran,
+        pemasukan: item.isMasuk
+            ? current.pemasukan + item.jumlah
+            : current.pemasukan,
+        pengeluaran: item.isKeluar
+            ? current.pengeluaran + item.jumlah
+            : current.pengeluaran,
       );
     }
 
@@ -543,10 +541,12 @@ class KeuanganController extends GetxController {
 
       hasil[key] = RekapKeuanganModel(
         label: current.label,
-        pemasukan:
-            item.isMasuk ? current.pemasukan + item.jumlah : current.pemasukan,
-        pengeluaran:
-            item.isKeluar ? current.pengeluaran + item.jumlah : current.pengeluaran,
+        pemasukan: item.isMasuk
+            ? current.pemasukan + item.jumlah
+            : current.pemasukan,
+        pengeluaran: item.isKeluar
+            ? current.pengeluaran + item.jumlah
+            : current.pengeluaran,
       );
     }
 
@@ -563,8 +563,7 @@ class KeuanganController extends GetxController {
     for (final item in data) {
       final tanggal = item.createdAt.toLocal();
 
-      final key =
-          '${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}';
+      final key = '${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}';
 
       if (!hasil.containsKey(key)) {
         hasil[key] = RekapKeuanganModel(
@@ -578,10 +577,12 @@ class KeuanganController extends GetxController {
 
       hasil[key] = RekapKeuanganModel(
         label: current.label,
-        pemasukan:
-            item.isMasuk ? current.pemasukan + item.jumlah : current.pemasukan,
-        pengeluaran:
-            item.isKeluar ? current.pengeluaran + item.jumlah : current.pengeluaran,
+        pemasukan: item.isMasuk
+            ? current.pemasukan + item.jumlah
+            : current.pemasukan,
+        pengeluaran: item.isKeluar
+            ? current.pengeluaran + item.jumlah
+            : current.pengeluaran,
       );
     }
 

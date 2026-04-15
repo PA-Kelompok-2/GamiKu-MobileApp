@@ -34,11 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black,
-        icon: const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 28,
-        ),
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
         borderColor: Colors.red,
         borderWidth: 1,
         margin: const EdgeInsets.all(16),
@@ -70,11 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black,
-        icon: const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 28,
-        ),
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
         borderColor: Colors.red,
         borderWidth: 1,
         margin: const EdgeInsets.all(16),
@@ -90,11 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black,
-        icon: const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 28,
-        ),
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
         borderColor: Colors.red,
         borderWidth: 1,
         margin: const EdgeInsets.all(16),
@@ -135,11 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     try {
-      await authC.register(
-        email: email,
-        password: password,
-        name: name,
-      );
+      await authC.register(email: email, password: password, name: name);
     } catch (e) {
       final errorMsg = e.toString().toLowerCase();
 
@@ -151,11 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black,
-        icon: const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 28,
-        ),
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
         borderColor: Colors.red,
         borderWidth: 1,
         margin: const EdgeInsets.all(16),

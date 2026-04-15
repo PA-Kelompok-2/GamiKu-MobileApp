@@ -31,10 +31,7 @@ class MenuSearchBar extends StatelessWidget {
         },
         decoration: InputDecoration(
           hintText: 'Cari menu...',
-          hintStyle: TextStyle(
-            color: AppColors.textGrey,
-            fontSize: 14,
-          ),
+          hintStyle: TextStyle(color: AppColors.textGrey, fontSize: 14),
 
           /// ICON SEARCH
           prefixIcon: const Icon(

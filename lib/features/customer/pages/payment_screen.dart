@@ -34,9 +34,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   void _goToPaymentGateway() {
     Get.toNamed(
       Routes.paymentGateway,
-      arguments: {
-        'onOrderPlaced': _onOrderPlaced,
-      },
+      arguments: {'onOrderPlaced': _onOrderPlaced},
     );
   }
 
@@ -363,10 +361,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 child: const Text(
                   '🍽️  Pesan Sekarang',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                 ),
               ),
             ),

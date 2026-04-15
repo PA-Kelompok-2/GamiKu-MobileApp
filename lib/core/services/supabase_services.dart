@@ -31,6 +31,7 @@ class SupabaseService {
 
   Future<String?> getRole() async {
     final user = supabase.auth.currentUser;
+
     if (user == null) return null;
 
     final data = await supabase
@@ -71,6 +72,7 @@ class SupabaseService {
 
   Future<String?> getUserRole() async {
     final user = supabase.auth.currentUser;
+
     if (user == null) return null;
 
     final data = await supabase
@@ -103,11 +105,7 @@ class SupabaseService {
     String? imageUrl,
     required String categoryId,
   }) async {
-    final data = {
-      'name': name,
-      'price': price,
-      'category_id': categoryId,
-    };
+    final data = {'name': name, 'price': price, 'category_id': categoryId};
 
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
       data['image_url'] = imageUrl;
@@ -123,11 +121,7 @@ class SupabaseService {
     String? imageUrl,
     required String categoryId,
   }) async {
-    final data = {
-      'name': name,
-      'price': price,
-      'category_id': categoryId,
-    };
+    final data = {'name': name, 'price': price, 'category_id': categoryId};
 
     if (imageUrl != null && imageUrl.trim().isNotEmpty) {
       data['image_url'] = imageUrl;
@@ -162,6 +156,7 @@ class SupabaseService {
 
   String generateToken() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
     return List.generate(
       20,
       (index) => chars[Random().nextInt(chars.length)],
@@ -217,6 +212,7 @@ class SupabaseService {
         .select()
         .eq('role', 'karyawan')
         .order('name');
+
     return List<Map<String, dynamic>>.from(res);
   }
 
@@ -226,17 +222,21 @@ class SupabaseService {
     required String password,
   }) async {
     final session = Supabase.instance.client.auth.currentSession;
+
     if (session == null) {
       throw Exception("User belum login (session null)");
     }
+
     final res = await supabase.functions.invoke(
       'create-karyawan',
       body: {'name': name, 'email': email, 'password': password},
     );
+
     if (res.status != 200) {
       final msg = res.data is Map<String, dynamic>
           ? (res.data['error'] ?? 'Gagal tambah karyawan')
           : 'Gagal tambah karyawan';
+
       throw Exception(msg);
     }
   }
@@ -260,10 +260,7 @@ class SupabaseService {
 
     await supabase
         .from('profiles')
-        .update({
-          'name': name.trim(),
-          'email': normalizedEmail,
-        })
+        .update({'name': name.trim(), 'email': normalizedEmail})
         .eq('id', id);
   }
 

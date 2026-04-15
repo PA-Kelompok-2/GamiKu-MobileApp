@@ -139,29 +139,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         return;
       }
 
-    final existing = await service.supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
+      final existing = await service.supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
 
-    if (existing != null && existing['id'] != user.id) {
-      Get.snackbar(
-        'Error',
-        'Email sudah digunakan akun lain',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
+      if (existing != null && existing['id'] != user.id) {
+        Get.snackbar(
+          'Error',
+          'Email sudah digunakan akun lain',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
 
-      await service.supabase.from('profiles').update({
-        'name': name,
-        'email': email,
-        'phone_number': phone.isEmpty ? null : phone,
-        'gender': gender,
-        'date_of_birth': formattedDob,
-      }).eq('id', user.id);
-
+      await service.supabase
+          .from('profiles')
+          .update({
+            'name': name,
+            'email': email,
+            'phone_number': phone.isEmpty ? null : phone,
+            'gender': gender,
+            'date_of_birth': formattedDob,
+          })
+          .eq('id', user.id);
 
       Get.find<ProfileController>().loadProfile();
       Get.snackbar(
@@ -209,9 +211,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: SingleChildScrollView(
               child: Column(
@@ -374,10 +374,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textGrey,
-          ),
+          style: const TextStyle(fontSize: 13, color: AppColors.textGrey),
         ),
         const SizedBox(height: 6),
         Container(
@@ -395,15 +392,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 color: AppColors.textGrey,
               ),
               suffixIcon: IconButton(
-                icon: Icon(
-                  isVisible ? Icons.visibility : Icons.visibility_off,
-                ),
+                icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
                 onPressed: onToggle,
               ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 14,
-              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
             ),
           ),
         ),
@@ -462,10 +455,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        _buildField(
-                          nameC,
-                          Icons.person_outline,
-                        ),
+                        _buildField(nameC, Icons.person_outline),
                         const SizedBox(height: 18),
                         const Text(
                           "Email",
@@ -551,7 +541,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           onTap: () async {
                             DateTime initialDate = DateTime(2000);
 
-                            final currentDob = _formatDateForDatabase(dobC.text);
+                            final currentDob = _formatDateForDatabase(
+                              dobC.text,
+                            );
                             if (currentDob != null) {
                               final parts = currentDob.split('-');
                               if (parts.length == 3) {
@@ -572,7 +564,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                             if (picked != null) {
                               final day = picked.day.toString().padLeft(2, '0');
-                              final month = picked.month.toString().padLeft(2, '0');
+                              final month = picked.month.toString().padLeft(
+                                2,
+                                '0',
+                              );
                               final year = picked.year.toString();
 
                               dobC.text = '$day/$month/$year';
@@ -701,11 +696,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       child: Row(
         children: [
           const SizedBox(width: 12),
-          Icon(
-            icon,
-            size: 20,
-            color: AppColors.textGrey,
-          ),
+          Icon(icon, size: 20, color: AppColors.textGrey),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(

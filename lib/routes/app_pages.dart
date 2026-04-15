@@ -24,134 +24,131 @@ import '../features/customer/pages/payment_screen.dart';
 import '../features/customer/pages/payment_gateway_screen.dart';
 import '../features/customer/pages/qr_screen.dart';
 
-  class AppPages {
-    static final pages = [
-      GetPage(name: Routes.splash, page: () => const SplashScreen()),
+class AppPages {
+  static final pages = [
+    GetPage(name: Routes.splash, page: () => const SplashScreen()),
 
-      GetPage(
-        name: Routes.login,
-        page: () => LoginPage(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.login,
+      page: () => LoginPage(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.register,
-        page: () => RegisterPage(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.register,
+      page: () => RegisterPage(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.home,
-        page: () => const HomeScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.home,
+      page: () => const HomeScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.settings,
-        page: () => SettingsScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.settings,
+      page: () => SettingsScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.myProfile,
-        page: () => const MyProfileScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.myProfile,
+      page: () => const MyProfileScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.about,
-        page: () => const AboutScreen(),
-      ),
+    GetPage(name: Routes.about, page: () => const AboutScreen()),
 
-      GetPage(
-        name: Routes.profile,
-        page: () => const ProfileScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.profile,
+      page: () => const ProfileScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.helpCenter,
-        page: () => const HelpCenterScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.helpCenter,
+      page: () => const HelpCenterScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.terms,
-        page: () => const TermsOfServicesScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.terms,
+      page: () => const TermsOfServicesScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.privacyPolicy,
-        page: () => const PrivacyPolicyScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.privacyPolicy,
+      page: () => const PrivacyPolicyScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.bahanBaku,
-        page: () => const BahanBakuScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.bahanBaku,
+      page: () => const BahanBakuScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.keuangan,
-        page: () => const KeuanganScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.keuangan,
+      page: () => const KeuanganScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.karyawanManagement,
-        page: () => const KaryawanManagementScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.karyawanManagement,
+      page: () => const KaryawanManagementScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.orderDetail,
-        page: () => const OrderDetailScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.orderDetail,
+      page: () => const OrderDetailScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.menuManagement,
-        page: () => const MenuManagementScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
+    GetPage(
+      name: Routes.menuManagement,
+      page: () => const MenuManagementScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-      GetPage(
-        name: Routes.bahanBakuMutasi,
-        page: () => const BahanBakuMutasiScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
-      
-      GetPage(
-        name: Routes.keuanganDetail,
-        page: () => KeuanganDetailScreen(
-          completedOrders: List<Map<String, dynamic>>.from(Get.arguments ?? []),
-        ),
-        middlewares: [StartupMiddleware()],
-      ),
-      
-      GetPage(
-        name: Routes.payment,
-        page: () => const PaymentScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
-      GetPage(
-        name: Routes.paymentGateway,
-        page: () {
-          final args = Get.arguments;
-          final onOrderPlaced = args is Map<String, dynamic>
-              ? args['onOrderPlaced'] as VoidCallback?
-              : null;
+    GetPage(
+      name: Routes.bahanBakuMutasi,
+      page: () => const BahanBakuMutasiScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
 
-          return PaymentGatewayScreen(onOrderPlaced: onOrderPlaced);
-        },
-        middlewares: [StartupMiddleware()],
+    GetPage(
+      name: Routes.keuanganDetail,
+      page: () => KeuanganDetailScreen(
+        completedOrders: List<Map<String, dynamic>>.from(Get.arguments ?? []),
       ),
-      GetPage(
-        name: Routes.qr,
-        page: () => const QRScreen(),
-        middlewares: [StartupMiddleware()],
-      ),
-    ];
-  }
+      middlewares: [StartupMiddleware()],
+    ),
+
+    GetPage(
+      name: Routes.payment,
+      page: () => const PaymentScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
+    GetPage(
+      name: Routes.paymentGateway,
+      page: () {
+        final args = Get.arguments;
+        final onOrderPlaced = args is Map<String, dynamic>
+            ? args['onOrderPlaced'] as VoidCallback?
+            : null;
+
+        return PaymentGatewayScreen(onOrderPlaced: onOrderPlaced);
+      },
+      middlewares: [StartupMiddleware()],
+    ),
+    GetPage(
+      name: Routes.qr,
+      page: () => const QRScreen(),
+      middlewares: [StartupMiddleware()],
+    ),
+  ];
+}

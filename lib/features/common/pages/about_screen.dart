@@ -41,10 +41,7 @@ class AboutScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                   ),
                   padding: const EdgeInsets.all(22),
-                  child: Image.asset(
-                    'assets/logo.png',
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset('assets/logo.png', fit: BoxFit.contain),
                 ),
 
                 const SizedBox(height: 22),

@@ -6,20 +6,12 @@ import '../../../core/constants/app_colors.dart';
 import '../controllers/keuangan_controller.dart';
 import '../widgets/keuangan_card.dart';
 
-enum DetailFilterType {
-  semua,
-  hariIni,
-  mingguIni,
-  bulanIni,
-}
+enum DetailFilterType { semua, hariIni, mingguIni, bulanIni }
 
 class KeuanganDetailScreen extends StatefulWidget {
   final List<Map<String, dynamic>> completedOrders;
 
-  const KeuanganDetailScreen({
-    super.key,
-    required this.completedOrders,
-  });
+  const KeuanganDetailScreen({super.key, required this.completedOrders});
 
   @override
   State<KeuanganDetailScreen> createState() => _KeuanganDetailScreenState();
@@ -221,10 +213,7 @@ class _KeuanganDetailScreenState extends State<KeuanganDetailScreen> {
             _buildFilterBar(),
             Expanded(
               child: TabBarView(
-                children: [
-                  _buildPemasukanTab(),
-                  _buildPengeluaranTab(),
-                ],
+                children: [_buildPemasukanTab(), _buildPengeluaranTab()],
               ),
             ),
           ],

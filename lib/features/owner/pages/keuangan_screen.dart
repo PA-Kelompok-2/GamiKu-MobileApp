@@ -71,9 +71,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: SingleChildScrollView(
               child: Form(
@@ -164,9 +162,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                       controller: nominalC,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (value) {
                         final raw = (value ?? '').replaceAll('.', '').trim();
 
@@ -191,8 +187,9 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                         final number = int.tryParse(value.replaceAll('.', ''));
                         if (number == null) return;
 
-                        final newText =
-                            NumberFormat.decimalPattern('id').format(number);
+                        final newText = NumberFormat.decimalPattern(
+                          'id',
+                        ).format(number);
 
                         nominalC.value = TextEditingValue(
                           text: newText,
@@ -277,9 +274,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                             const SizedBox(width: 10),
                             Text(
                               DateFormat('dd/MM/yyyy').format(selectedDate),
-                              style: const TextStyle(
-                                color: AppColors.textDark,
-                              ),
+                              style: const TextStyle(color: AppColors.textDark),
                             ),
                           ],
                         ),
@@ -636,10 +631,11 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     children: [
                       SummaryCard(
-                        totalPemasukan:
-                            keuanganC.getTotalPemasukanGabungan(_completedOrders),
-                        totalPengeluaran:
-                            keuanganC.getTotalPengeluaranGabungan(),
+                        totalPemasukan: keuanganC.getTotalPemasukanGabungan(
+                          _completedOrders,
+                        ),
+                        totalPengeluaran: keuanganC
+                            .getTotalPengeluaranGabungan(),
                         saldo: keuanganC.getSaldoGabungan(_completedOrders),
                       ),
                       _buildRekapSection(),

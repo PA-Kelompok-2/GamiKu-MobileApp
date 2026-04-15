@@ -179,8 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                           () => SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed:
-                                  authC.isLoading.value ? null : login,
+                              onPressed: authC.isLoading.value ? null : login,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.splashRed,
                                 padding: const EdgeInsets.symmetric(
@@ -233,10 +232,7 @@ class _LoginPageState extends State<LoginPage> {
             top: 15,
             left: 10,
             child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () => Get.back(),
             ),
           ),

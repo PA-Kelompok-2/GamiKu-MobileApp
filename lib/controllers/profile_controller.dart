@@ -3,7 +3,7 @@ import '../core/services/supabase_services.dart';
 
 class ProfileController extends GetxController {
   final service = SupabaseService();
-  
+
   var name = ''.obs;
   var role = ''.obs;
   var isLoading = true.obs;
@@ -19,7 +19,6 @@ class ProfileController extends GetxController {
 
     final user = service.supabase.auth.currentUser;
 
-    // jika belum login → mode guest
     if (user == null) {
       name.value = "Guest User";
       role.value = "customer";

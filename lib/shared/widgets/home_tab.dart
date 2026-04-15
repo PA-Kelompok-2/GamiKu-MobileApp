@@ -22,7 +22,6 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-
   @override
   void initState() {
     super.initState();
@@ -189,7 +188,8 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                     ),
 
-                    const SizedBox(height: 10),     ],
+                    const SizedBox(height: 10),
+                  ],
                 ),
               ),
             ),

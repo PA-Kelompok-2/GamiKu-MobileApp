@@ -89,10 +89,7 @@ class _SummaryItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColors.textGrey,
-          ),
+          style: const TextStyle(fontSize: 11, color: AppColors.textGrey),
         ),
         const SizedBox(height: 2),
         Text(

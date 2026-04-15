@@ -10,12 +10,10 @@ class BahanBakuMutasiScreen extends StatefulWidget {
   const BahanBakuMutasiScreen({super.key});
 
   @override
-  State<BahanBakuMutasiScreen> createState() =>
-      _BahanBakuMutasiScreenState();
+  State<BahanBakuMutasiScreen> createState() => _BahanBakuMutasiScreenState();
 }
 
-class _BahanBakuMutasiScreenState
-    extends State<BahanBakuMutasiScreen> {
+class _BahanBakuMutasiScreenState extends State<BahanBakuMutasiScreen> {
   final keuanganC = Get.isRegistered<KeuanganController>()
       ? Get.find<KeuanganController>()
       : Get.put(KeuanganController());
@@ -156,20 +154,8 @@ class _BahanBakuMutasiScreenState
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _summaryItem(
-              'Masuk',
-              totalMasuk,
-              Colors.green,
-            ),
-          ),
-          Expanded(
-            child: _summaryItem(
-              'Keluar',
-              totalKeluar,
-              Colors.red,
-            ),
-          ),
+          Expanded(child: _summaryItem('Masuk', totalMasuk, Colors.green)),
+          Expanded(child: _summaryItem('Keluar', totalKeluar, Colors.red)),
           Expanded(
             child: _summaryItem(
               'Selisih',

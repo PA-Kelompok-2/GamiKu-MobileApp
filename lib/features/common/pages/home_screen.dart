@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../customer/pages/order_screen.dart';
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+
     _homeTabCtrl = TabController(length: categories.length, vsync: this);
 
     if (widget.initialTab != null) {
@@ -55,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     if (currentUser == null) {
       if (!mounted) return;
+
       setState(() {
         role = null;
         isLoadingRole = false;
@@ -66,16 +69,11 @@ class _HomeScreenState extends State<HomeScreen>
     final r = await service.getUserRole();
 
     if (!mounted) return;
+
     setState(() {
       role = r;
       isLoadingRole = false;
     });
-  }
-
-  @override
-  void dispose() {
-    _homeTabCtrl.dispose();
-    super.dispose();
   }
 
   void _onNavTap(int i) => setState(() => _navIdx = i);
@@ -96,10 +94,14 @@ class _HomeScreenState extends State<HomeScreen>
 
     Get.toNamed(
       Routes.payment,
-      arguments: {
-        'onOrderPlaced': () => setState(() => _navIdx = 2),
-      },
+      arguments: {'onOrderPlaced': () => setState(() => _navIdx = 2)},
     )?.then((_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _homeTabCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -114,23 +116,23 @@ class _HomeScreenState extends State<HomeScreen>
             isLoadingRole
                 ? const Center(child: CircularProgressIndicator())
                 : role == 'owner'
-                    ? const HomeTabInternalScreen()
-                    : role == 'karyawan'
-                        ? const HomeTabInternalScreen()
-                        : HomeTab(
-                            onCartChanged: () => setState(() {}),
-                            onOpenMenu: (cat) {
-                              Get.find<MenuC>().selectedCategory.value = cat;
-                              _onNavTap(1);
-                            },
-                            onOpenOrders: () {
-                              if (_isGuest()) {
-                                _goToLogin();
-                                return;
-                              }
-                              _onNavTap(2);
-                            },
-                          ),
+                ? const HomeTabInternalScreen()
+                : role == 'karyawan'
+                ? const HomeTabInternalScreen()
+                : HomeTab(
+                    onCartChanged: () => setState(() {}),
+                    onOpenMenu: (cat) {
+                      Get.find<MenuC>().selectedCategory.value = cat;
+                      _onNavTap(1);
+                    },
+                    onOpenOrders: () {
+                      if (_isGuest()) {
+                        _goToLogin();
+                        return;
+                      }
+                      _onNavTap(2);
+                    },
+                  ),
             const MenuScreen(),
             OrderScreen(key: ValueKey('order-$_navIdx')),
             const ProfileScreen(),
@@ -140,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
           final cartC = Get.find<CartController>();
           final cartCount = cartC.totalItems;
           final showCartBar = cartCount > 0 && _navIdx == 1;
+
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -149,9 +152,10 @@ class _HomeScreenState extends State<HomeScreen>
                 cartCount: cartCount,
                 onTap: (i) {
                   if (_isGuest() && i == 2) {
-                  _goToLogin();
-                  return;
-                }
+                    _goToLogin();
+                    return;
+                  }
+
                   _onNavTap(i);
                 },
               ),

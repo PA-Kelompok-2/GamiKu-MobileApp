@@ -63,12 +63,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       final order = await service.createOrder(
         total: cartC.grandTotal,
         items: cartC.entries.map((e) {
-          return {
-            'id': e.id,
-            'name': e.name,
-            'price': e.price,
-            'qty': e.qty,
-          };
+          return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
         }).toList(),
       );
 
@@ -76,10 +71,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
 
       cartC.clear();
       widget.onOrderPlaced?.call();
-    Get.toNamed(
-      Routes.qr,
-      arguments: {'token': token},
-    );
+      Get.toNamed(Routes.qr, arguments: {'token': token});
     } catch (e) {
       Get.snackbar('Error', 'Gagal membuat pesanan');
     } finally {
