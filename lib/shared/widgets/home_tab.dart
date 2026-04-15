@@ -21,6 +21,8 @@ class HomeTab extends StatefulWidget {
   State<HomeTab> createState() => _HomeTabState();
 }
 
+String selectedCategory = '';
+
 class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
@@ -232,18 +234,19 @@ class _HomeTabState extends State<HomeTab> {
             SliverToBoxAdapter(
               child: Obx(() {
                 final menuC = Get.find<MenuC>();
-                final cats = menuC.menus
-                    .map((m) => m['cat']?.toString() ?? '')
-                    .where((cat) => cat.isNotEmpty)
-                    .toSet()
-                    .toList();
+                final categories = menuC.categories;
 
                 return SizedBox(
                   height: 120,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: cats.map((cat) => _categoryItem(cat)).toList(),
+                    children: categories.map((cat) {
+                      return _categoryItem(
+                        cat['name'],
+                        cat['image_url'],
+                      );
+                    }).toList(),
                   ),
                 );
               }),
@@ -290,46 +293,97 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _categoryItem(String title) {
-    return InkWell(
-      onTap: () => widget.onOpenMenu(title),
-      child: Container(
-        width: 100,
-        margin: const EdgeInsets.only(right: 12),
-        child: Column(
-          children: [
-            Container(
-              height: 80,
-              width: 80,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadow,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+  Widget _categoryItem(String title, String? imageUrl) {
+    final isSelected = selectedCategory == title;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = title;
+        });
+
+        widget.onOpenMenu(title);
+      },
+
+      /// ANIMASI KLIK
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 200),
+        scale: isSelected ? 1.05 : 1.0,
+
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+
+          width: 100,
+          margin: const EdgeInsets.only(right: 12),
+
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+
+            /// GRADIENT SAAT AKTIF
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [
+                      Color(0xFFCC1B1B),
+                      Color(0xFFE53935),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+
+            color: isSelected ? null : AppColors.white,
+
+            boxShadow: [
+              BoxShadow(
+                color: isSelected
+                    ? Colors.red.withOpacity(0.3)
+                    : AppColors.shadow,
+                blurRadius: isSelected ? 12 : 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              /// IMAGE
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.network(
+                  imageUrl ?? '',
+                  height: 50,
+                  width: 50,
+                  fit: BoxFit.cover,
+
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.fastfood,
+                    size: 30,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.primary,
                   ),
-                ],
+                ),
               ),
-              child: const Icon(
-                Icons.fastfood,
-                color: AppColors.primary,
-                size: 32,
+
+              const SizedBox(height: 8),
+
+              /// TEXT
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected
+                      ? Colors.white
+                      : AppColors.textDark,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -337,66 +391,117 @@ class _HomeTabState extends State<HomeTab> {
 
   Widget _popularCard(Map item) {
     return Container(
-      width: 240,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['name'] ?? '',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+      width: 220,
+      margin: const EdgeInsets.only(right: 14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            /// IMAGE
+            Positioned.fill(
+              child: Image.network(
+                item['image_url'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: AppColors.imgBg,
+                  child: const Icon(Icons.fastfood, size: 40),
+                ),
+              ),
+            ),
+
+            /// GRADIENT OVERLAY (BIAR TEXT KELIHATAN)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.1),
+                      Colors.black.withOpacity(0.7),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Rp ${item['price']}",
-                  style: const TextStyle(
+              ),
+            ),
+
+            /// CONTENT
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 14,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// NAMA MENU
+                  Text(
+                    item['name'] ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  /// CATEGORY
+                  Text(
+                    item['cat'] ?? '',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  /// PRICE
+                  Text(
+                    "Rp ${item['price']}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            /// OPTIONAL BADGE (biar gak kosong)
+            Positioned(
+              top: 10,
+              left: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  "Popular",
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Pesan Sekarang',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

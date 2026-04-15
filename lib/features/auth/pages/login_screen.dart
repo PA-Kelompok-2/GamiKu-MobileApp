@@ -18,22 +18,54 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isObscure = true;
 
+  /// =========================
+  /// SNACKBAR HELPER
+  /// =========================
+  void showError(String message) {
+    Get.snackbar(
+      "Login Gagal",
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.white,
+      colorText: Colors.black,
+      icon: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE5E5),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          Icons.close,
+          color: Colors.red,
+          size: 22,
+        ),
+      ),
+      borderColor: Colors.red,
+      borderWidth: 1,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+    );
+  }
+
+  /// =========================
+  /// LOGIN FUNCTION
+  /// =========================
   void login() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar("Error", "Email dan Password wajib diisi");
+      showError("Email dan Password wajib diisi");
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar("Error", "Format email tidak valid");
+      showError("Format email tidak valid");
       return;
     }
 
     if (password.length < 8) {
-      Get.snackbar("Error", "Password minimal 8 karakter");
+      showError("Password minimal 8 karakter");
       return;
     }
 
@@ -42,8 +74,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       final errorMsg = e.toString().toLowerCase();
 
-      Get.snackbar(
-        "Login Gagal",
+      showError(
         errorMsg.contains('invalid') ||
                 errorMsg.contains('password') ||
                 errorMsg.contains('credential') ||
@@ -62,6 +93,9 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Column(
             children: [
+              /// =========================
+              /// HEADER
+              /// =========================
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60, bottom: 40),
@@ -104,6 +138,10 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
+
+              /// =========================
+              /// FORM
+              /// =========================
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -120,6 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 30),
+
                         const Text(
                           "Login",
                           style: TextStyle(
@@ -127,7 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+
                         const SizedBox(height: 25),
+
+                        /// EMAIL
                         TextField(
                           controller: emailController,
                           decoration: InputDecoration(
@@ -144,7 +186,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 15),
+
+                        /// PASSWORD
                         TextField(
                           controller: passwordController,
                           obscureText: isObscure,
@@ -174,12 +219,16 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 20),
+
+                        /// BUTTON LOGIN
                         Obx(
                           () => SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: authC.isLoading.value ? null : login,
+                              onPressed:
+                                  authC.isLoading.value ? null : login,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.splashRed,
                                 padding: const EdgeInsets.symmetric(
@@ -203,13 +252,17 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 20),
+
+                        /// REGISTER
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text("Don't have an account? "),
                             GestureDetector(
-                              onTap: () => Get.toNamed(Routes.register),
+                              onTap: () =>
+                                  Get.toNamed(Routes.register),
                               child: const Text(
                                 "Sign Up",
                                 style: TextStyle(
@@ -220,6 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -228,11 +282,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
+
+          /// BACK BUTTON
           Positioned(
             top: 15,
             left: 10,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+              ),
               onPressed: () => Get.back(),
             ),
           ),
