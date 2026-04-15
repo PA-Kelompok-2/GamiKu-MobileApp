@@ -54,15 +54,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void forgotPassword() async {
-    if (emailController.text.isEmpty) {
-      Get.snackbar("Error", "Masukkan email terlebih dahulu");
-      return;
-    }
-
-    await authC.resetPassword(emailController.text);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,18 +174,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: forgotPassword,
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 20),
                         Obx(
                           () => SizedBox(
                             width: double.infinity,

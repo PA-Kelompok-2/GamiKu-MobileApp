@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
@@ -20,10 +21,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   final phoneC = TextEditingController();
   final dobC = TextEditingController();
 
-  String gender = 'Male';
+  String? gender;
 
   final genders = ['Male', 'Female'];
-
   bool isLoading = true;
   bool isSaving = false;
 
@@ -69,12 +69,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Future<void> _loadProfile() async {
     final data = await service.getProfile();
     if (data != null) {
+      final loadedGender = data['gender']?.toString().trim();
+
       setState(() {
         nameC.text = data['name'] ?? '';
         emailC.text = data['email'] ?? '';
         phoneC.text = data['phone_number'] ?? '';
         dobC.text = _formatDateForDisplay(data['date_of_birth']);
-        gender = data['gender'] ?? 'Male';
+        gender = genders.contains(loadedGender) ? loadedGender : null;
         isLoading = false;
       });
     } else {
@@ -85,10 +87,44 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Future<void> _save() async {
-    if (nameC.text.isEmpty || emailC.text.isEmpty) {
+    final name = nameC.text.trim();
+    final email = emailC.text.trim().toLowerCase();
+    final phone = phoneC.text.trim();
+    final phoneDigits = phone.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (name.isEmpty || email.isEmpty) {
       Get.snackbar(
         'Error',
         'Nama dan email tidak boleh kosong',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      Get.snackbar(
+        'Error',
+        'Format email tidak valid',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (phone.isNotEmpty && phoneDigits.length < 10) {
+      Get.snackbar(
+        'Error',
+        'Nomor telepon minimal 10 digit',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final formattedDob = _formatDateForDatabase(dobC.text);
+
+    if (dobC.text.trim().isNotEmpty && formattedDob == null) {
+      Get.snackbar(
+        'Error',
+        'Format tanggal lahir tidak valid',
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -103,24 +139,29 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         return;
       }
 
-      final formattedDob = _formatDateForDatabase(dobC.text);
+    final existing = await service.supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
 
-      if (dobC.text.trim().isNotEmpty && formattedDob == null) {
-        Get.snackbar(
-          'Error',
-          'Format tanggal lahir tidak valid',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
+    if (existing != null && existing['id'] != user.id) {
+      Get.snackbar(
+        'Error',
+        'Email sudah digunakan akun lain',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
       await service.supabase.from('profiles').update({
-        'name': nameC.text.trim(),
-        'email': emailC.text.trim(),
-        'phone_number': phoneC.text.trim(),
+        'name': name,
+        'email': email,
+        'phone_number': phone.isEmpty ? null : phone,
         'gender': gender,
         'date_of_birth': formattedDob,
       }).eq('id', user.id);
+
 
       Get.find<ProfileController>().loadProfile();
       Get.snackbar(
@@ -451,8 +492,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         _buildField(
                           phoneC,
                           Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
+                          keyboardType: TextInputType.number,
                           hint: '08xxxxxxxxxx',
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(15),
+                          ],
                         ),
                         const SizedBox(height: 18),
                         const Text(
@@ -474,6 +519,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: gender,
+                              hint: const Text(
+                                'Pilih gender',
+                                style: TextStyle(color: AppColors.textGrey),
+                              ),
                               icon: const Icon(Icons.keyboard_arrow_down),
                               items: genders.map((g) {
                                 return DropdownMenuItem(
@@ -483,7 +532,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  gender = value!;
+                                  gender = value;
                                 });
                               },
                             ),
@@ -640,6 +689,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     IconData icon, {
     TextInputType keyboardType = TextInputType.text,
     String? hint,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Container(
       height: 52,
@@ -661,6 +711,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             child: TextField(
               controller: controller,
               keyboardType: keyboardType,
+              inputFormatters: inputFormatters,
               decoration: InputDecoration(
                 hintText: hint,
                 border: InputBorder.none,

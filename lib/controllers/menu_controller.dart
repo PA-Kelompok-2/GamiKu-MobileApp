@@ -97,7 +97,7 @@ class MenuC extends GetxController {
   Future<void> addMenu({
     required String name,
     required int price,
-    required String imageUrl,
+    String? imageUrl,
     required String categoryId,
   }) async {
     try {
@@ -125,7 +125,7 @@ class MenuC extends GetxController {
     required dynamic id,
     required String name,
     required int price,
-    required String imageUrl,
+    String? imageUrl,
     required String categoryId,
   }) async {
     try {

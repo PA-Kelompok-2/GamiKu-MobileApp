@@ -22,7 +22,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
   List<Map<String, dynamic>> _completedOrders = [];
   bool _isLoading = true;
 
-  int _rekapTabIndex = 0; 
+  int _rekapTabIndex = 0;
 
   int get totalPemasukan =>
       _completedOrders.fold(0, (s, o) => s + (o['total_price'] as int? ?? 0));
@@ -51,6 +51,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
   }
 
   void _tambahPengeluaran() {
+    final formKey = GlobalKey<FormState>();
     final namaC = TextEditingController();
     final nominalC = TextEditingController();
     DateTime selectedDate = DateTime.now();
@@ -75,177 +76,267 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
               ),
             ),
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 45,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.border,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Tambah Pengeluaran",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: namaC,
-                    decoration: InputDecoration(
-                      labelText: "Nama Pengeluaran",
-                      prefixIcon: const Icon(Icons.inventory_2_outlined),
-                      filled: true,
-                      fillColor: AppColors.bg,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: nominalC,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (value) {
-                      if (value.isEmpty) return;
-
-                      final number = int.parse(value.replaceAll('.', ''));
-                      final newText =
-                          NumberFormat.decimalPattern('id').format(number);
-
-                      nominalC.value = TextEditingValue(
-                        text: newText,
-                        selection: TextSelection.collapsed(
-                          offset: newText.length,
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 45,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.border,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      labelText: "Nominal (Rp)",
-                      prefixIcon: const Icon(Icons.payments_outlined),
-                      filled: true,
-                      fillColor: AppColors.bg,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime.now(),
-                      );
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Tambah Pengeluaran",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
-                      if (picked != null) {
-                        setModalState(() {
-                          selectedDate = picked;
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.bg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today,
-                            size: 18,
-                            color: AppColors.textGrey,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                            style: const TextStyle(
-                              color: AppColors.textDark,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (namaC.text.isEmpty || nominalC.text.isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "Semua field wajib diisi",
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                          return;
+                    TextFormField(
+                      controller: namaC,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        final v = value?.trim() ?? '';
+
+                        if (v.isEmpty) {
+                          return 'Nama pengeluaran wajib diisi';
                         }
 
-                        final nominal = int.tryParse(
-                          nominalC.text.replaceAll('.', ''),
-                        );
+                        if (v.length < 3) {
+                          return 'Nama pengeluaran minimal 3 karakter';
+                        }
 
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Nama Pengeluaran",
+                        prefixIcon: const Icon(
+                          Icons.inventory_2_outlined,
+                          color: AppColors.primary,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.bg,
+                        labelStyle: const TextStyle(
+                          color: AppColors.textGrey,
+                          fontSize: 13,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1.2,
+                          ),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1.4,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextFormField(
+                      controller: nominalC,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      validator: (value) {
+                        final raw = (value ?? '').replaceAll('.', '').trim();
+
+                        if (raw.isEmpty) {
+                          return 'Nominal wajib diisi';
+                        }
+
+                        final nominal = int.tryParse(raw);
                         if (nominal == null) {
-                          Get.snackbar(
-                            "Error",
-                            "Nominal harus berupa angka",
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                          return;
+                          return 'Nominal harus berupa angka';
                         }
 
-                        await keuanganC.tambah(
-                          nama: namaC.text,
-                          nominal: nominal,
-                          tanggal: selectedDate,
-                        );
-                        keuanganC.hitungRekapGabungan(_completedOrders);
-
-                        if (mounted) {
-                          Get.back();
+                        if (nominal <= 0) {
+                          return 'Nominal harus lebih dari 0';
                         }
 
-                        Get.snackbar(
-                          "Berhasil",
-                          "Pengeluaran berhasil ditambahkan",
-                          snackPosition: SnackPosition.BOTTOM,
+                        return null;
+                      },
+                      onChanged: (value) {
+                        if (value.isEmpty) return;
+
+                        final number = int.tryParse(value.replaceAll('.', ''));
+                        if (number == null) return;
+
+                        final newText =
+                            NumberFormat.decimalPattern('id').format(number);
+
+                        nominalC.value = TextEditingValue(
+                          text: newText,
+                          selection: TextSelection.collapsed(
+                            offset: newText.length,
+                          ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                      decoration: InputDecoration(
+                        labelText: "Nominal (Rp)",
+                        prefixIcon: const Icon(
+                          Icons.payments_outlined,
+                          color: AppColors.primary,
                         ),
-                      ),
-                      child: const Text(
-                        "Simpan",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 15,
+                        filled: true,
+                        fillColor: AppColors.bg,
+                        labelStyle: const TextStyle(
+                          color: AppColors.textGrey,
+                          fontSize: 13,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1.2,
+                          ),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1.4,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 12),
+
+                    GestureDetector(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+
+                        if (picked != null) {
+                          setModalState(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.bg,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 18,
+                              color: AppColors.textGrey,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              DateFormat('dd/MM/yyyy').format(selectedDate),
+                              style: const TextStyle(
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final isValid =
+                              formKey.currentState?.validate() ?? false;
+                          if (!isValid) return;
+
+                          final nama = namaC.text.trim();
+                          final nominal = int.parse(
+                            nominalC.text.replaceAll('.', '').trim(),
+                          );
+
+                          await keuanganC.tambah(
+                            nama: nama,
+                            nominal: nominal,
+                            tanggal: selectedDate,
+                          );
+                          keuanganC.hitungRekapGabungan(_completedOrders);
+
+                          if (mounted) {
+                            Get.back();
+                          }
+
+                          Get.snackbar(
+                            "Berhasil",
+                            "Pengeluaran berhasil ditambahkan",
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          "Simpan",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -331,10 +422,9 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                      Get.toNamed(
-                        Routes.keuanganDetail,
-                        arguments : _completedOrders,
-
+                    Get.toNamed(
+                      Routes.keuanganDetail,
+                      arguments: _completedOrders,
                     );
                   },
                   child: const Text(
@@ -347,7 +437,7 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12), 
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
@@ -557,12 +647,12 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                   ),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: AppColors.primary,
-                onPressed: _tambahPengeluaran,
-                child: const Icon(Icons.add, color: AppColors.white),
-              ),
-            ),
-          );
-        }
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.primary,
+          onPressed: _tambahPengeluaran,
+          child: const Icon(Icons.add, color: AppColors.white),
+        ),
+      ),
+    );
+  }
 }

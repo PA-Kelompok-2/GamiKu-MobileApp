@@ -26,6 +26,7 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
     setState(() => isLoading = true);
     try {
       final data = await service.getKaryawan();
+      if (!mounted) return;
       setState(() => karyawanList = data);
     } catch (e) {
       Get.snackbar(
@@ -34,7 +35,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -76,14 +79,11 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   const Text(
                     "Tambah Karyawan",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
-
                   const SizedBox(height: 20),
 
                   TextField(
@@ -99,7 +99,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
 
                   TextField(
@@ -116,7 +115,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
 
                   TextField(
@@ -145,19 +143,47 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
 
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (nameC.text.isEmpty ||
-                            emailC.text.isEmpty ||
-                            passC.text.isEmpty) {
+                        final name = nameC.text.trim();
+                        final email = emailC.text.trim().toLowerCase();
+                        final password = passC.text;
+
+                        if (name.isEmpty || email.isEmpty || password.isEmpty) {
                           Get.snackbar(
                             'Error',
                             'Semua field harus diisi',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        if (name.length < 3) {
+                          Get.snackbar(
+                            'Error',
+                            'Nama minimal 3 karakter',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        if (!GetUtils.isEmail(email)) {
+                          Get.snackbar(
+                            'Error',
+                            'Format email tidak valid',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        if (password.length < 8) {
+                          Get.snackbar(
+                            'Error',
+                            'Password minimal 8 karakter',
                             snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
@@ -167,9 +193,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                         try {
                           await service.addKaryawan(
-                            name: nameC.text,
-                            email: emailC.text,
-                            password: passC.text,
+                            name: name,
+                            email: email,
+                            password: password,
                           );
 
                           await _fetchKaryawan();
@@ -180,14 +206,24 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                             snackPosition: SnackPosition.BOTTOM,
                           );
                         } catch (e) {
+                          final errorText = e.toString().toLowerCase();
+                          String message = 'Gagal menambah karyawan';
+
+                          if (errorText.contains('email sudah digunakan') ||
+                              errorText.contains('user_already_exists') ||
+                              errorText.contains('duplicate key') ||
+                              errorText.contains('already exists') ||
+                              errorText.contains('unique')) {
+                            message = 'Email sudah digunakan';
+                          }
+
                           Get.snackbar(
                             'Error',
-                            'Gagal menambah karyawan: $e',
+                            message,
                             snackPosition: SnackPosition.BOTTOM,
                           );
                         }
                       },
-
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD61F1F),
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -195,7 +231,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-
                       child: const Text(
                         "Simpan",
                         style: TextStyle(
@@ -250,14 +285,11 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   const Text(
                     "Edit Karyawan",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
-
                   const SizedBox(height: 20),
 
                   TextField(
@@ -273,7 +305,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
 
                   TextField(
@@ -290,17 +321,37 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
 
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (nameC.text.isEmpty || emailC.text.isEmpty) {
+                        final name = nameC.text.trim();
+                        final email = emailC.text.trim().toLowerCase();
+
+                        if (name.isEmpty || email.isEmpty) {
                           Get.snackbar(
                             'Error',
                             'Semua field harus diisi',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        if (name.length < 3) {
+                          Get.snackbar(
+                            'Error',
+                            'Nama minimal 3 karakter',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                          return;
+                        }
+
+                        if (!GetUtils.isEmail(email)) {
+                          Get.snackbar(
+                            'Error',
+                            'Format email tidak valid',
                             snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
@@ -311,8 +362,8 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                         try {
                           await service.updateKaryawan(
                             id: karyawan['id'],
-                            name: nameC.text,
-                            email: emailC.text,
+                            name: name,
+                            email: email,
                           );
 
                           await _fetchKaryawan();
@@ -322,9 +373,17 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                             snackPosition: SnackPosition.BOTTOM,
                           );
                         } catch (e) {
+                          final errorText = e.toString().toLowerCase();
+                            String message = 'Gagal update data karyawan';
+                            if (errorText.contains('email sudah digunakan') ||
+                                errorText.contains('duplicate key') ||
+                                errorText.contains('already exists') ||
+                                errorText.contains('unique')) {
+                              message = 'Email sudah digunakan';
+                            }
                           Get.snackbar(
                             'Error',
-                            'Gagal update: $e',
+                            message,
                             snackPosition: SnackPosition.BOTTOM,
                           );
                         }
@@ -336,7 +395,6 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-
                       child: const Text(
                         "Simpan",
                         style: TextStyle(
@@ -410,86 +468,89 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : karyawanList.isEmpty
-                ? const Center(child: Text('Belum ada karyawan'))
-                : Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Total Karyawan: ${karyawanList.length} orang",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : karyawanList.isEmpty
+              ? const Center(child: Text('Belum ada karyawan'))
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Total Karyawan: ${karyawanList.length} orang",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: karyawanList.length,
-                          itemBuilder: (context, i) {
-                            final k = karyawanList[i];
-                            final initials = (k['name'] as String)
-                                .trim()
-                                .split(' ')
-                                .take(2)
-                                .map((w) => w[0].toUpperCase())
-                                .join();
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.blue.shade100,
-                                  child: Text(
-                                    initials,
-                                    style: TextStyle(
-                                      color: Colors.blue.shade800,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                    ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: karyawanList.length,
+                        itemBuilder: (context, i) {
+                          final k = karyawanList[i];
+                          final initials = (k['name'] as String)
+                              .trim()
+                              .split(' ')
+                              .take(2)
+                              .map((w) => w[0].toUpperCase())
+                              .join();
+
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.blue.shade100,
+                                child: Text(
+                                  initials,
+                                  style: TextStyle(
+                                    color: Colors.blue.shade800,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
                                   ),
                                 ),
-                                title: Text(k['name'] ?? '-'),
-                                subtitle: Text(k['email'] ?? '-'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit,
-                                        color: Colors.blue,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => _showEditDialog(k),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => _deleteKaryawan(k),
-                                    ),
-                                  ],
-                                ),
                               ),
-                            );
-                          },
-                        ),
+                              title: Text(k['name'] ?? '-'),
+                              subtitle: Text(k['email'] ?? '-'),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => _showEditDialog(k),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => _deleteKaryawan(k),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: _showAddDialog,

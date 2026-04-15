@@ -308,6 +308,18 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
     _isAvailable = widget.item['is_available'] ?? true;
   }
 
+  bool _hasValidImageUrl(dynamic url) {
+    if (url == null) return false;
+
+    final value = url.toString().trim();
+    if (value.isEmpty) return false;
+
+    final uri = Uri.tryParse(value);
+    if (uri == null) return false;
+
+    return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   Future<void> _toggleAvailability() async {
     if (_isLoading) return;
 
@@ -357,14 +369,14 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: widget.item['image_url'] != null &&
-                          widget.item['image_url'].toString().isNotEmpty
+                  child: _hasValidImageUrl(widget.item['image_url'])
                       ? Image.network(
                           widget.item['image_url'],
                           width: double.infinity,
                           height: 110,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _imagePlaceholder(),
+                          errorBuilder: (context, error, stackTrace) =>
+                              _imagePlaceholder(),
                         )
                       : _imagePlaceholder(),
                 ),
@@ -549,6 +561,7 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
   final _priceC = TextEditingController();
 
   String? _selectedCategoryId;
+  String? _categoryError;
   File? _pickedImage;
   bool _isSaving = false;
 
@@ -574,6 +587,34 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     super.dispose();
   }
 
+  bool _hasValidImageUrl(dynamic url) {
+    if (url == null) return false;
+
+    final value = url.toString().trim();
+    if (value.isEmpty) return false;
+
+    final uri = Uri.tryParse(value);
+    if (uri == null) return false;
+
+    return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  bool _isDuplicateMenuName(String value) {
+    final menuC = Get.find<MenuC>();
+    final inputName = value.trim().toLowerCase();
+
+    if (inputName.isEmpty) return false;
+
+    return menuC.allMenus.any((menu) {
+      final menuName = (menu['name'] ?? '').toString().trim().toLowerCase();
+      final sameName = menuName == inputName;
+
+      final sameItem = _isEdit && menu['id'] == widget.item!['id'];
+
+      return sameName && !sameItem;
+    });
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
@@ -586,23 +627,21 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    final isFormValid = _formKey.currentState?.validate() ?? false;
 
-    if (_selectedCategoryId == null) {
-      Get.snackbar(
-        'Perhatian',
-        'Pilih kategori terlebih dahulu',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
+    setState(() {
+      _categoryError =
+          _selectedCategoryId == null ? 'Kategori wajib dipilih' : null;
+    });
+
+    if (!isFormValid || _categoryError != null) return;
 
     setState(() => _isSaving = true);
 
     final menuC = Get.find<MenuC>();
     final service = SupabaseService();
 
-    String imageUrl = _isEdit ? (widget.item!['image_url'] ?? '') : '';
+    String? imageUrl = _isEdit ? widget.item!['image_url'] : null;
 
     try {
       if (_pickedImage != null) {
@@ -697,11 +736,14 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                   child: _pickedImage != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: Image.file(_pickedImage!, fit: BoxFit.cover),
+                          child: Image.file(
+                            _pickedImage!,
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         )
-                      : _isEdit &&
-                              widget.item!['image_url'] != null &&
-                              widget.item!['image_url'].toString().isNotEmpty
+                      : _isEdit && _hasValidImageUrl(widget.item!['image_url'])
                           ? Stack(
                               children: [
                                 ClipRRect(
@@ -709,8 +751,11 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                                   child: Image.network(
                                     widget.item!['image_url'],
                                     width: double.infinity,
+                                    height: double.infinity,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) => _pickerPlaceholder(),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            _pickerPlaceholder(),
                                   ),
                                 ),
                                 Positioned(
@@ -749,32 +794,27 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                           : _pickerPlaceholder(),
                 ),
               ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 13,
-                    color: Colors.orange.shade400,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Gambar belum terhubung ke storage (coming soon)',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.orange.shade400,
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 16),
               _label('Nama Menu'),
               const SizedBox(height: 6),
               _textField(
                 controller: _nameC,
                 hint: 'Contoh: Nasi Goreng Spesial',
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Nama tidak boleh kosong' : null,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Nama menu wajib diisi';
+                  }
+
+                  if (v.trim().length < 3) {
+                    return 'Nama menu minimal 3 karakter';
+                  }
+
+                  if (_isDuplicateMenuName(v)) {
+                    return 'Nama menu sudah ada';
+                  }
+
+                  return null;
+                },
               ),
               const SizedBox(height: 14),
               _label('Harga (Rp)'),
@@ -785,10 +825,20 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                 keyboardType: TextInputType.number,
                 isPrice: true,
                 validator: (v) {
-                  if (v == null || v.isEmpty) return 'Harga tidak boleh kosong';
-                  if (int.tryParse(v.replaceAll('.', '')) == null) {
-                    return 'Masukkan angka valid';
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Harga wajib diisi';
                   }
+
+                  final parsed = int.tryParse(v.replaceAll('.', '').trim());
+
+                  if (parsed == null) {
+                    return 'Masukkan harga yang valid';
+                  }
+
+                  if (parsed <= 0) {
+                    return 'Harga harus lebih dari 0';
+                  }
+
                   return null;
                 },
               ),
@@ -826,13 +876,26 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
                             )
                             .toList(),
                         onChanged: (val) {
-                          setState(() => _selectedCategoryId = val);
+                          setState(() {
+                            _selectedCategoryId = val;
+                            _categoryError = null;
+                          });
                         },
                       ),
                     ),
                   );
                 },
               ),
+              if (_categoryError != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  _categoryError!,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
@@ -888,11 +951,6 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
             color: AppColors.primary,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          '(belum terhubung ke storage)',
-          style: TextStyle(color: AppColors.textGrey, fontSize: 11),
         ),
       ],
     );

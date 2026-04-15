@@ -15,6 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   final authC = Get.find<AuthController>();
 
@@ -22,8 +23,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void register() async {
     final name = nameController.text.trim();
-    final email = emailController.text.trim();
+    final email = emailController.text.trim().toLowerCase();
     final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       Get.snackbar(
@@ -37,6 +39,22 @@ class _RegisterPageState extends State<RegisterPage> {
           color: Colors.red,
           size: 28,
         ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+      return;
+    }
+
+    if (name.length < 3) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Nama minimal 3 karakter.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
         borderColor: Colors.red,
         borderWidth: 1,
         margin: const EdgeInsets.all(16),
@@ -85,6 +103,37 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    if (confirmPassword.isEmpty) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Konfirmasi password wajib diisi.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+      return;
+    }
+
+    if (confirmPassword != password) {
+      Get.snackbar(
+        "Registrasi Gagal",
+        "Password tidak sama.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+      );
+      return;
+    }
     try {
       await authC.register(
         email: email,
@@ -120,6 +169,7 @@ class _RegisterPageState extends State<RegisterPage> {
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -252,6 +302,24 @@ class _RegisterPageState extends State<RegisterPage> {
                               isObscure = !isObscure;
                             });
                           },
+                        ),
+                        filled: true,
+                        fillColor: AppColors.inputBg,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: confirmPasswordController,
+                      obscureText: isObscure,
+                      decoration: InputDecoration(
+                        hintText: "Confirm Password",
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: AppColors.splashRed,
                         ),
                         filled: true,
                         fillColor: AppColors.inputBg,

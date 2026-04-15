@@ -100,33 +100,40 @@ class SupabaseService {
   Future<void> addMenu({
     required String name,
     required int price,
-    required String imageUrl,
+    String? imageUrl,
     required String categoryId,
   }) async {
-    await supabase.from('menus').insert({
+    final data = {
       'name': name,
       'price': price,
-      'image_url': imageUrl,
       'category_id': categoryId,
-    });
+    };
+
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      data['image_url'] = imageUrl;
+    }
+
+    await supabase.from('menus').insert(data);
   }
 
   Future<void> updateMenu({
     required dynamic id,
     required String name,
     required int price,
-    required String imageUrl,
+    String? imageUrl,
     required String categoryId,
   }) async {
-    await supabase
-        .from('menus')
-        .update({
-          'name': name,
-          'price': price,
-          'image_url': imageUrl,
-          'category_id': categoryId,
-        })
-        .eq('id', id);
+    final data = {
+      'name': name,
+      'price': price,
+      'category_id': categoryId,
+    };
+
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      data['image_url'] = imageUrl;
+    }
+
+    await supabase.from('menus').update(data).eq('id', id);
   }
 
   Future<void> deleteMenu(dynamic id) async {
@@ -239,9 +246,24 @@ class SupabaseService {
     required String name,
     required String email,
   }) async {
+    final normalizedEmail = email.trim().toLowerCase();
+
+    final existing = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+    if (existing != null && existing['id'] != id) {
+      throw Exception('Email sudah digunakan');
+    }
+
     await supabase
         .from('profiles')
-        .update({'name': name, 'email': email})
+        .update({
+          'name': name.trim(),
+          'email': normalizedEmail,
+        })
         .eq('id', id);
   }
 

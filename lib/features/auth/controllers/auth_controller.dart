@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/routes/app_routes.dart';
 import '../../../core/services/supabase_services.dart';
-import '../../../core/constants/app_colors.dart';
 
 
 class AuthController extends GetxController {
@@ -67,7 +66,6 @@ class AuthController extends GetxController {
     await service.logout();
     Get.delete<ProfileController>();
 
-    // kembali ke home saja
     Get.offAllNamed(Routes.home);
   }
 
@@ -79,14 +77,17 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      final res = await service.register(email, password);
+      final normalizedEmail = email.trim().toLowerCase();
+      final normalizedName = name.trim();
+
+      final res = await service.register(normalizedEmail, password);
       final user = res.user;
 
       if (user != null) {
         await service.insertProfile(
           id: user.id,
-          email: email,
-          name: name,
+          email: normalizedEmail,
+          name: normalizedName,
         );
       }
 
@@ -139,29 +140,6 @@ class AuthController extends GetxController {
       );
     } finally {
       isLoading.value = false;
-    }
-  }
-
-
-  Future<void> resetPassword(String email) async {
-    try {
-      await service.supabase.auth.resetPasswordForEmail(email);
-
-      Get.snackbar(
-        'Berhasil',
-        'Link reset password telah dikirim ke email',
-        backgroundColor: AppColors.tagGreen,
-        colorText: AppColors.white,
-        margin: const EdgeInsets.all(20),
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Tidak dapat mengirim reset password',
-        backgroundColor: AppColors.splashRed,
-        colorText: AppColors.white,
-        margin: const EdgeInsets.all(20),
-      );
     }
   }
 }
