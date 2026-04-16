@@ -640,12 +640,14 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     String? imageUrl = _isEdit ? widget.item!['image_url'] : null;
 
     try {
+      // 🔥 upload gambar kalau ada
       if (_pickedImage != null) {
         imageUrl = await service.uploadMenuImage(_pickedImage!);
       }
 
       final parsedPrice = int.parse(_priceC.text.replaceAll('.', '').trim());
 
+      // 🔥 insert / update
       if (_isEdit) {
         await menuC.updateMenu(
           id: widget.item!['id'],
@@ -663,12 +665,26 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
         );
       }
 
-      if (!mounted) return;
-      Get.back();
+      // 🔥 snackbar sukses
+      Get.snackbar(
+        'Berhasil',
+        _isEdit ? 'Menu berhasil diupdate' : 'Menu berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
+      // 🔥 DELAY + SAFE CLOSE
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (Get.isOverlaysOpen) {
+          Get.back(); // nutup bottom sheet
+        }
+      });
     } catch (e) {
+      print('ERROR SAVE: $e');
+
       Get.snackbar(
         'Error',
-        'Gagal upload gambar / simpan menu',
+        e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

@@ -291,9 +291,21 @@ class SupabaseService {
 
     final path = fileName;
 
-    await supabase.storage.from('menu-images').upload(path, file);
+    // 🔥 DEBUG
+    print('UPLOAD FILE: ${file.path}');
+    print('EXISTS: ${file.existsSync()}');
+
+    await supabase.storage
+        .from('menu-images')
+        .upload(
+          path,
+          file,
+          fileOptions: const FileOptions(upsert: true), // 🔥 FIX PENTING
+        );
 
     final publicUrl = supabase.storage.from('menu-images').getPublicUrl(path);
+
+    print('PUBLIC URL: $publicUrl');
 
     return publicUrl;
   }
