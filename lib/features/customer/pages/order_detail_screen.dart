@@ -145,6 +145,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                       const Divider(height: 16, color: AppColors.border),
                       _buildStatusRow('Status', status),
+                      _buildInfoRow(
+                        'Order Type',
+                        _formatOrderType(resolvedOrder['order_type']),
+                      ),
+                      const Divider(height: 16, color: AppColors.border),
                     ],
                   ),
                 ),
@@ -308,6 +313,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       bottomNavigationBar: _buildBottomBar(context, status, canUpdateStatus),
     );
+  }
+
+  String _formatOrderType(dynamic type) {
+    if (type == 'dine_in') return 'Dine In';
+    if (type == 'takeaway') return 'Takeaway';
+    return '-';
   }
 
   Widget? _buildBottomBar(

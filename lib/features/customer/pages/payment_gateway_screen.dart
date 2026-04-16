@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../../core/services/supabase_services.dart';
-import '../../models/order_model.dart';
 import '../../../routes/app_routes.dart';
 
 class PaymentGatewayScreen extends StatefulWidget {
@@ -11,39 +10,55 @@ class PaymentGatewayScreen extends StatefulWidget {
   const PaymentGatewayScreen({super.key, this.onOrderPlaced});
 
   @override
-  State<PaymentGatewayScreen> createState() => _PaymentGatewayScreenState();
+  State<PaymentGatewayScreen> createState() =>
+      _PaymentGatewayScreenState();
 }
 
 class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
-  final _nameCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
   final _tableCtrl = TextEditingController();
 
-  final String _orderType = 'Dine In';
+  String _orderType = 'dine_in';
   String _paymentMethod = 'online';
   bool _isSubmitting = false;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _phoneCtrl.dispose();
     _tableCtrl.dispose();
     super.dispose();
   }
 
+  /// ================= ORDER =================
+
   Future<void> _placeOrder() async {
     if (_isSubmitting) return;
 
-    final name = _nameCtrl.text.trim();
     final tableNumber = _tableCtrl.text.trim();
 
-    if (name.isEmpty) {
-      Get.snackbar('Validasi', 'Nama pelanggan wajib diisi');
-      return;
-    }
-
-    if (tableNumber.isEmpty) {
-      Get.snackbar('Validasi', 'Nomor meja wajib diisi');
+    if (_orderType == 'dine_in' && tableNumber.isEmpty) {
+      Get.snackbar(
+        "Validasi",
+        "Nomor meja wajib diisi untuk Dine In",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFE5E5),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red,
+            size: 22,
+          ),
+        ),
+        borderColor: Colors.red,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+      );
       return;
     }
 
@@ -51,19 +66,45 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     final service = SupabaseService();
 
     if (cartC.entries.isEmpty) {
-      Get.snackbar('Info', 'Keranjang masih kosong');
+      Get.snackbar(
+        "Keranjang Kosong",
+        "Tambahkan menu terlebih dahulu sebelum melakukan pembayaran",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
+        icon: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: const BoxDecoration(
+            color: Color(0xFFE8F5E9),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.shopping_cart_outlined,
+            color: Colors.green,
+            size: 22,
+          ),
+        ),
+        borderColor: Colors.green,
+        borderWidth: 1,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        duration: const Duration(seconds: 2),
+      );
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
+    setState(() => _isSubmitting = true);
 
     try {
       final order = await service.createOrder(
         total: cartC.grandTotal,
         items: cartC.entries.map((e) {
-          return {'id': e.id, 'name': e.name, 'price': e.price, 'qty': e.qty};
+          return {
+            'id': e.id,
+            'name': e.name,
+            'price': e.price,
+            'qty': e.qty,
+          };
         }).toList(),
       );
 
@@ -71,22 +112,20 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
 
       cartC.clear();
       widget.onOrderPlaced?.call();
+
       Get.toNamed(Routes.qr, arguments: {'token': token});
     } catch (e) {
       Get.snackbar('Error', 'Gagal membuat pesanan');
     } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
+
+  /// ================= UI =================
 
   @override
   Widget build(BuildContext context) {
     final cartC = Get.find<CartController>();
-    final entries = cartC.entries;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -96,7 +135,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
-            fontSize: 17,
           ),
         ),
         backgroundColor: AppColors.primary,
@@ -107,9 +145,9 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           onPressed: Get.back,
         ),
       ),
-      body: entries.isEmpty
+      body: cartC.entries.isEmpty
           ? _buildEmptyState()
-          : _buildContent(entries, cartC),
+          : _buildContent(cartC),
     );
   }
 
@@ -122,27 +160,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           const SizedBox(height: 12),
           const Text(
             'Keranjang Kosong',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Tambah menu dulu yuk!',
-            style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-          ),
+          const Text('Tambah menu dulu yuk!'),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: Get.back,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
             child: const Text('Kembali ke Menu'),
           ),
         ],
@@ -150,7 +174,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     );
   }
 
-  Widget _buildContent(List<OrderItem> entries, CartController cartC) {
+  Widget _buildContent(CartController cartC) {
     return Column(
       children: [
         Expanded(
@@ -158,8 +182,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               _orderTypeSelector(),
-              const SizedBox(height: 16),
-              _customerInfoSection(),
+
+              /// 🔥 TABLE FIELD (ONLY DINE IN)
+              if (_orderType == 'dine_in') ...[
+                const SizedBox(height: 16),
+                _tableField(),
+              ],
+
               const SizedBox(height: 16),
               _paymentMethodSection(),
               const SizedBox(height: 16),
@@ -167,119 +196,99 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             ],
           ),
         ),
+
+        /// ⚠️ FOOTER TIDAK DIUBAH
         _buildBottomCheckout(cartC.grandTotal),
       ],
     );
   }
 
+  /// ================= ORDER TYPE =================
+
   Widget _orderTypeSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.chipRed,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Order Type',
-            style: TextStyle(fontSize: 14, color: AppColors.textDark),
-          ),
-          Row(
-            children: [
-              Text(
-                _orderType,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(width: 4),
-              const Icon(
-                Icons.check_circle,
-                color: AppColors.primary,
-                size: 18,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _customerInfoSection() {
     return _sectionCard(
-      title: 'Customer Information',
-      child: Column(
+      title: 'Order Type',
+      child: Row(
         children: [
-          _buildTextField(
-            controller: _nameCtrl,
-            label: 'Full Name*',
-            hint: 'Masukkan nama',
-            icon: Icons.person_outline,
-          ),
-          const SizedBox(height: 12),
-          _buildTextField(
-            controller: _phoneCtrl,
-            label: 'Phone Number',
-            hint: '08xxxxxxxxxx',
-            icon: Icons.phone_outlined,
-          ),
-          const SizedBox(height: 12),
-          _buildTextField(
-            controller: _tableCtrl,
-            label: 'Table Number*',
-            hint: 'Nomor meja',
-            icon: Icons.table_restaurant_outlined,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(
-                color: AppColors.textLight,
-                fontSize: 14,
-              ),
-              prefixIcon: Icon(icon, color: AppColors.textGrey, size: 20),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
-              ),
+          Expanded(
+            child: _orderTypeChip(
+              label: 'Dine In',
+              icon: Icons.restaurant,
+              isSelected: _orderType == 'dine_in',
+              onTap: () => setState(() => _orderType = 'dine_in'),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: _orderTypeChip(
+              label: 'Takeaway',
+              icon: Icons.takeout_dining,
+              isSelected: _orderType == 'takeaway',
+              onTap: () => setState(() => _orderType = 'takeaway'),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
+  Widget _orderTypeChip({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.chipRed : AppColors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.textGrey,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight:
+                    isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// ================= TABLE =================
+
+  Widget _tableField() {
+    return _sectionCard(
+      title: 'Nomor Meja',
+      child: TextField(
+        controller: _tableCtrl,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          hintText: 'Masukkan nomor meja',
+          prefixIcon: Icon(Icons.table_restaurant),
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  /// ================= PAYMENT =================
 
   Widget _paymentMethodSection() {
     return _sectionCard(
@@ -288,7 +297,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         children: [
           Expanded(
             child: _paymentMethodChip(
-              label: 'Online Payment',
+              label: 'Online',
               icon: Icons.payment,
               isSelected: _paymentMethod == 'online',
               onTap: () => setState(() => _paymentMethod = 'online'),
@@ -297,7 +306,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _paymentMethodChip(
-              label: 'Pay at Cashier',
+              label: 'Cashier',
               icon: Icons.storefront,
               isSelected: _paymentMethod == 'cashier',
               onTap: () => setState(() => _paymentMethod = 'cashier'),
@@ -317,7 +326,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.chipRed : AppColors.white,
           borderRadius: BorderRadius.circular(10),
@@ -327,27 +336,16 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? AppColors.primary : AppColors.textGrey,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? AppColors.primary : AppColors.textDark,
-                ),
-              ),
-            ),
+            Icon(icon, size: 18),
+            const SizedBox(width: 6),
+            Expanded(child: Text(label)),
           ],
         ),
       ),
     );
   }
+
+  /// ================= COMPLETE =================
 
   Widget _completePaymentSection() {
     return _sectionCard(
@@ -512,7 +510,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                         ),
                       )
                     : const Text(
-                        'Pay',
+                        'Bayar Sekarang',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,

@@ -19,6 +19,7 @@ class CartController extends GetxController {
         'name': item['name'] ?? 'Unknown',
         'price': item['price'] ?? 0,
         'emoji': item['emoji'] ?? '🍽️',
+        'image_url': item['image_url'],
         'qty': 1,
       };
     }
@@ -71,9 +72,49 @@ class CartController extends GetxController {
         id: item['id'],
         name: item['name'],
         emoji: item['emoji'],
+        imageUrl: item['image_url'],
         price: item['price'],
         qty: item['qty'],
       );
     }).toList();
+  }
+
+  void addItem(OrderItem item) {
+    final id = item.id.toString();
+
+    if (cart.containsKey(id)) {
+      cart[id]!['qty'] += 1;
+    } else {
+      cart[id] = {
+        'id': item.id,
+        'name': item.name,
+        'price': item.price,
+        'emoji': item.emoji,
+        'qty': 1,
+      };
+    }
+
+    cart.refresh();
+  }
+
+  void decreaseQty(OrderItem item) {
+    final id = item.id.toString();
+
+    if (!cart.containsKey(id)) return;
+
+    final currentQty = cart[id]!['qty'];
+
+    if (currentQty > 1) {
+      cart[id]!['qty'] -= 1;
+    } else {
+      cart.remove(id);
+    }
+
+    cart.refresh();
+  }
+
+  void removeItem(OrderItem item) {
+    cart.remove(item.id.toString());
+    cart.refresh();
   }
 }

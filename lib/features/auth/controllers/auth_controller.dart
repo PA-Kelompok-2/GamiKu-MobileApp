@@ -33,7 +33,12 @@ class AuthController extends GetxController {
       }
 
       Get.put(ProfileController());
-      Get.offAllNamed(Routes.home);
+
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      Get.offNamed(
+        Routes.home
+      );
     } catch (e) {
       Get.snackbar(
         "Login Gagal",
@@ -56,7 +61,7 @@ class AuthController extends GetxController {
     await service.logout();
     Get.delete<ProfileController>();
 
-    Get.offAllNamed(Routes.home);
+    Get.offNamed(Routes.login); // 🔥 wajib offAll di sini
   }
 
   Future<void> register({

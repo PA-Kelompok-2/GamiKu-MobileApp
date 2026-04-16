@@ -262,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                             const Text("Don't have an account? "),
                             GestureDetector(
                               onTap: () =>
-                                  Get.toNamed(Routes.register),
+                                  Get.offNamed(Routes.register),
                               child: const Text(
                                 "Sign Up",
                                 style: TextStyle(
@@ -292,7 +292,13 @@ class _LoginPageState extends State<LoginPage> {
                 Icons.arrow_back_ios_new,
                 color: Colors.white,
               ),
-              onPressed: () => Get.back(),
+              onPressed: () {
+                if (Get.previousRoute.isEmpty) {
+                  Get.offAllNamed(Routes.home); // 🔥 fallback ke home
+                } else {
+                  Get.back();
+                }
+              }
             ),
           ),
         ],
