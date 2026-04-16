@@ -124,6 +124,7 @@ class _QRScreenState extends State<QRScreen> {
                     color: Colors.black87,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -134,6 +135,7 @@ class _QRScreenState extends State<QRScreen> {
                     color: Colors.grey,
                     fontSize: 15,
                     height: 1.5,
+                    decoration: TextDecoration.none, // 🔥 INI FIX UTAMA
                   ),
                 ),
                 const SizedBox(height: 30),

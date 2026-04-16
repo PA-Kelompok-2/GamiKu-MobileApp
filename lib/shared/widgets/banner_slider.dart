@@ -1,48 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
+import '../../controllers/menu_controller.dart';
 
 class BannerSlider extends StatefulWidget {
   const BannerSlider({super.key});
+
   @override
   State<BannerSlider> createState() => _BannerSliderState();
 }
 
 class _BannerSliderState extends State<BannerSlider> {
-  final _ctrl = PageController();
-  int _cur = 0;
-
-  static const _banners = [
-    _BannerData(
-      title: 'Gami Bebek Spesial 🦆',
-      subtitle: 'Rasa autentik, harga terjangkau',
-      tag: 'TERPOPULER',
-      tagColor: AppColors.accent,
-      imageUrl:
-          'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=600&q=80',
-      gradientStart: AppColors.primary,
-      gradientEnd: AppColors.primaryDark,
-    ),
-    _BannerData(
-      title: 'Sambal Bakar Iga Premium 🥩',
-      subtitle: 'Sensasi pedas nampol abis',
-      tag: 'HOT 🔥',
-      tagColor: AppColors.bannerRed2Start,
-      imageUrl:
-          'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80',
-      gradientStart: AppColors.bannerRed2Start,
-      gradientEnd: AppColors.bannerRed2End,
-    ),
-    _BannerData(
-      title: 'Mie Gami, Cuma 25k! 🍜',
-      subtitle: 'Beli 2 gratis es teh manis',
-      tag: 'PROMO',
-      tagColor: AppColors.accent,
-      imageUrl:
-          'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80',
-      gradientStart: AppColors.bannerGoldStart,
-      gradientEnd: AppColors.bannerGoldEnd,
-    ),
-  ];
+  final _ctrl = PageController(initialPage: 1000);
+int _cur = 1000;
 
   @override
   void initState() {
@@ -54,11 +24,20 @@ class _BannerSliderState extends State<BannerSlider> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 4));
       if (!mounted) return false;
+
+      final menuC = Get.find<MenuC>();
+      final total = menuC.menus.length;
+
+      if (total == 0) return true;
+
+      final next = _cur + 1;
+
       _ctrl.animateToPage(
-        (_cur + 1) % _banners.length,
+        next,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
+
       return true;
     });
   }
@@ -71,42 +50,68 @@ class _BannerSliderState extends State<BannerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 400,
-          child: PageView.builder(
-            controller: _ctrl,
-            itemCount: _banners.length,
-            onPageChanged: (i) => setState(() => _cur = i),
-            itemBuilder: (_, i) => _BannerCard(data: _banners[i]),
+    return Obx(() {
+      final menuC = Get.find<MenuC>();
+      final banners = menuC.menus.take(5).toList();
+
+      if (banners.isEmpty) {
+        return const SizedBox(height: 400);
+      }
+
+      return Column(
+        children: [
+          SizedBox(
+            height: 400,
+            child: PageView.builder(
+              controller: _ctrl,
+              onPageChanged: (i) => setState(() => _cur = i),
+              itemBuilder: (_, i) {
+                final item = banners[i % banners.length];
+
+                return _BannerCard(
+                  data: _BannerData(
+                    title: item['name'] ?? '',
+                    subtitle: "Mulai Rp ${item['price']}",
+                    tag: "PROMO",
+                    tagColor: AppColors.accent,
+                    imageUrl: item['image_url'] ?? '',
+                    gradientStart: AppColors.primary,
+                    gradientEnd: AppColors.primaryDark,
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            _banners.length,
-            (i) => AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: i == _cur ? 20 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i == _cur ? AppColors.primary : AppColors.textLight,
-                borderRadius: BorderRadius.circular(3),
+
+          const SizedBox(height: 10),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              banners.length,
+              (i) => AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: i == (_cur % banners.length) ? 20 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color:
+                      i == (_cur % banners.length) ? AppColors.primary : AppColors.textLight,
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
 
 class _BannerData {
   final String title, subtitle, tag, imageUrl;
   final Color tagColor, gradientStart, gradientEnd;
+
   const _BannerData({
     required this.title,
     required this.subtitle,
@@ -120,6 +125,7 @@ class _BannerData {
 
 class _BannerCard extends StatelessWidget {
   final _BannerData data;
+
   const _BannerCard({required this.data});
 
   @override
@@ -136,17 +142,20 @@ class _BannerCard extends StatelessWidget {
             return Container(
               color: data.gradientStart,
               child: const Center(
-                child: CircularProgressIndicator(color: AppColors.white38),
+                child: CircularProgressIndicator(
+                  color: AppColors.white38,
+                ),
               ),
             );
           },
         ),
+
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                data.gradientStart.withValues(alpha: 0.85),
-                data.gradientEnd.withValues(alpha: 0.5),
+                data.gradientStart.withOpacity(0.85),
+                data.gradientEnd.withOpacity(0.5),
                 AppColors.bannerCircle,
               ],
               begin: Alignment.centerLeft,
@@ -154,6 +163,7 @@ class _BannerCard extends StatelessWidget {
             ),
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.all(18),
           child: Column(
@@ -179,7 +189,9 @@ class _BannerCard extends StatelessWidget {
                   ),
                 ),
               ),
+
               const SizedBox(height: 8),
+
               Text(
                 data.title,
                 style: const TextStyle(
@@ -196,16 +208,22 @@ class _BannerCard extends StatelessWidget {
                   ],
                 ),
               ),
+
               const SizedBox(height: 4),
+
               Text(
                 data.subtitle,
                 style: const TextStyle(
                   color: AppColors.white70,
                   fontSize: 11,
-                  shadows: [Shadow(color: AppColors.black26, blurRadius: 4)],
+                  shadows: [
+                    Shadow(color: AppColors.black26, blurRadius: 4),
+                  ],
                 ),
               ),
+
               const SizedBox(height: 12),
+
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,

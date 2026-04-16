@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
+import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -54,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const Text(
                 "Logout",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, decoration: TextDecoration.none),
               ),
 
               const SizedBox(height: 8),
@@ -62,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Text(
                 "Yakin ingin keluar dari akun ini?",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+                style: TextStyle(color: Colors.grey, fontSize: 14, decoration: TextDecoration.none),
               ),
 
               const SizedBox(height: 25),
@@ -91,10 +92,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () async {
-                        await service.logout();
-                        Get.offAllNamed('/login');
-                      },
+                  onPressed: () async {
+                    Get.back(); // 🔥 tutup dialog dulu
+                    await Future.delayed(const Duration(milliseconds: 100));
+
+                    Get.find<AuthController>().logout();
+                  },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD32F2F),
                         shape: RoundedRectangleBorder(

@@ -4,6 +4,7 @@ class OrderItem {
   final String emoji;
   final int price;
   int qty;
+  final String? imageUrl;
 
   OrderItem({
     required this.id,
@@ -11,6 +12,7 @@ class OrderItem {
     required this.emoji,
     required this.price,
     required this.qty,
+    this.imageUrl,
   });
 
   int get subtotal => price * qty;
