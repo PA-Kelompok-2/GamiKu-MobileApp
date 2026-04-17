@@ -12,7 +12,7 @@ class BannerSlider extends StatefulWidget {
 
 class _BannerSliderState extends State<BannerSlider> {
   final _ctrl = PageController(initialPage: 1000);
-int _cur = 1000;
+  int _cur = 1000;
 
   @override
   void initState() {
@@ -95,8 +95,9 @@ int _cur = 1000;
                 width: i == (_cur % banners.length) ? 20 : 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color:
-                      i == (_cur % banners.length) ? AppColors.primary : AppColors.textLight,
+                  color: i == (_cur % banners.length)
+                      ? AppColors.primary
+                      : AppColors.textLight,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -142,9 +143,7 @@ class _BannerCard extends StatelessWidget {
             return Container(
               color: data.gradientStart,
               child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.white38,
-                ),
+                child: CircularProgressIndicator(color: AppColors.white38),
               ),
             );
           },
@@ -216,9 +215,7 @@ class _BannerCard extends StatelessWidget {
                 style: const TextStyle(
                   color: AppColors.white70,
                   fontSize: 11,
-                  shadows: [
-                    Shadow(color: AppColors.black26, blurRadius: 4),
-                  ],
+                  shadows: [Shadow(color: AppColors.black26, blurRadius: 4)],
                 ),
               ),
 

@@ -15,6 +15,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   List<Map<String, dynamic>> orders = [];
   bool isLoading = true;
+  bool isUpdating = false; // 🔥 tambahan
   String? userRole;
   String selectedFilter = 'Semua';
 
@@ -23,38 +24,78 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
-    loadOrders();
-    loadRole();
+    init();
   }
 
-  void loadOrders() async {
-    final data = await service.getOrdersWithItems();
-    if (!mounted) return;
-    setState(() {
-      orders = data;
-      isLoading = false;
-    });
-  }
-
-  void loadRole() async {
-    final role = await service.getUserRole();
-    if (!mounted) return;
-    setState(() {
-      userRole = role;
-    });
-  }
-
-  void updateStatus(String id, String currentStatus) async {
-    String next;
-    if (currentStatus == 'pending') {
-      next = 'paid';
-    } else if (currentStatus == 'paid') {
-      next = 'completed';
-    } else {
-      return;
+  Future<void> init() async {
+    try {
+      await loadRole();
+      await loadOrders();
+    } catch (e) {
+      print("INIT ERROR: $e");
     }
-    await service.updateOrderStatus(id, next);
-    loadOrders();
+  }
+
+  Future<void> loadOrders() async {
+    try {
+      final data = await service.getOrdersWithItems();
+
+      if (!mounted) return;
+
+      setState(() {
+        orders = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("ERROR LOAD ORDERS: $e");
+
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> loadRole() async {
+    try {
+      final role = await service.getUserRole();
+
+      if (!mounted) return;
+
+      setState(() {
+        userRole = role;
+      });
+    } catch (e) {
+      print("ERROR LOAD ROLE: $e");
+    }
+  }
+
+  Future<void> updateStatus(String id, String currentStatus) async {
+    if (isUpdating) return; // 🔥 anti spam
+
+    isUpdating = true;
+
+    try {
+      String next;
+      if (currentStatus == 'pending') {
+        next = 'paid';
+      } else if (currentStatus == 'paid') {
+        next = 'completed';
+      } else {
+        return;
+      }
+
+      await service.updateOrderStatus(id, next);
+
+      if (!mounted) return;
+
+      await loadOrders(); // 🔥 langsung await (hapus delay)
+    } catch (e) {
+      print("ERROR UPDATE STATUS: $e");
+    } finally {
+      isUpdating = false;
+    }
   }
 
   List<Map<String, dynamic>> get filteredOrders {
