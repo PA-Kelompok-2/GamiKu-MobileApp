@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../routes/app_routes.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class PaymentGatewayScreen extends StatefulWidget {
   final VoidCallback? onOrderPlaced;
@@ -27,37 +28,15 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     super.dispose();
   }
 
-  /// ================= ORDER =================
-
   Future<void> _placeOrder() async {
     if (_isSubmitting) return;
 
     final tableNumber = _tableCtrl.text.trim();
 
     if (_orderType == 'dine_in' && tableNumber.isEmpty) {
-      Get.snackbar(
+      showWarningSnackbar(
         "Validasi",
-        "Nomor meja wajib diisi untuk Dine In",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFE5E5),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.warning_amber_rounded,
-            color: Colors.red,
-            size: 22,
-          ),
-        ),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-        duration: const Duration(seconds: 2),
+        "Nomor meja wajib diisi untuk Dine In"
       );
       return;
     }
@@ -66,29 +45,9 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     final service = SupabaseService();
 
     if (cartC.entries.isEmpty) {
-      Get.snackbar(
+      showWarningSnackbar(
         "Keranjang Kosong",
-        "Tambahkan menu terlebih dahulu sebelum melakukan pembayaran",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: const BoxDecoration(
-            color: Color(0xFFE8F5E9),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.shopping_cart_outlined,
-            color: Colors.green,
-            size: 22,
-          ),
-        ),
-        borderColor: Colors.green,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-        duration: const Duration(seconds: 2),
+        "Tambahkan menu terlebih dahulu sebelum melakukan pembayaran"
       );
       return;
     }
@@ -106,6 +65,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             'qty': e.qty,
           };
         }).toList(),
+        orderType: _orderType,
       );
 
       final token = order['qr_token'];
@@ -113,15 +73,18 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       cartC.clear();
       widget.onOrderPlaced?.call();
 
+      showSuccessSnackbar(
+        "Berhasil",
+        "Pesanan berhasil dibuat",
+      );
+
       Get.toNamed(Routes.qr, arguments: {'token': token});
     } catch (e) {
-      Get.snackbar('Error', 'Gagal membuat pesanan');
+      showErrorSnackbar('Error', 'Gagal membuat pesanan');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
-
-  /// ================= UI =================
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +146,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             children: [
               _orderTypeSelector(),
 
-              /// 🔥 TABLE FIELD (ONLY DINE IN)
               if (_orderType == 'dine_in') ...[
                 const SizedBox(height: 16),
                 _tableField(),
@@ -197,13 +159,10 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           ),
         ),
 
-        /// ⚠️ FOOTER TIDAK DIUBAH
         _buildBottomCheckout(cartC.grandTotal),
       ],
     );
   }
-
-  /// ================= ORDER TYPE =================
 
   Widget _orderTypeSelector() {
     return _sectionCard(
@@ -271,8 +230,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     );
   }
 
-  /// ================= TABLE =================
-
   Widget _tableField() {
     return _sectionCard(
       title: 'Nomor Meja',
@@ -287,8 +244,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       ),
     );
   }
-
-  /// ================= PAYMENT =================
 
   Widget _paymentMethodSection() {
     return _sectionCard(
@@ -344,8 +299,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       ),
     );
   }
-
-  /// ================= COMPLETE =================
 
   Widget _completePaymentSection() {
     return _sectionCard(

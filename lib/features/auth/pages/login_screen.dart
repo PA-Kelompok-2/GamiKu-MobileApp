@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/app_snackbar.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,54 +19,22 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isObscure = true;
 
-  /// =========================
-  /// SNACKBAR HELPER
-  /// =========================
-  void showError(String message) {
-    Get.snackbar(
-      "Login Gagal",
-      message,
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.white,
-      colorText: Colors.black,
-      icon: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFE5E5),
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.close,
-          color: Colors.red,
-          size: 22,
-        ),
-      ),
-      borderColor: Colors.red,
-      borderWidth: 1,
-      margin: const EdgeInsets.all(16),
-      borderRadius: 12,
-    );
-  }
-
-  /// =========================
-  /// LOGIN FUNCTION
-  /// =========================
   void login() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      showError("Email dan Password wajib diisi");
+      showErrorSnackbar("Login Gagal", "Email dan Password wajib diisi");
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      showError("Format email tidak valid");
+      showErrorSnackbar("Login Gagal", "Format email tidak valid");
       return;
     }
 
     if (password.length < 8) {
-      showError("Password minimal 8 karakter");
+      showErrorSnackbar("Login Gagal", "Password minimal 8 karakter");
       return;
     }
 
@@ -74,7 +43,8 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       final errorMsg = e.toString().toLowerCase();
 
-      showError(
+      showErrorSnackbar(
+        "Login Gagal",
         errorMsg.contains('invalid') ||
                 errorMsg.contains('password') ||
                 errorMsg.contains('credential') ||
@@ -93,9 +63,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Column(
             children: [
-              /// =========================
               /// HEADER
-              /// =========================
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60, bottom: 40),
@@ -139,9 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              /// =========================
               /// FORM
-              /// =========================
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -293,12 +259,8 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.white,
               ),
               onPressed: () {
-                if (Get.previousRoute.isEmpty) {
-                  Get.offAllNamed(Routes.home); // 🔥 fallback ke home
-                } else {
-                  Get.back();
-                }
-              }
+                Get.offNamed(Routes.home);
+              },
             ),
           ),
         ],

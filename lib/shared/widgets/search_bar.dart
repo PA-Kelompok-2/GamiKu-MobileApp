@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 
-class MenuSearchBar extends StatelessWidget {
+class MenuSearchBar extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final TextEditingController? controller;
 
-  const MenuSearchBar({super.key, this.onChanged, this.controller});
+  const MenuSearchBar({
+    super.key,
+    this.onChanged,
+    this.controller,
+  });
+
+  @override
+  State<MenuSearchBar> createState() => _MenuSearchBarState();
+}
+
+class _MenuSearchBarState extends State<MenuSearchBar> {
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller?.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {}); // rebuild untuk update suffix icon
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_onTextChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final text = widget.controller?.text ?? '';
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -23,32 +51,27 @@ class MenuSearchBar extends StatelessWidget {
         ],
       ),
       child: TextField(
-        controller: controller,
-        onChanged: (value) {
-          if (onChanged != null) {
-            onChanged!(value);
-          }
-        },
+        controller: widget.controller,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           hintText: 'Cari menu...',
-          hintStyle: TextStyle(color: AppColors.textGrey, fontSize: 14),
+          hintStyle: TextStyle(
+            color: AppColors.textGrey,
+            fontSize: 14,
+          ),
 
-          /// ICON SEARCH
           prefixIcon: const Icon(
             Icons.search,
             color: AppColors.textGrey,
             size: 20,
           ),
 
-          /// BUTTON CLEAR
-          suffixIcon: controller != null && controller!.text.isNotEmpty
+          suffixIcon: text.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () {
-                    controller!.clear();
-                    if (onChanged != null) {
-                      onChanged!('');
-                    }
+                    widget.controller?.clear();
+                    widget.onChanged?.call('');
                   },
                 )
               : null,

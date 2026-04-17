@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
+import '../../../controllers/menu_controller.dart';
+import '../../../controllers/cart_controller.dart';
 import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -92,12 +94,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   Expanded(
                     child: ElevatedButton(
-                  onPressed: () async {
-                    Get.back(); // 🔥 tutup dialog dulu
-                    await Future.delayed(const Duration(milliseconds: 100));
+                      onPressed: () async {
+                        Get.back();
+                        await Future.delayed(const Duration(milliseconds: 100));
 
-                    Get.find<AuthController>().logout();
-                  },
+                        final menuC = Get.find<MenuC>();
+
+                        menuC.resetMenu();
+
+                        Get.find<AuthController>().logout();
+                        Get.offAllNamed('/login');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD32F2F),
                         shape: RoundedRectangleBorder(

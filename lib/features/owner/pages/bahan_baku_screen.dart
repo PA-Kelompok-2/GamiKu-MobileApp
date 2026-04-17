@@ -8,6 +8,7 @@ import '../controllers/keuangan_controller.dart';
 import '../models/bahan_baku_model.dart';
 import '../models/mutasi_bahan_baku_model.dart';
 import '../widgets/bahan_baku_item_card.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class BahanBakuScreen extends StatefulWidget {
   const BahanBakuScreen({super.key});
@@ -320,12 +321,11 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                           if (!mounted) return;
                           Get.back();
 
-                          Get.snackbar(
+                          showSuccessSnackbar(
                             "Berhasil",
                             isEdit
                                 ? "Bahan baku berhasil diperbarui"
                                 : "Bahan baku berhasil ditambahkan",
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -466,10 +466,9 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     if (!mounted) return;
                     Get.back();
 
-                    Get.snackbar(
-                      'Berhasil',
+                    showSuccessSnackbar(
+                      "Berhasil",
                       '${b.name} +$jumlah ${b.unit} • Rp ${NumberFormat.decimalPattern('id').format(total)} dicatat',
-                      snackPosition: SnackPosition.BOTTOM,
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -605,10 +604,9 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     if (!mounted) return;
                     Get.back();
 
-                    Get.snackbar(
-                      'Berhasil',
+                    showSuccessSnackbar(
+                      "Berhasil",
                       '${b.name} -$jumlah ${b.unit} digunakan',
-                      snackPosition: SnackPosition.BOTTOM,
                     );
                   },
                   style: ElevatedButton.styleFrom(

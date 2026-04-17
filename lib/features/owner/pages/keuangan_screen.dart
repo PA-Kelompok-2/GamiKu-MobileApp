@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
 import '../controllers/keuangan_controller.dart';
 import '../widgets/summary_card.dart';
+import '../../../core/utils/app_snackbar.dart';
 import 'package:flutter/services.dart';
 
 class KeuanganScreen extends StatefulWidget {
@@ -307,10 +308,9 @@ class _KeuanganScreenState extends State<KeuanganScreen> {
                             Get.back();
                           }
 
-                          Get.snackbar(
+                          showSuccessSnackbar(
                             "Berhasil",
-                            "Pengeluaran berhasil ditambahkan",
-                            snackPosition: SnackPosition.BOTTOM,
+                            "Pengeluaran berhasil ditambahkan"
                           );
                         },
                         style: ElevatedButton.styleFrom(

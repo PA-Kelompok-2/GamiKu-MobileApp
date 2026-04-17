@@ -27,8 +27,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+
   late TabController _homeTabCtrl;
-  List<String> categories = [];
+  late Worker _worker;
+
   int _navIdx = 0;
   String? role;
   bool isLoadingRole = true;
@@ -37,21 +39,30 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
 
-    _homeTabCtrl = TabController(length: categories.length, vsync: this);
+    /// 🔥 FIX 1: INIT TAB CONTROLLER
+    _homeTabCtrl = TabController(length: 4, vsync: this);
 
-    if (widget.initialTab != null) {
-      _navIdx = widget.initialTab!;
-    }
-
+    /// 🔥 FIX 2: LOAD ROLE
     loadRole();
 
-    ever(Get.find<MenuC>().selectedCategory, (_) {
+    /// 🔥 FIX 3: SAFE EVER LISTENER
+    _worker = ever(Get.find<MenuC>().selectedCategory, (_) {
+      if (!mounted) return;
+
       if (_navIdx != 1) {
         setState(() => _navIdx = 1);
       }
     });
   }
 
+  @override
+  void dispose() {
+    _worker.dispose(); // 🔥 WAJIB
+    _homeTabCtrl.dispose(); // 🔥 WAJIB
+    super.dispose();
+  }
+
+  /// ================= LOAD ROLE =================
   void loadRole() async {
     final currentUser = Supabase.instance.client.auth.currentUser;
 
@@ -76,7 +87,11 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  void _onNavTap(int i) => setState(() => _navIdx = i);
+  /// ================= NAVIGATION =================
+  void _onNavTap(int i) {
+    if (!mounted) return;
+    setState(() => _navIdx = i);
+  }
 
   bool _isGuest() {
     return Supabase.instance.client.auth.currentUser == null;
@@ -94,50 +109,65 @@ class _HomeScreenState extends State<HomeScreen>
 
     Get.toNamed(
       Routes.payment,
-      arguments: {'onOrderPlaced': () => setState(() => _navIdx = 2)},
-    )?.then((_) => setState(() {}));
+      arguments: {
+        'onOrderPlaced': () {
+          if (mounted) {
+            setState(() => _navIdx = 2);
+          }
+        }
+      },
+    )?.then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
-  @override
-  void dispose() {
-    _homeTabCtrl.dispose();
-    super.dispose();
-  }
-
+  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.bg,
+
         body: IndexedStack(
           index: _navIdx,
           children: [
             isLoadingRole
                 ? const Center(child: CircularProgressIndicator())
                 : role == 'owner'
-                ? const HomeTabInternalScreen()
-                : role == 'karyawan'
-                ? const HomeTabInternalScreen()
-                : HomeTab(
-                    onCartChanged: () => setState(() {}),
-                    onOpenMenu: (cat) {
-                      Get.find<MenuC>().selectedCategory.value = cat;
-                      _onNavTap(1);
-                    },
-                    onOpenOrders: () {
-                      if (_isGuest()) {
-                        _goToLogin();
-                        return;
-                      }
-                      _onNavTap(2);
-                    },
-                  ),
+                    ? const HomeTabInternalScreen()
+                    : role == 'karyawan'
+                        ? const HomeTabInternalScreen()
+                        : HomeTab(
+                            onCartChanged: () {
+                              if (mounted) setState(() {});
+                            },
+                            onOpenMenu: (cat) {
+                              final menuC = Get.find<MenuC>();
+
+                              menuC.selectedCategory.value = cat;
+                              menuC.applyFilter('');
+
+                              _onNavTap(1);
+                            },
+                            onOpenOrders: () {
+                              if (_isGuest()) {
+                                _goToLogin();
+                                return;
+                              }
+                              _onNavTap(2);
+                            },
+                          ),
+
             const MenuScreen(),
+
             OrderScreen(key: ValueKey('order-$_navIdx')),
+
             const ProfileScreen(),
           ],
         ),
+
+        /// ================= BOTTOM =================
         bottomNavigationBar: Obx(() {
           final cartC = Get.find<CartController>();
           final cartCount = cartC.totalItems;
@@ -146,7 +176,9 @@ class _HomeScreenState extends State<HomeScreen>
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showCartBar) BottomCartBar(onTap: _openPayment),
+              if (showCartBar)
+                BottomCartBar(onTap: _openPayment),
+
               BottomNav(
                 selected: _navIdx,
                 cartCount: cartCount,

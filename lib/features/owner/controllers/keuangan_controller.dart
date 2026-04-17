@@ -5,6 +5,7 @@ import '../models/pengeluaran_model.dart';
 import '../models/bahan_baku_model.dart';
 import '../models/rekap_keuangan_model.dart';
 import '../models/mutasi_bahan_baku_model.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 enum DetailKeuanganTab { pemasukan, pengeluaran }
 
@@ -182,7 +183,7 @@ class KeuanganController extends GetxController {
           )
           .toList();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal ambil detail keuangan: $e');
+      showErrorSnackbar('Error', 'Gagal ambil detail keuangan: $e');
     } finally {
       isLoadingDetailKeuangan.value = false;
     }
@@ -395,7 +396,7 @@ class KeuanganController extends GetxController {
 
       hitungRekapMutasiBahanBaku();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal ambil mutasi bahan baku: $e');
+      showErrorSnackbar('Error', 'Gagal ambil mutasi bahan baku: $e');
     } finally {
       isLoadingMutasiBahanBaku.value = false;
     }

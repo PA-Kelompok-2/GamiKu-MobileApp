@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,16 +18,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showDeleteAccountDialog() {
     Get.defaultDialog(
-      title: 'Delete Account',
+      title: 'Hapus Akun',
       middleText:
-          'Are you sure you want to delete your account? This action cannot be undone.',
-      textConfirm: 'Delete',
-      textCancel: 'Cancel',
+          'Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.',
+      textConfirm: 'Hapus',
+      textCancel: 'Batal',
       confirmTextColor: AppColors.white,
       cancelTextColor: AppColors.textGrey,
       buttonColor: AppColors.primary,
       onConfirm: () {
         Get.back();
+
+        showWarningSnackbar(
+          "Perhatian",
+          "Fitur hapus akun belum tersedia",
+        );
       },
     );
   }
@@ -45,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           onPressed: () => Get.back(result: profileUpdated),
         ),
         title: const Text(
-          'Settings',
+          'Pengaturan',
           style: TextStyle(
             color: AppColors.textDark,
             fontSize: 20,
@@ -61,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (isLoggedIn)
             _buildMenuItem(
               icon: Icons.person_outline,
-              title: 'My Profile',
+              title: 'Profil Saya',
               onTap: () async {
                 final result = await Get.toNamed(Routes.myProfile);
 
@@ -75,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           _buildMenuItem(
             icon: Icons.info_outline,
-            title: 'About',
+            title: 'Tentang',
             trailing: const Icon(
               Icons.chevron_right,
               color: AppColors.textLight,
@@ -86,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (isLoggedIn)
             _buildMenuItem(
               icon: Icons.close,
-              title: 'Delete Account',
+              title: 'Hapus Akun',
               iconColor: AppColors.primary,
               textColor: AppColors.textDark,
               onTap: _showDeleteAccountDialog,

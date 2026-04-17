@@ -15,7 +15,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   List<Map<String, dynamic>> orders = [];
   bool isLoading = true;
-  bool isUpdating = false; // 🔥 tambahan
+  bool isUpdating = false; 
   String? userRole;
   String selectedFilter = 'Semua';
 
@@ -72,7 +72,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Future<void> updateStatus(String id, String currentStatus) async {
-    if (isUpdating) return; // 🔥 anti spam
+    if (isUpdating) return; 
 
     isUpdating = true;
 
@@ -90,7 +90,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
       if (!mounted) return;
 
-      await loadOrders(); // 🔥 langsung await (hapus delay)
+      await loadOrders(); 
     } catch (e) {
       print("ERROR UPDATE STATUS: $e");
     } finally {

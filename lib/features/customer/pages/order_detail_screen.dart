@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../controllers/menu_controller.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key});
@@ -51,18 +53,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       setState(() {
         resolvedOrder = {...resolvedOrder, 'status': nextStatus};
       });
-      Get.snackbar(
+      showSuccessSnackbar(
         'Berhasil',
-        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.tagGreen,
-        colorText: Colors.white,
+        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai'
       );
     } catch (e) {
-      Get.snackbar(
+      showSuccessSnackbar(
         'Error',
-        'Gagal update status: $e',
-        snackPosition: SnackPosition.BOTTOM,
+        'Gagal update status: $e'
       );
     } finally {
       setState(() => _isLoading = false);
@@ -141,7 +139,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       const Divider(height: 16, color: AppColors.border),
                       _buildInfoRow(
                         'Tanggal',
-                        resolvedOrder['created_at'] ?? '-',
+                        _formatDate(resolvedOrder['created_at']),
                       ),
                       const Divider(height: 16, color: AppColors.border),
                       _buildStatusRow('Status', status),
@@ -421,7 +419,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 child: GestureDetector(
                   onTap: () {
                     Get.find<MenuC>().selectedCategory.value = 'Semua';
-                    Get.find<MenuC>().searchMenu('');
+                    final menuC = Get.find<MenuC>();
+                      menuC.selectedCategory.value = 'Semua';
+                      menuC.applyFilter('');
                     Get.until((route) => route.isFirst);
                   },
                   child: Container(
@@ -553,6 +553,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ),
       ],
     );
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return '-';
+
+    final utcDate = DateTime.parse(dateStr);
+    final wibDate = utcDate.add(const Duration(hours: 8));
+
+    return DateFormat('dd MMM yyyy, HH:mm', 'id_ID').format(wibDate);
   }
 
   Widget _buildPlaceholder() {

@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 
 import '../../../core/services/supabase_services.dart';
 import '../../../routes/app_routes.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class QRScreen extends StatefulWidget {
   const QRScreen({super.key});
@@ -45,7 +46,7 @@ class _QRScreenState extends State<QRScreen> {
 
   Future<void> _confirmPayment() async {
     if (_token.isEmpty) {
-      Get.snackbar('Error', 'Token QR tidak ditemukan');
+      showErrorSnackbar('Error', 'Token QR tidak ditemukan');
       return;
     }
 
@@ -61,7 +62,7 @@ class _QRScreenState extends State<QRScreen> {
       if (mounted) {
         setState(() => isLoading = false);
       }
-      Get.snackbar('Error', 'Gagal update pembayaran');
+      showErrorSnackbar('Error', 'Gagal update pembayaran');
     }
   }
 
@@ -135,7 +136,7 @@ class _QRScreenState extends State<QRScreen> {
                     color: Colors.grey,
                     fontSize: 15,
                     height: 1.5,
-                    decoration: TextDecoration.none, // 🔥 INI FIX UTAMA
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 30),

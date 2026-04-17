@@ -52,33 +52,67 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
   Future<void> loadOrders() async {
     final data = await service.getOrdersWithItems();
 
-    pending = data.where((o) => o['status'] == 'pending').length;
-    processed = data.where((o) => o['status'] == 'paid').length;
-    completed = data.where((o) => o['status'] == 'completed').length;
+    final now = DateTime.now().toUtc().add(const Duration(hours: 7));
+
+    final todayOrders = data.where((o) {
+      final createdAt = DateTime.parse(o['created_at'])
+        .add(const Duration(hours: 7));
+
+      return createdAt.year == now.year &&
+          createdAt.month == now.month &&
+          createdAt.day == now.day;
+    }).toList();
+
+    pending = todayOrders.where((o) => o['status'] == 'pending').length;
+    processed = todayOrders.where((o) => o['status'] == 'paid').length;
+    completed = todayOrders.where((o) => o['status'] == 'completed').length;
 
     setState(() {});
   }
 
   Future<void> loadStatistik() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
     final menu = await Supabase.instance.client.from('menus').select();
     totalMenu = menu.length;
+
     final completedOrders = await Supabase.instance.client
         .from('orders')
-        .select('total_price, status')
+        .select('total_price, status, created_at')
         .eq('status', 'completed');
-    pemasukan = completedOrders.fold<int>(
+
+    final todayOrders = completedOrders.where((o) {
+      final createdAt = DateTime.parse(o['created_at'])
+        .add(const Duration(hours: 7));
+      return createdAt.isAfter(startOfDay) &&
+          createdAt.isBefore(endOfDay);
+    }).toList();
+
+    pemasukan = todayOrders.fold<int>(
       0,
       (sum, item) => sum + ((item['total_price'] ?? 0) as num).toInt(),
     );
+
     final pengeluaranData = await Supabase.instance.client
         .from('keuangan')
-        .select('nominal, jenis')
+        .select('nominal, jenis, created_at')
         .eq('jenis', 'pengeluaran');
-    pengeluaran = pengeluaranData.fold<int>(
+
+    final todayPengeluaran = pengeluaranData.where((o) {
+      final createdAt = DateTime.parse(o['created_at']).toLocal();
+      return createdAt.isAfter(startOfDay) &&
+          createdAt.isBefore(endOfDay);
+    }).toList();
+
+    pengeluaran = todayPengeluaran.fold<int>(
       0,
       (sum, item) => sum + ((item['nominal'] ?? 0) as num).toInt(),
     );
+
     saldo = pemasukan - pengeluaran;
+
     setState(() {});
   }
 

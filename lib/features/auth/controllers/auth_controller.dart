@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/routes/app_routes.dart';
 import '../../../core/services/supabase_services.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class AuthController extends GetxController {
   final service = SupabaseService();
@@ -17,17 +18,9 @@ class AuthController extends GetxController {
       final res = await service.login(email, password);
 
       if (res.user == null) {
-        Get.snackbar(
+        showErrorSnackbar(
           "Login Gagal",
-          "Email atau password salah.",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.white,
-          colorText: Colors.black,
-          icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-          borderColor: Colors.red,
-          borderWidth: 1,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 12,
+          "Email atau password salah."
         );
         return;
       }
@@ -40,17 +33,9 @@ class AuthController extends GetxController {
         Routes.home
       );
     } catch (e) {
-      Get.snackbar(
+      showErrorSnackbar(
         "Login Gagal",
-        "Tidak dapat login. Periksa email dan password.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
+        "Tidak dapat login. Periksa email dan password."
       );
     } finally {
       isLoading.value = false;
@@ -61,7 +46,7 @@ class AuthController extends GetxController {
     await service.logout();
     Get.delete<ProfileController>();
 
-    Get.offNamed(Routes.login); // 🔥 wajib offAll di sini
+    Get.offNamed(Routes.login); 
   }
 
   Future<void> register({
@@ -88,17 +73,9 @@ class AuthController extends GetxController {
 
       Get.back();
 
-      Get.snackbar(
+      showSuccessSnackbar(
         "Registrasi Berhasil",
-        "Akun berhasil dibuat",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.check_circle, color: Colors.green),
-        borderColor: Colors.green,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
+        "Akun berhasil dibuat"
       );
     } catch (e) {
       String pesan = "Registrasi gagal.";
@@ -107,24 +84,9 @@ class AuthController extends GetxController {
         pesan = "Email sudah terdaftar. Silakan gunakan email lain.";
       }
 
-      Get.snackbar(
+      showErrorSnackbar(
         "Registrasi Gagal!",
         pesan,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFE5E5),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.close, color: Colors.red, size: 22),
-        ),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
       );
     } finally {
       isLoading.value = false;

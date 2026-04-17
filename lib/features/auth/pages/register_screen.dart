@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/app_snackbar.dart'; // ✅ tambah ini
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -28,118 +29,45 @@ class _RegisterPageState extends State<RegisterPage> {
     final confirmPassword = confirmPasswordController.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Semua field wajib diisi.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Semua field wajib diisi.");
       return;
     }
 
     if (name.length < 3) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Nama minimal 3 karakter.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Nama minimal 3 karakter.");
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Format email tidak valid.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Format email tidak valid.");
       return;
     }
 
     if (password.length < 8) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Password minimal 8 karakter.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Password minimal 8 karakter.");
       return;
     }
 
     if (confirmPassword.isEmpty) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Konfirmasi password wajib diisi.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Konfirmasi password wajib diisi.");
       return;
     }
 
     if (confirmPassword != password) {
-      Get.snackbar(
-        "Registrasi Gagal",
-        "Password tidak sama.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-      );
+      showErrorSnackbar("Registrasi Gagal", "Password tidak sama.");
       return;
     }
+
     try {
       await authC.register(email: email, password: password, name: name);
     } catch (e) {
       final errorMsg = e.toString().toLowerCase();
 
-      Get.snackbar(
+      showErrorSnackbar(
         "Registrasi Gagal",
         errorMsg.contains('email')
             ? "Email sudah digunakan atau tidak valid."
             : "Terjadi kesalahan, coba lagi.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black,
-        icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-        borderColor: Colors.red,
-        borderWidth: 1,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
       );
     }
   }
@@ -229,6 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 25),
+
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
@@ -245,7 +174,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 15),
+
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -263,7 +194,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 15),
+
                     TextField(
                       controller: passwordController,
                       obscureText: isObscure,
@@ -291,7 +224,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 15),
+
                     TextField(
                       controller: confirmPasswordController,
                       obscureText: isObscure,
@@ -309,7 +244,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 25),
+
                     Obx(
                       () => SizedBox(
                         width: double.infinity,
@@ -333,7 +270,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 20),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -350,6 +289,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 25),
                   ],
                 ),

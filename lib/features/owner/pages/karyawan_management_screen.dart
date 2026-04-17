@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class KaryawanManagementScreen extends StatefulWidget {
   const KaryawanManagementScreen({super.key});
@@ -29,10 +30,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       if (!mounted) return;
       setState(() => karyawanList = data);
     } catch (e) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
-        'Gagal memuat data: $e',
-        snackPosition: SnackPosition.BOTTOM,
+        'Gagal memuat data: $e'
       );
     } finally {
       if (mounted) {
@@ -154,37 +154,29 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                         final password = passC.text;
 
                         if (name.isEmpty || email.isEmpty || password.isEmpty) {
-                          Get.snackbar(
-                            'Error',
+                          showWarningSnackbar('Validasi',
                             'Semua field harus diisi',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
 
                         if (name.length < 3) {
-                          Get.snackbar(
-                            'Error',
+                          showWarningSnackbar('Validasi',
                             'Nama minimal 3 karakter',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
 
                         if (!GetUtils.isEmail(email)) {
-                          Get.snackbar(
-                            'Error',
+                          showWarningSnackbar('Validasi',
                             'Format email tidak valid',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
 
                         if (password.length < 8) {
-                          Get.snackbar(
-                            'Error',
+                          showWarningSnackbar('Validasi',
                             'Password minimal 8 karakter',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
@@ -200,10 +192,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
 
                           await _fetchKaryawan();
 
-                          Get.snackbar(
+                          showSuccessSnackbar(
                             'Sukses',
-                            'Karyawan berhasil ditambahkan',
-                            snackPosition: SnackPosition.BOTTOM,
+                            'Karyawan berhasil ditambahkan'
                           );
                         } catch (e) {
                           final errorText = e.toString().toLowerCase();
@@ -217,10 +208,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                             message = 'Email sudah digunakan';
                           }
 
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             message,
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                         }
                       },
@@ -331,28 +321,25 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                         final email = emailC.text.trim().toLowerCase();
 
                         if (name.isEmpty || email.isEmpty) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
-                            'Semua field harus diisi',
-                            snackPosition: SnackPosition.BOTTOM,
+                            'Semua field harus diisi'
                           );
                           return;
                         }
 
                         if (name.length < 3) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
-                            'Nama minimal 3 karakter',
-                            snackPosition: SnackPosition.BOTTOM,
+                            'Nama minimal 3 karakter'
                           );
                           return;
                         }
 
                         if (!GetUtils.isEmail(email)) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
-                            'Format email tidak valid',
-                            snackPosition: SnackPosition.BOTTOM,
+                            'Format email tidak valid'
                           );
                           return;
                         }
@@ -367,10 +354,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                           );
 
                           await _fetchKaryawan();
-                          Get.snackbar(
+                          showSuccessSnackbar(
                             'Sukses',
-                            'Data karyawan diperbarui',
-                            snackPosition: SnackPosition.BOTTOM,
+                            'Data karyawan diperbarui'
                           );
                         } catch (e) {
                           final errorText = e.toString().toLowerCase();
@@ -381,10 +367,9 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
                               errorText.contains('unique')) {
                             message = 'Email sudah digunakan';
                           }
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             message,
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                         }
                       },
@@ -436,16 +421,14 @@ class _KaryawanManagementScreenState extends State<KaryawanManagementScreen> {
       try {
         await service.deleteKaryawan(karyawan['id']);
         await _fetchKaryawan();
-        Get.snackbar(
+        showSuccessSnackbar(
           'Sukses',
-          'Karyawan berhasil dihapus',
-          snackPosition: SnackPosition.BOTTOM,
+          'Karyawan berhasil dihapus'
         );
       } catch (e) {
-        Get.snackbar(
+        showErrorSnackbar(
           'Error',
-          'Gagal menghapus: $e',
-          snackPosition: SnackPosition.BOTTOM,
+          'Gagal menghapus: $e'
         );
       }
     }

@@ -26,7 +26,7 @@ class _BannerSliderState extends State<BannerSlider> {
       if (!mounted) return false;
 
       final menuC = Get.find<MenuC>();
-      final total = menuC.menus.length;
+      final total = menuC.allMenus.length;
 
       if (total == 0) return true;
 
@@ -52,7 +52,8 @@ class _BannerSliderState extends State<BannerSlider> {
   Widget build(BuildContext context) {
     return Obx(() {
       final menuC = Get.find<MenuC>();
-      final banners = menuC.menus.take(5).toList();
+      final _ = menuC.menus.length;
+      final banners = menuC.allMenus.take(5).toList();
 
       if (banners.isEmpty) {
         return const SizedBox(height: 400);

@@ -31,7 +31,6 @@ class OrderCard extends StatelessWidget {
           Routes.orderDetail,
           arguments: {'order': order, 'userRole': userRole},
         );
-        // Refresh list saat kembali dari detail screen
         onRefresh();
       },
       child: Container(

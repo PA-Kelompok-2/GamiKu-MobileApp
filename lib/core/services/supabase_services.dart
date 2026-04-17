@@ -166,6 +166,7 @@ class SupabaseService {
   Future<Map<String, dynamic>> createOrder({
     required int total,
     required List<Map<String, dynamic>> items,
+    required String orderType,
   }) async {
     final user = supabase.auth.currentUser;
     final token = generateToken();
@@ -177,6 +178,7 @@ class SupabaseService {
           'total_price': total,
           'status': 'pending',
           'qr_token': token,
+          'order_type': orderType,
         })
         .select()
         .single();

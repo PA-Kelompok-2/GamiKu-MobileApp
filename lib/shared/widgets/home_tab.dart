@@ -21,9 +21,16 @@ class HomeTab extends StatefulWidget {
   State<HomeTab> createState() => _HomeTabState();
 }
 
-String selectedCategory = '';
 
 class _HomeTabState extends State<HomeTab> {
+  String selectedCategory = '';
+
+  @override
+  void didUpdateWidget(covariant HomeTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    selectedCategory = '';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -272,15 +279,20 @@ class _HomeTabState extends State<HomeTab> {
 
             SliverToBoxAdapter(
               child: Obx(() {
-                final menuC = Get.find<MenuC>();
-                final popularMenus = menuC.menus.take(5).toList();
+              final menuC = Get.find<MenuC>();
 
-                return SizedBox(
-                  height: 160,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: popularMenus.map((m) => _popularCard(m)).toList(),
+              // 🔥 trigger reactive (WAJIB)
+              final _ = menuC.menus.length;
+
+              final popularMenus = List<Map<String, dynamic>>.from(menuC.allMenus)
+                ..shuffle();
+
+              return SizedBox(
+                height: 160,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: popularMenus.take(5).map((m) => _popularCard(m)).toList(),
                   ),
                 );
               }),
@@ -305,7 +317,6 @@ class _HomeTabState extends State<HomeTab> {
         widget.onOpenMenu(title);
       },
 
-      /// ANIMASI KLIK
       child: AnimatedScale(
         duration: const Duration(milliseconds: 200),
         scale: isSelected ? 1.05 : 1.0,
@@ -320,7 +331,6 @@ class _HomeTabState extends State<HomeTab> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
 
-            /// GRADIENT SAAT AKTIF
             gradient: isSelected
                 ? const LinearGradient(
                     colors: [
@@ -348,7 +358,6 @@ class _HomeTabState extends State<HomeTab> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /// IMAGE
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: Image.network(
@@ -369,7 +378,6 @@ class _HomeTabState extends State<HomeTab> {
 
               const SizedBox(height: 8),
 
-              /// TEXT
               Text(
                 title,
                 style: TextStyle(
@@ -397,7 +405,6 @@ class _HomeTabState extends State<HomeTab> {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            /// IMAGE
             Positioned.fill(
               child: Image.network(
                 item['image_url'] ?? '',
@@ -409,7 +416,6 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
 
-            /// GRADIENT OVERLAY (BIAR TEXT KELIHATAN)
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -425,7 +431,6 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
 
-            /// CONTENT
             Positioned(
               left: 14,
               right: 14,
@@ -433,7 +438,6 @@ class _HomeTabState extends State<HomeTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// NAMA MENU
                   Text(
                     item['name'] ?? '',
                     maxLines: 1,
@@ -447,7 +451,6 @@ class _HomeTabState extends State<HomeTab> {
 
                   const SizedBox(height: 4),
 
-                  /// CATEGORY
                   Text(
                     item['cat'] ?? '',
                     style: TextStyle(
@@ -458,7 +461,6 @@ class _HomeTabState extends State<HomeTab> {
 
                   const SizedBox(height: 6),
 
-                  /// PRICE
                   Text(
                     "Rp ${item['price']}",
                     style: const TextStyle(
@@ -471,7 +473,6 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
 
-            /// OPTIONAL BADGE (biar gak kosong)
             Positioned(
               top: 10,
               left: 10,

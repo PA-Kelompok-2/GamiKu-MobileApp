@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../controllers/profile_controller.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -93,28 +94,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final phoneDigits = phone.replaceAll(RegExp(r'[^0-9]'), '');
 
     if (name.isEmpty || email.isEmpty) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
-        'Nama dan email tidak boleh kosong',
-        snackPosition: SnackPosition.BOTTOM,
+        'Nama dan email tidak boleh kosong'
       );
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
-        'Format email tidak valid',
-        snackPosition: SnackPosition.BOTTOM,
+        'Format email tidak valid'
       );
       return;
     }
 
     if (phone.isNotEmpty && phoneDigits.length < 10) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
-        'Nomor telepon minimal 10 digit',
-        snackPosition: SnackPosition.BOTTOM,
+        'Nomor telepon minimal 10 digit'
       );
       return;
     }
@@ -122,10 +120,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     final formattedDob = _formatDateForDatabase(dobC.text);
 
     if (dobC.text.trim().isNotEmpty && formattedDob == null) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
-        'Format tanggal lahir tidak valid',
-        snackPosition: SnackPosition.BOTTOM,
+        'Format tanggal lahir tidak valid'
       );
       return;
     }
@@ -135,7 +132,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     try {
       final user = service.currentUser;
       if (user == null) {
-        Get.snackbar('Error', 'User Tidak Ditemukan');
+        showErrorSnackbar('Error', 'User Tidak Ditemukan');
         return;
       }
 
@@ -146,10 +143,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           .maybeSingle();
 
       if (existing != null && existing['id'] != user.id) {
-        Get.snackbar(
+        showErrorSnackbar(
           'Error',
           'Email sudah digunakan akun lain',
-          snackPosition: SnackPosition.BOTTOM,
         );
         return;
       }
@@ -166,19 +162,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           .eq('id', user.id);
 
       Get.find<ProfileController>().loadProfile();
-      Get.snackbar(
+      showSuccessSnackbar(
         'Sukses',
         'Profil berhasil diperbarui',
-        snackPosition: SnackPosition.BOTTOM,
       );
 
       await Future.delayed(const Duration(seconds: 2));
       Get.back(result: true);
     } catch (e) {
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
         'Gagal menyimpan: $e',
-        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       if (mounted) {
@@ -275,28 +269,25 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         if (oldPass.isEmpty ||
                             newPass.isEmpty ||
                             confirmPass.isEmpty) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             'Semua field harus diisi',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
 
                         if (newPass.length < 8) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             'Password baru minimal 8 karakter',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
 
                         if (newPass != confirmPass) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             'Password baru tidak cocok',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
@@ -309,10 +300,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             password: oldPass,
                           );
                         } catch (e) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             'Password lama salah',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                           return;
                         }
@@ -324,16 +314,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
                           Get.back();
 
-                          Get.snackbar(
+                          showSuccessSnackbar(
                             'Sukses',
                             'Password berhasil diubah',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                         } catch (e) {
-                          Get.snackbar(
+                          showErrorSnackbar(
                             'Error',
                             'Password baru tidak valid / terlalu lemah',
-                            snackPosition: SnackPosition.BOTTOM,
                           );
                         }
                       },

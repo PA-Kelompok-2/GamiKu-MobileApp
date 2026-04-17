@@ -21,11 +21,11 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  Get.put(AuthController());
-  Get.put(CartController());
-  Get.put(MenuC());
-  Get.put(ProfileController());
-  Get.put(KeuanganController());
+  Get.lazyPut<AuthController>(() => AuthController(), fenix: true);
+  Get.lazyPut<CartController>(() => CartController(), fenix: true);
+  Get.lazyPut<MenuC>(() => MenuC(), fenix: true);
+  Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
+  Get.lazyPut<KeuanganController>(() => KeuanganController(), fenix: true);
 
   runApp(const GamikuApp());
 }

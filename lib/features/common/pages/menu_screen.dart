@@ -27,11 +27,10 @@ class _MenuScreenState extends State<MenuScreen> {
   void initState() {
     super.initState();
 
-    selectedCategory = Get.arguments ?? 'Semua';
-
     _loadRole();
 
     final menuC = Get.find<MenuC>();
+    selectedCategory = menuC.selectedCategory.value;
 
     ever(menuC.selectedCategory, (cat) {
       setState(() {
@@ -44,7 +43,14 @@ class _MenuScreenState extends State<MenuScreen> {
     });
 
     _searchController.addListener(() {
-      menuC.searchMenu(_searchController.text);
+      final menuC = Get.find<MenuC>();
+
+      menuC.selectedCategory.value = "Semua";
+      menuC.applyFilter(_searchController.text);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      menuC.applyFilter('');
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,7 +75,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
     final cats = [
       'Semua',
-      ...menuC.menus.map((m) => m['cat']?.toString() ?? '').toSet(),
+      ...menuC.allMenus.map((m) => m['cat']?.toString() ?? '').toSet(),
     ];
 
     final index = cats.indexOf(selectedCategory);
@@ -103,17 +109,13 @@ class _MenuScreenState extends State<MenuScreen> {
     final menuC = Get.find<MenuC>();
 
     return Obx(() {
-      final Set<String> categorySet = menuC.menus
-          .map((m) => (m['cat'] ?? 'Unknown').toString())
-          .toSet();
+    final Set<String> categorySet = menuC.allMenus
+        .map((m) => (m['cat'] ?? 'Unknown').toString())
+        .toSet();
 
       final List<String> categories = ['Semua', ...categorySet];
 
-      final items = selectedCategory == 'Semua'
-          ? menuC.menus
-          : menuC.menus
-                .where((m) => (m['cat'] ?? '') == selectedCategory)
-                .toList();
+      final items = menuC.menus;
 
       return Scaffold(
         backgroundColor: AppColors.bg,
@@ -148,7 +150,10 @@ class _MenuScreenState extends State<MenuScreen> {
               MenuSearchBar(
                 controller: _searchController,
                 onChanged: (value) {
-                  Get.find<MenuC>().searchMenu(value);
+                  final menuC = Get.find<MenuC>();
+
+                  menuC.selectedCategory.value = "Semua";
+                  menuC.applyFilter(value);
                 },
               ),
 
@@ -166,16 +171,21 @@ class _MenuScreenState extends State<MenuScreen> {
                     final isSelected = cat == selectedCategory;
 
                     return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedCategory = cat;
-                        });
+                    onTap: () {
+                      final menuC = Get.find<MenuC>();
 
-                        Future.delayed(
-                          const Duration(milliseconds: 50),
-                          _scrollToCenter,
-                        );
-                      },
+                      setState(() {
+                        selectedCategory = cat;
+                      });
+
+                      menuC.selectedCategory.value = cat;
+                      menuC.applyFilter(_searchController.text);
+
+                      Future.delayed(
+                        const Duration(milliseconds: 50),
+                        _scrollToCenter,
+                      );
+                    },
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 6),
                         padding: const EdgeInsets.symmetric(

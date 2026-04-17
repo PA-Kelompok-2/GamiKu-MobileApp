@@ -54,7 +54,6 @@ class _MenuCardState extends State<MenuCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // GAMBAR MENU
             Stack(
               children: [
                 ClipRRect(
@@ -68,7 +67,6 @@ class _MenuCardState extends State<MenuCard> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                // OVERLAY "OFF" JIKA TIDAK AVAILABLE
                 if (!_isAvailable)
                   Positioned.fill(
                     child: Container(
@@ -94,7 +92,6 @@ class _MenuCardState extends State<MenuCard> {
             ),
             const SizedBox(height: 6),
 
-            // NAMA MENU
             Text(
               widget.item['name'],
               maxLines: 1,
@@ -108,7 +105,6 @@ class _MenuCardState extends State<MenuCard> {
             ),
             const SizedBox(height: 2),
 
-            // KATEGORI
             Text(
               widget.item['cat'] ?? '',
               style: TextStyle(
@@ -120,10 +116,8 @@ class _MenuCardState extends State<MenuCard> {
             ),
             const Spacer(),
 
-            // HARGA & TOMBOL ACTION
             Row(
               children: [
-                // HARGA
                 Expanded(
                   child: Text(
                     "Rp ${widget.item['price']}",
@@ -135,13 +129,10 @@ class _MenuCardState extends State<MenuCard> {
                   ),
                 ),
 
-                // OWNER/KARYAWAN: TIDAK ADA TOMBOL (KOSONG)
                 if (isOwnerOrEmployee)
                   const SizedBox.shrink()
-                // PEMBELI JIKA MENU AVAILABLE: TOMBOL ADD
                 else if (_isAvailable)
                   _buildAddButton(cartC)
-                // PEMBELI JIKA MENU OFF: LABEL OFF
                 else
                   _buildOffLabel(),
               ],
@@ -152,13 +143,11 @@ class _MenuCardState extends State<MenuCard> {
     );
   }
 
-  // TOMBOL ADD/COUNTER UNTUK PEMBELI (JIKA MENU ON)
   Widget _buildAddButton(CartController cartC) {
     return Obx(() {
       final id = widget.item['id'].toString();
       final qty = cartC.qtyOf(id);
 
-      // Jika belum ada di keranjang, tampilkan tombol +
       if (qty == 0) {
         return GestureDetector(
           onTap: () {
@@ -176,7 +165,6 @@ class _MenuCardState extends State<MenuCard> {
         );
       }
 
-      // Jika sudah ada di keranjang, tampilkan counter
       return _Counter(
         qty: qty,
         onAdd: () {
@@ -191,7 +179,6 @@ class _MenuCardState extends State<MenuCard> {
     });
   }
 
-  // LABEL OFF UNTUK PEMBELI (JIKA MENU OFF)
   Widget _buildOffLabel() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

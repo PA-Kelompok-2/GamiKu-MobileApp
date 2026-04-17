@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-
 import '../features/models/order_model.dart';
 
 class CartController extends GetxController {
@@ -24,6 +23,46 @@ class CartController extends GetxController {
       };
     }
 
+    cart.refresh();
+  }
+
+  void addItem(OrderItem item) {
+    final id = item.id.toString();
+
+    if (cart.containsKey(id)) {
+      cart[id]!['qty'] += 1;
+    } else {
+      cart[id] = {
+        'id': item.id,
+        'name': item.name,
+        'price': item.price,
+        'emoji': item.emoji,
+        'image_url': item.imageUrl, 
+        'qty': 1,
+      };
+    }
+
+    cart.refresh();
+  }
+
+  void decreaseQty(OrderItem item) {
+    final id = item.id.toString();
+
+    if (!cart.containsKey(id)) return;
+
+    final currentQty = cart[id]!['qty'] ?? 0;
+
+    if (currentQty > 1) {
+      cart[id]!['qty'] -= 1;
+    } else {
+      cart.remove(id);
+    }
+
+    cart.refresh();
+  }
+
+  void removeItem(OrderItem item) {
+    cart.remove(item.id.toString());
     cart.refresh();
   }
 
@@ -58,7 +97,8 @@ class CartController extends GetxController {
   int get subtotal {
     return cart.values.fold(
       0,
-      (sum, item) => sum + (item['price'] as int) * (item['qty'] as int),
+      (sum, item) =>
+          sum + (item['price'] as int) * (item['qty'] as int),
     );
   }
 
@@ -77,44 +117,5 @@ class CartController extends GetxController {
         qty: item['qty'],
       );
     }).toList();
-  }
-
-  void addItem(OrderItem item) {
-    final id = item.id.toString();
-
-    if (cart.containsKey(id)) {
-      cart[id]!['qty'] += 1;
-    } else {
-      cart[id] = {
-        'id': item.id,
-        'name': item.name,
-        'price': item.price,
-        'emoji': item.emoji,
-        'qty': 1,
-      };
-    }
-
-    cart.refresh();
-  }
-
-  void decreaseQty(OrderItem item) {
-    final id = item.id.toString();
-
-    if (!cart.containsKey(id)) return;
-
-    final currentQty = cart[id]!['qty'];
-
-    if (currentQty > 1) {
-      cart[id]!['qty'] -= 1;
-    } else {
-      cart.remove(id);
-    }
-
-    cart.refresh();
-  }
-
-  void removeItem(OrderItem item) {
-    cart.remove(item.id.toString());
-    cart.refresh();
   }
 }

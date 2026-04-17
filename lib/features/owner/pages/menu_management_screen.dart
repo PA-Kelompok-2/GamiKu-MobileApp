@@ -8,6 +8,7 @@ import '/controllers/menu_controller.dart';
 import '/controllers/profile_controller.dart';
 import '/core/constants/app_colors.dart';
 import '/core/services/supabase_services.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -25,7 +26,10 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   void initState() {
     super.initState();
     _searchController.addListener(() {
-      Get.find<MenuC>().searchMenu(_searchController.text);
+      final menuC = Get.find<MenuC>();
+
+      menuC.selectedCategory.value = "Semua"; // reset category
+      menuC.applyFilter(_searchController.text);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -48,9 +52,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             .toSet();
         final List<String> categories = ['Semua', ...categorySet];
 
-        final items = selectedCategory == 'Semua'
-            ? menuC.menus
-            : menuC.menus.where((m) => m['cat'] == selectedCategory).toList();
+        final items = menuC.menus;
 
         return Obx(() {
           final isOwner = profileC.role.value == 'owner';
@@ -136,7 +138,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         final isSelected = cat == selectedCategory;
 
                         return GestureDetector(
-                          onTap: () => setState(() => selectedCategory = cat),
+                          onTap: () {
+                            setState(() => selectedCategory = cat);
+
+                            final menuC = Get.find<MenuC>();
+                            menuC.selectedCategory.value = cat;
+
+                            menuC.applyFilter(_searchController.text);
+                          },
                           child: Container(
                             margin: const EdgeInsets.only(right: 12),
                             padding: const EdgeInsets.symmetric(
@@ -327,11 +336,9 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
       await widget.onToggleAvailability(itemId, newValue);
       setState(() => _isAvailable = newValue);
     } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        'Tidak dapat mengubah status menu',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      showErrorSnackbar(
+        'Error',
+        'Tidak dapat mengubah status menu'
       );
     } finally {
       setState(() => _isLoading = false);
@@ -640,14 +647,12 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
     String? imageUrl = _isEdit ? widget.item!['image_url'] : null;
 
     try {
-      // 🔥 upload gambar kalau ada
       if (_pickedImage != null) {
         imageUrl = await service.uploadMenuImage(_pickedImage!);
       }
 
       final parsedPrice = int.parse(_priceC.text.replaceAll('.', '').trim());
 
-      // 🔥 insert / update
       if (_isEdit) {
         await menuC.updateMenu(
           id: widget.item!['id'],
@@ -665,28 +670,22 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
         );
       }
 
-      // 🔥 snackbar sukses
-      Get.snackbar(
+      showSuccessSnackbar(
         'Berhasil',
-        _isEdit ? 'Menu berhasil diupdate' : 'Menu berhasil ditambahkan',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        _isEdit ? 'Menu berhasil diupdate' : 'Menu berhasil ditambahkan'
       );
 
-      // 🔥 DELAY + SAFE CLOSE
       Future.delayed(const Duration(milliseconds: 150), () {
         if (Get.isOverlaysOpen) {
-          Get.back(); // nutup bottom sheet
+          Get.back(); 
         }
       });
     } catch (e) {
       print('ERROR SAVE: $e');
 
-      Get.snackbar(
+      showErrorSnackbar(
         'Error',
         e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
       );
     } finally {
       if (mounted) {
