@@ -150,3 +150,31 @@ Karyawan tidak memiliki akses penuh seperti owner, namun tetap memiliki peran pe
 - Mengelola status pesanan (diproses, selesai, dll)
 - Membantu operasional layanan
 - Akses terbatas terhadap data tertentu sesuai kebutuhan
+
+# 🧩 Widget yang Digunakan
+## 📌 Core Layout
+`MaterialApp → Root aplikasi`
+
+`Scaffold → Struktur halaman`
+
+`AppBar → Header`
+
+`Container → Styling & layout`
+
+`Column & Row → Layout vertikal & horizontal`
+
+## 📝 Input & Interaksi
+`TextField → Input user`
+
+`ElevatedButton → Tombol aksi`
+
+`GestureDetector → Interaksi klik`
+
+`Icon → Ikon UI`
+
+## 📋 Data Display
+`ListView → Menampilkan list menu`
+
+`Text → Menampilkan data`
+
+`Card → Tampilan item menu`
