@@ -133,3 +133,38 @@ Karyawan tidak memiliki akses penuh seperti owner, namun tetap memiliki peran pe
 `Text → Menampilkan data`
 
 `Card → Tampilan item menu`
+
+# SOURCE CODE
+<img width="332" height="203" alt="image" src="https://github.com/user-attachments/assets/27e28faf-9e2c-48cd-bbcd-c48499aefe12" />
+
+## 📁 controllers
+<img width="235" height="139" alt="image" src="https://github.com/user-attachments/assets/4226ccfb-ca7f-4c65-8f5e-b58cc9ea8628" />
+
+Folder ini berisi logic atau otak aplikasi yang mengatur alur data dan state. Controller bertugas menghubungkan antara UI dengan data, misalnya mengelola menu, cart, profil, dan proses lainnya menggunakan GetX.
+
+## 📁 core
+<img width="126" height="110" alt="image" src="https://github.com/user-attachments/assets/0f3c690a-41d0-4c59-8464-77d70afd6b84" />
+
+Folder ini berisi konfigurasi utama aplikasi yang bersifat global. Biasanya mencakup:
+- Konstanta (seperti warna, tema)
+- Service (seperti koneksi ke Supabase)
+- Util (seperti app snackbar)
+Folder ini menjadi pusat pengaturan yang bisa digunakan di seluruh aplikasi.
+
+## 📁 features
+<img width="158" height="165" alt="image" src="https://github.com/user-attachments/assets/f5d400fa-928f-4bb5-89b3-d47cf96c1ab2" />
+
+Folder ini berisi fitur-fitur utama aplikasi yang dipisahkan berdasarkan fungsi. Tujuannya agar struktur kode lebih rapi dan modular.
+
+##  📁 routes
+<img width="249" height="114" alt="image" src="https://github.com/user-attachments/assets/cb32302d-93ae-4f01-b9bf-675ca0d1ec3a" />
+
+Folder ini digunakan untuk mengatur navigasi antar halaman dalam aplikasi. Biasanya berisi definisi route atau nama-nama halaman yang digunakan untuk berpindah screen menggunakan GetX.
+
+## 📁 shared/widgets
+<img width="208" height="218" alt="image" src="https://github.com/user-attachments/assets/6558278d-b270-4b5f-b23f-87255abb2252" />
+
+Folder ini berisi widget yang bisa digunakan ulang (reusable components) di berbagai halaman. Tujuannya agar tidak perlu menulis ulang kode yang sama.
+
+## 📄 main.dart
+File ini merupakan entry point aplikasi, yaitu file pertama yang dijalankan saat aplikasi dibuka. Di sini biasanya terdapat inisialisasi aplikasi.
