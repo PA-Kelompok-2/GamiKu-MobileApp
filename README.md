@@ -11,6 +11,8 @@ Tujuan utama dari pengembangan aplikasi ini adalah untuk mendigitalisasi proses 
 # ✨ Fitur Aplikasi
 
 ## 🔐 1. Authentication (Autentikasi)
+<img width="328" height="698" alt="image" src="https://github.com/user-attachments/assets/697cf090-4dca-48a4-897c-471e7eb3cac6" />
+
 Fitur autentikasi berfungsi sebagai sistem keamanan utama dalam aplikasi yang memastikan bahwa hanya pengguna yang terdaftar yang dapat mengakses fitur-fitur di dalamnya.
 
 ### Fungsi:
@@ -20,6 +22,7 @@ Fitur autentikasi berfungsi sebagai sistem keamanan utama dalam aplikasi yang me
 - Splash screen sebagai loading awal
 
 ## 🏠 2. Home / Beranda
+<img width="326" height="702" alt="image" src="https://github.com/user-attachments/assets/d186434b-9c14-4d09-812f-f6f34141cd94" />
 Halaman beranda merupakan halaman utama yang pertama kali diakses setelah pengguna berhasil login. Halaman ini berfungsi sebagai pusat navigasi yang menghubungkan pengguna ke seluruh fitur yang tersedia dalam aplikasi.
 
 ### Fungsi:
@@ -28,6 +31,7 @@ Halaman beranda merupakan halaman utama yang pertama kali diakses setelah penggu
 - Menampilkan informasi umum
 
 ## 🍽️ 3. Menu (Daftar Produk)
+
 Fitur menu merupakan fitur inti dalam aplikasi yang digunakan untuk menampilkan daftar makanan atau minuman yang tersedia. Data menu diambil langsung dari database Supabase sehingga informasi yang ditampilkan bersifat dinamis dan dapat diperbarui secara real-time.
 
 ### Fungsi:
@@ -36,6 +40,8 @@ Fitur menu merupakan fitur inti dalam aplikasi yang digunakan untuk menampilkan 
 - Integrasi langsung dengan Supabase
 
 ## 🛒 4. Cart (Keranjang)
+<img width="325" height="698" alt="image" src="https://github.com/user-attachments/assets/700bdafd-fad9-4128-8563-6a121656b41b" />
+
 Fitur cart digunakan untuk menampung dan mengelola item yang dipilih oleh pengguna sebelum dilakukan proses pemesanan. Fitur ini memungkinkan pengguna untuk melihat daftar item yang telah dipilih beserta jumlah dan total harga.
 
 ### Fungsi:
@@ -44,6 +50,8 @@ Fitur cart digunakan untuk menampung dan mengelola item yang dipilih oleh penggu
 - Menampilkan total pesanan
 
 ## 👤 5. Profile (Profil Pengguna)
+<img width="325" height="703" alt="image" src="https://github.com/user-attachments/assets/970a7a41-3db2-4580-acdf-b888ab6919aa" />
+
 Fitur profil digunakan untuk menampilkan dan mengelola informasi pribadi pengguna yang telah terdaftar dalam sistem. Pengguna dapat melihat data seperti nama, email, atau informasi lain yang tersimpan, serta melakukan perubahan jika diperlukan.
 
 ### Fungsi:
@@ -52,6 +60,8 @@ Fitur profil digunakan untuk menampilkan dan mengelola informasi pribadi penggun
 - Menyimpan perubahan data
   
 ## ⚙️ 6. Settings & Informasi
+<img width="323" height="704" alt="image" src="https://github.com/user-attachments/assets/059ec1b6-4f24-4d3c-9b17-5e6762817f79" />
+
 Fitur settings dan informasi berfungsi untuk memberikan akses kepada pengguna terhadap pengaturan aplikasi serta informasi tambahan yang berkaitan dengan penggunaan aplikasi.
 
 ### Menu yang tersedia:
@@ -71,6 +81,8 @@ Aplikasi ini menggunakan Supabase sebagai backend utama yang berperan dalam peng
 # 👥 Role Pengguna dalam Aplikasi
 
 ## 👤 1. Pengguna (Customer)
+<img width="326" height="702" alt="image" src="https://github.com/user-attachments/assets/d186434b-9c14-4d09-812f-f6f34141cd94" />
+
 Pengguna atau customer merupakan role utama yang menggunakan aplikasi untuk melakukan pemesanan menu. Role ini berinteraksi langsung dengan fitur-fitur utama seperti melihat daftar menu, menambahkan item ke keranjang, serta mengelola profil pribadi.
 
 Pengguna memiliki akses terbatas hanya pada fitur yang berkaitan dengan aktivitas pemesanan dan informasi akun pribadi. Mereka tidak memiliki akses untuk mengelola data sistem seperti menu atau data pengguna lain.
@@ -84,6 +96,8 @@ Pengguna memiliki akses terbatas hanya pada fitur yang berkaitan dengan aktivita
 - Mengakses halaman informasi (help center, privacy policy, dll)
 
 ## 🧑‍💼 2. Owner
+<img width="328" height="702" alt="image" src="https://github.com/user-attachments/assets/980637e2-8e70-4974-bc2f-10a0f35ca0b5" />
+
 Owner merupakan role dengan hak akses tertinggi dalam aplikasi yang bertanggung jawab atas pengelolaan keseluruhan sistem. Owner memiliki kontrol penuh terhadap data dan operasional aplikasi, termasuk pengelolaan menu, karyawan, serta pemantauan performa bisnis.
 
 Dalam implementasinya, owner biasanya memiliki akses ke fitur tambahan seperti dashboard statistik, manajemen data karyawan, serta laporan keuangan atau transaksi.
@@ -96,6 +110,8 @@ Dalam implementasinya, owner biasanya memiliki akses ke fitur tambahan seperti d
 - Mengakses seluruh fitur dalam aplikasi
 
 ## 👨‍🍳 3. Karyawan
+<img width="327" height="705" alt="image" src="https://github.com/user-attachments/assets/ea219e61-1d60-4414-8e62-88924c6c25b9" />
+
 Karyawan merupakan role yang membantu operasional sehari-hari dalam sistem. Role ini memiliki akses terbatas yang berfokus pada pengelolaan pesanan dan pelayanan kepada pengguna.
 
 Karyawan tidak memiliki akses penuh seperti owner, namun tetap memiliki peran penting dalam memastikan pesanan diproses dengan baik.
