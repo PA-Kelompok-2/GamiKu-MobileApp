@@ -11,9 +11,7 @@ Tujuan utama dari pengembangan aplikasi ini adalah untuk mendigitalisasi proses 
 # ✨ Fitur Aplikasi
 
 ## 🔐 1. Authentication (Autentikasi)
-Fitur autentikasi berfungsi sebagai sistem keamanan utama dalam aplikasi yang memastikan bahwa hanya pengguna yang terdaftar yang dapat mengakses fitur-fitur di dalamnya. Proses autentikasi dilakukan menggunakan email dan password yang terintegrasi langsung dengan layanan Supabase Authentication.
-
-Pada fitur ini, pengguna dapat melakukan registrasi akun baru dengan mengisi data yang diperlukan, kemudian melakukan login untuk masuk ke dalam sistem. Setelah berhasil login, sesi pengguna akan disimpan sehingga pengguna tidak perlu melakukan login ulang setiap kali membuka aplikasi. Selain itu, terdapat splash screen yang berfungsi sebagai tampilan awal sekaligus melakukan pengecekan status login pengguna secara otomatis.
+Fitur autentikasi berfungsi sebagai sistem keamanan utama dalam aplikasi yang memastikan bahwa hanya pengguna yang terdaftar yang dapat mengakses fitur-fitur di dalamnya.
 
 ### Fungsi:
 - Login pengguna menggunakan email & password
@@ -21,71 +19,40 @@ Pada fitur ini, pengguna dapat melakukan registrasi akun baru dengan mengisi dat
 - Menyimpan sesi login
 - Splash screen sebagai loading awal
 
-### File terkait:
-- login_screen.dart
-- register_screen.dart
-- splash_screen.dart
-- auth_controller.dart
-
 ## 🏠 2. Home / Beranda
 Halaman beranda merupakan halaman utama yang pertama kali diakses setelah pengguna berhasil login. Halaman ini berfungsi sebagai pusat navigasi yang menghubungkan pengguna ke seluruh fitur yang tersedia dalam aplikasi.
-
-Pada halaman ini, pengguna dapat melihat tampilan ringkasan aplikasi serta mengakses menu utama seperti daftar menu, profil, dan pengaturan. Desain halaman dibuat sederhana dan intuitif agar memudahkan pengguna dalam berpindah antar fitur tanpa kebingungan.
 
 ### Fungsi:
 - Menampilkan menu utama aplikasi
 - Akses cepat ke fitur lain (menu, profil, settings)
 - Menampilkan informasi umum
 
-### File terkait:
-- home_screen.dart
-
 ## 🍽️ 3. Menu (Daftar Produk)
 Fitur menu merupakan fitur inti dalam aplikasi yang digunakan untuk menampilkan daftar makanan atau minuman yang tersedia. Data menu diambil langsung dari database Supabase sehingga informasi yang ditampilkan bersifat dinamis dan dapat diperbarui secara real-time.
-
-Setiap item menu ditampilkan dalam bentuk list yang berisi informasi seperti nama produk, harga, dan kemungkinan deskripsi tambahan. Pengguna dapat memilih item yang diinginkan untuk kemudian ditambahkan ke dalam keranjang.
 
 ### Fungsi:
 - Menampilkan list menu dari database
 - Menampilkan detail item (nama, harga, dll)
 - Integrasi langsung dengan Supabase
 
-### File terakit:
-- menu_controller.dart
-- menu_screen.dart
-  
 ## 🛒 4. Cart (Keranjang)
 Fitur cart digunakan untuk menampung dan mengelola item yang dipilih oleh pengguna sebelum dilakukan proses pemesanan. Fitur ini memungkinkan pengguna untuk melihat daftar item yang telah dipilih beserta jumlah dan total harga.
-
-Pengguna dapat menambahkan item dari menu ke dalam keranjang, menghapus item yang tidak diinginkan, serta melihat total keseluruhan pesanan secara otomatis. Fitur ini sangat penting dalam mendukung alur pemesanan yang terstruktur.
 
 ### Fungsi:
 - Menambahkan item ke keranjang
 - Menghapus item
 - Menampilkan total pesanan
 
-### Controller:
-- cart_controller.dart
-
 ## 👤 5. Profile (Profil Pengguna)
 Fitur profil digunakan untuk menampilkan dan mengelola informasi pribadi pengguna yang telah terdaftar dalam sistem. Pengguna dapat melihat data seperti nama, email, atau informasi lain yang tersimpan, serta melakukan perubahan jika diperlukan.
-
-Perubahan data profil akan disimpan kembali ke database sehingga informasi tetap terbarui. Fitur ini memberikan kontrol kepada pengguna terhadap data pribadi mereka di dalam aplikasi.
 
 ### Fungsi:
 - Menampilkan informasi user
 - Edit profil
 - Menyimpan perubahan data
-
-### File terkait:
-- profile_controller.dart
-- profile_screen.dart
-- my_profile_screen.dart
   
 ## ⚙️ 6. Settings & Informasi
 Fitur settings dan informasi berfungsi untuk memberikan akses kepada pengguna terhadap pengaturan aplikasi serta informasi tambahan yang berkaitan dengan penggunaan aplikasi.
-
-Di dalam fitur ini, pengguna dapat menemukan berbagai halaman seperti tentang aplikasi, pusat bantuan, kebijakan privasi, serta syarat dan ketentuan penggunaan. Fitur ini bertujuan untuk meningkatkan transparansi dan memberikan panduan kepada pengguna dalam menggunakan aplikasi.
 
 ### Menu yang tersedia:
 - Settings
@@ -93,25 +60,13 @@ Di dalam fitur ini, pengguna dapat menemukan berbagai halaman seperti tentang ap
 - Help Center
 - Privacy Policy
 - Terms of Service
-
-### File terkait:
-- settings_screen.dart
-- about_screen.dart
-- help_center_screen.dart
-- privacy_policy_screen.dart
-- terms_of_services_screen.dart
   
 ## 🔄 7. Integrasi Backend (Supabase)
 Aplikasi ini menggunakan Supabase sebagai backend utama yang berperan dalam pengelolaan autentikasi dan database. Supabase dipilih karena kemudahan integrasi dengan Flutter serta kemampuannya dalam menyediakan layanan backend secara real-time.
 
-Melalui Supabase, aplikasi dapat melakukan proses login dan registrasi pengguna, serta mengambil dan menyimpan data seperti menu dan informasi pengguna. Seluruh komunikasi dengan backend dikelola melalui service yang telah dibuat agar kode lebih terstruktur dan mudah dipelihara.
-
 ### Fungsi Supabase:
 - Authentication (login & register)
 - Database (data menu & user)
-
-### Service:
-- supabase_services.dart
 
 # 👥 Role Pengguna dalam Aplikasi
 
