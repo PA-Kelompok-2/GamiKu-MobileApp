@@ -119,13 +119,25 @@ class _MenuCardState extends State<MenuCard> {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    "Rp ${widget.item['price']}",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: _isAvailable ? Colors.black : Colors.grey,
-                    ),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Rp ${widget.item['price']}",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: _isAvailable ? Colors.black : Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        "Rp ${widget.item['price']}",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: _isAvailable ? Colors.black : Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
