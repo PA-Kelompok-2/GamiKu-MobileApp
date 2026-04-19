@@ -55,8 +55,9 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
     final now = DateTime.now().toUtc().add(const Duration(hours: 7));
 
     final todayOrders = data.where((o) {
-      final createdAt = DateTime.parse(o['created_at'])
-        .add(const Duration(hours: 7));
+      final createdAt = DateTime.parse(
+        o['created_at'],
+      ).add(const Duration(hours: 7));
 
       return createdAt.year == now.year &&
           createdAt.month == now.month &&
@@ -111,6 +112,15 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bg,
+
+      floatingActionButton: role == "karyawan"
+          ? FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              onPressed: () => Get.toNamed(Routes.scanQR),
+              child: const Icon(Icons.qr_code_scanner, color: Colors.white),
+            )
+          : null,
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),

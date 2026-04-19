@@ -22,6 +22,8 @@ import '../features/owner/pages/keuangan_detail_screen.dart';
 import '../features/customer/pages/payment_screen.dart';
 import '../features/customer/pages/payment_gateway_screen.dart';
 import '../features/customer/pages/qr_screen.dart';
+import '../features/karyawan/pages/scan_qr_screen.dart';
+import '../features/customer/pages/qris_payment_screen.dart';
 
 class AppPages {
   static final pages = [
@@ -147,5 +149,7 @@ class AppPages {
       page: () => const QRScreen(),
       middlewares: [StartupMiddleware()],
     ),
+    GetPage(name: Routes.scanQR, page: () => const ScanQRScreen()),
+    GetPage(name: Routes.qris, page: () => const QrisPaymentScreen()),
   ];
 }

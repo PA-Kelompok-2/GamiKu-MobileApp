@@ -26,6 +26,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final args = Get.arguments as Map;
     resolvedOrder = Map<String, dynamic>.from(args['order']);
     resolvedRole = args['userRole'] as String? ?? '';
+    _refreshOrder();
   }
 
   Future<bool> _isCustomer() async {
@@ -55,15 +56,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       });
       showSuccessSnackbar(
         'Berhasil',
-        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai'
+        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai',
       );
     } catch (e) {
-      showSuccessSnackbar(
-        'Error',
-        'Gagal update status: $e'
-      );
+      showSuccessSnackbar('Error', 'Gagal update status: $e');
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _refreshOrder() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    final fresh = await _service.getOrderById(resolvedOrder['id']);
+
+    if (fresh != null) {
+      print("UPDATED ORDER: $fresh"); // debug
+      setState(() {
+        resolvedOrder = fresh;
+      });
     }
   }
 
@@ -299,6 +310,94 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         'Rp ${resolvedOrder['total_price']}',
                         isTotal: true,
                       ),
+                      // 🔥 QRIS VERIFICATION
+                      if (resolvedOrder['payment_method'] != 'cash') ...[
+                        const SizedBox(height: 20),
+
+                        const Divider(),
+
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          "Bukti Pembayaran",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        if (resolvedOrder['payment_proof'] != null &&
+                            resolvedOrder['payment_proof']
+                                .toString()
+                                .isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              Get.dialog(
+                                Dialog(
+                                  child: Image.network(
+                                    resolvedOrder['payment_proof'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                resolvedOrder['payment_proof'],
+                                height: 180,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        else
+                          const Text(
+                            "Belum ada bukti pembayaran",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+
+                        const SizedBox(height: 16),
+
+                        // 🔥 BUTTON KONFIRMASI
+                        if (isKaryawan)
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed:
+                                  resolvedOrder['payment_status'] == 'success'
+                                  ? null
+                                  : () async {
+                                      await _service.confirmPayment(
+                                        resolvedOrder['id'],
+                                      );
+
+                                      setState(() {
+                                        resolvedOrder['payment_status'] =
+                                            'success';
+                                        resolvedOrder['status'] = 'completed';
+                                      });
+
+                                      Get.snackbar(
+                                        "Berhasil",
+                                        "Pembayaran dikonfirmasi",
+                                      );
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                resolvedOrder['payment_status'] == 'success'
+                                    ? "Sudah Dibayar"
+                                    : "Konfirmasi Pembayaran",
+                              ),
+                            ),
+                          ),
+                      ],
                     ],
                   ),
                 ),
@@ -420,8 +519,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   onTap: () {
                     Get.find<MenuC>().selectedCategory.value = 'Semua';
                     final menuC = Get.find<MenuC>();
-                      menuC.selectedCategory.value = 'Semua';
-                      menuC.applyFilter('');
+                    menuC.selectedCategory.value = 'Semua';
+                    menuC.applyFilter('');
                     Get.until((route) => route.isFirst);
                   },
                   child: Container(

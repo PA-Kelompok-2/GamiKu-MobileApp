@@ -167,6 +167,7 @@ class SupabaseService {
     required int total,
     required List<Map<String, dynamic>> items,
     required String orderType,
+    required String paymentMethod,
   }) async {
     final user = supabase.auth.currentUser;
     final token = generateToken();
@@ -177,6 +178,8 @@ class SupabaseService {
           'user_id': user!.id,
           'total_price': total,
           'status': 'pending',
+          'payment_status': 'pending',
+          'payment_method': paymentMethod,
           'qr_token': token,
           'order_type': orderType,
         })
@@ -280,11 +283,11 @@ class SupabaseService {
     return data;
   }
 
-  Future<void> markAsPaid(String token) async {
+  Future<void> markAsPaid(String id) async {
     await supabase
         .from('orders')
-        .update({'status': 'paid'})
-        .eq('qr_token', token);
+        .update({'payment_status': 'success', 'status': 'paid'})
+        .eq('id', id);
   }
 
   Future<String> uploadMenuImage(File file) async {
@@ -295,13 +298,76 @@ class SupabaseService {
 
     await supabase.storage
         .from('menu-images')
-        .upload(
-          path,
-          file,
-          fileOptions: const FileOptions(upsert: true), 
-        );
+        .upload(path, file, fileOptions: const FileOptions(upsert: true));
 
     final publicUrl = supabase.storage.from('menu-images').getPublicUrl(path);
     return publicUrl;
+  }
+
+  Future<void> uploadPaymentProof(String orderId, String imageUrl) async {
+    await supabase
+        .from('orders')
+        .update({
+          'payment_proof': imageUrl,
+          'payment_method': 'midtrans',
+          'payment_status': 'pending',
+        })
+        .eq('id', orderId)
+        .select();
+  }
+
+  Future<void> confirmPayment(String orderId) async {
+    await supabase
+        .from('orders')
+        .update({'payment_status': 'failed', 'status': 'cancelled'})
+        .eq('id', orderId);
+  }
+
+  Future<Map<String, dynamic>?> getOrderById(String id) async {
+    final res = await supabase
+        .from('orders')
+        .select(
+          'id, total_price, status, payment_status, payment_method, payment_proof, order_items(*, menus(*))',
+        )
+        .eq('id', id)
+        .maybeSingle();
+
+    return res;
+  }
+
+  Future<void> markAsFailed(String id) async {
+    await supabase
+        .from('orders')
+        .update({'payment_status': 'failed', 'status': 'cancelled'})
+        .eq('id', id);
+  }
+
+  Future<void> cancelOrder(String id) async {
+    await supabase
+        .from('orders')
+        .update({'status': 'cancelled', 'payment_status': 'failed'})
+        .eq('id', id);
+  }
+
+  void listenOrder(String orderId, Function(Map) callback) {
+    supabase
+        .channel('orders-realtime')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'orders',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'id',
+            value: orderId,
+          ),
+          callback: (payload) {
+            final data = payload.newRecord;
+            print("REALTIME PAYLOAD: $data");
+
+            callback(data);
+          },
+        )
+        .subscribe();
   }
 }

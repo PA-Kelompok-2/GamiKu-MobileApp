@@ -11,8 +11,7 @@ class PaymentGatewayScreen extends StatefulWidget {
   const PaymentGatewayScreen({super.key, this.onOrderPlaced});
 
   @override
-  State<PaymentGatewayScreen> createState() =>
-      _PaymentGatewayScreenState();
+  State<PaymentGatewayScreen> createState() => _PaymentGatewayScreenState();
 }
 
 class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
@@ -34,20 +33,16 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     final tableNumber = _tableCtrl.text.trim();
 
     if (_orderType == 'dine_in' && tableNumber.isEmpty) {
-      showWarningSnackbar(
-        "Validasi",
-        "Nomor meja wajib diisi untuk Dine In"
-      );
+      showWarningSnackbar("Validasi", "Nomor meja wajib diisi untuk Dine In");
       return;
     }
 
     final cartC = Get.find<CartController>();
-    final service = SupabaseService();
 
     if (cartC.entries.isEmpty) {
       showWarningSnackbar(
         "Keranjang Kosong",
-        "Tambahkan menu terlebih dahulu sebelum melakukan pembayaran"
+        "Tambahkan menu terlebih dahulu sebelum melakukan pembayaran",
       );
       return;
     }
@@ -55,32 +50,27 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final order = await service.createOrder(
-        total: cartC.grandTotal,
-        items: cartC.entries.map((e) {
-          return {
-            'id': e.id,
-            'name': e.name,
-            'price': e.price,
-            'qty': e.qty,
-          };
-        }).toList(),
-        orderType: _orderType,
-      );
-
-      final token = order['qr_token'];
-
-      cartC.clear();
-      widget.onOrderPlaced?.call();
-
-      showSuccessSnackbar(
-        "Berhasil",
-        "Pesanan berhasil dibuat",
-      );
-
-      Get.toNamed(Routes.qr, arguments: {'token': token});
+      if (_paymentMethod == 'online') {
+        Get.toNamed(
+          Routes.qris,
+          arguments: {
+            'cart': cartC.entries,
+            'total': cartC.grandTotal,
+            'orderType': _orderType,
+          },
+        );
+      } else {
+        Get.toNamed(
+          Routes.qr,
+          arguments: {
+            'cart': cartC.entries,
+            'total': cartC.grandTotal,
+            'orderType': _orderType,
+          },
+        );
+      }
     } catch (e) {
-      showErrorSnackbar('Error', 'Gagal membuat pesanan');
+      showErrorSnackbar('Error', 'Gagal lanjut ke pembayaran');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -95,10 +85,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       appBar: AppBar(
         title: const Text(
           'Payment',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -108,9 +95,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           onPressed: Get.back,
         ),
       ),
-      body: cartC.entries.isEmpty
-          ? _buildEmptyState()
-          : _buildContent(cartC),
+      body: cartC.entries.isEmpty ? _buildEmptyState() : _buildContent(cartC),
     );
   }
 
@@ -212,16 +197,13 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textGrey,
+              color: isSelected ? AppColors.primary : AppColors.textGrey,
             ),
             const SizedBox(height: 6),
             Text(
               label,
               style: TextStyle(
-                fontWeight:
-                    isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
           ],

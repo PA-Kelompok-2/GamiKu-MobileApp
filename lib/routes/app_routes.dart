@@ -19,4 +19,6 @@ abstract class Routes {
   static const payment = '/payment';
   static const paymentGateway = '/payment-gateway';
   static const qr = '/qr';
+  static const scanQR = '/scan-qr';
+  static const qris = '/qris';
 }

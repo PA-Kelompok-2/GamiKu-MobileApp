@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../routes/app_routes.dart';
+import '../../core/services/supabase_services.dart';
 
 class OrderCard extends StatelessWidget {
   final Map<String, dynamic> order;
@@ -165,56 +166,117 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            Row(
+            const SizedBox(height: 16),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      const Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textGrey,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Rp ${order['total_price']}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (showButton &&
-                    userRole == 'karyawan' &&
-                    (order['status'] == 'pending' || order['status'] == 'paid'))
-                  GestureDetector(
-                    onTap: () => onUpdateStatus(order['id'], order['status']),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.primary),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                if (order['payment_method'] == 'midtrans') ...[
+                  const Divider(height: 20),
+
+                  // 🟡 STATUS
+                  if (order['payment_status'] == 'pending')
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 6),
                       child: Text(
-                        order['status'] == 'pending' ? 'Proses' : 'Selesaikan',
-                        style: const TextStyle(
-                          color: AppColors.primary,
+                        "Menunggu Verifikasi",
+                        style: TextStyle(
+                          color: Colors.orange,
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ),
+
+                  // 🔗 CONDITIONAL
+                  if (order['payment_proof'] != null &&
+                      order['payment_proof'].toString().isNotEmpty)
+                    GestureDetector(
+                      onTap: () async {
+                        await Get.toNamed(
+                          Routes.orderDetail,
+                          arguments: {'order': order, 'userRole': userRole},
+                        );
+                        onRefresh();
+                      },
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.receipt_long,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          const Text("Lihat Bukti & Verifikasi"),
+                          const Spacer(),
+                          const Icon(Icons.chevron_right, size: 18),
+                        ],
+                      ),
+                    )
+                  else
+                    const Text(
+                      "Belum upload bukti",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+
+                  const SizedBox(height: 12),
+                ],
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textGrey,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Rp ${order['total_price']}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    if (showButton &&
+                        userRole == 'karyawan' &&
+                        order['payment_method'] != 'midtrans' &&
+                        (order['status'] == 'pending' ||
+                            order['status'] == 'paid'))
+                      GestureDetector(
+                        onTap: () =>
+                            onUpdateStatus(order['id'], order['status']),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.primary),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            order['payment_method'] == 'midtrans'
+                                ? (order['payment_status'] == 'success'
+                                      ? 'Selesaikan'
+                                      : 'Menunggu Verifikasi')
+                                : (order['status'] == 'pending'
+                                      ? 'Proses'
+                                      : 'Selesaikan'),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ],
