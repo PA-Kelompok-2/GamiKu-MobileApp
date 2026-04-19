@@ -39,13 +39,10 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
 
-    /// 🔥 FIX 1: INIT TAB CONTROLLER
     _homeTabCtrl = TabController(length: 4, vsync: this);
 
-    /// 🔥 FIX 2: LOAD ROLE
     loadRole();
 
-    /// 🔥 FIX 3: SAFE EVER LISTENER
     _worker = ever(Get.find<MenuC>().selectedCategory, (_) {
       if (!mounted) return;
 
@@ -57,12 +54,11 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    _worker.dispose(); // 🔥 WAJIB
-    _homeTabCtrl.dispose(); // 🔥 WAJIB
+    _worker.dispose(); 
+    _homeTabCtrl.dispose(); 
     super.dispose();
   }
 
-  /// ================= LOAD ROLE =================
   void loadRole() async {
     final currentUser = Supabase.instance.client.auth.currentUser;
 
@@ -87,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  /// ================= NAVIGATION =================
   void _onNavTap(int i) {
     if (!mounted) return;
     setState(() => _navIdx = i);
@@ -121,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -167,7 +161,6 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
 
-        /// ================= BOTTOM =================
         bottomNavigationBar: Obx(() {
           final cartC = Get.find<CartController>();
           final cartCount = cartC.totalItems;

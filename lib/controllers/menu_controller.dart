@@ -5,7 +5,6 @@ import '../../../core/utils/app_snackbar.dart';
 class MenuC extends GetxController {
   final SupabaseService service = SupabaseService();
 
-  /// STATE
   var menus = <Map<String, dynamic>>[].obs;
   var categories = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
@@ -14,7 +13,6 @@ class MenuC extends GetxController {
 
   List<Map<String, dynamic>> allMenus = [];
 
-  /// ================= RESET (FIX LOGOUT) =================
   void resetMenu() {
     selectedCategory.value = "Semua";
 
@@ -24,7 +22,6 @@ class MenuC extends GetxController {
     isLoading.value = false;
   }
 
-  /// ================= INIT =================
   @override
   void onInit() {
     super.onInit();
@@ -32,15 +29,13 @@ class MenuC extends GetxController {
     fetchCategories();
   }
 
-  /// ================= FETCH MENUS =================
   Future<void> fetchMenus() async {
     try {
       isLoading.value = true;
 
       final data = await service.getMenus();
 
-      /// 🔥 HANDLE NULL / EMPTY
-      if (data == null || data.isEmpty) {
+      if (data.isEmpty) {
         menus.clear();
         allMenus.clear();
         return;
@@ -58,7 +53,7 @@ class MenuC extends GetxController {
       }).toList();
 
       allMenus = mappedMenus;
-      menus.value = List.from(allMenus); // 🔥 copy biar aman
+      menus.value = List.from(allMenus); 
 
     } catch (e) {
       menus.clear();
@@ -69,11 +64,10 @@ class MenuC extends GetxController {
         'Failed to fetch menus: $e',
       );
     } finally {
-      isLoading.value = false; // 🔥 WAJIB biar gak stuck
+      isLoading.value = false; 
     }
   }
 
-  /// ================= FILTER =================
   void applyFilter(String query) {
     final q = query.toLowerCase();
 
@@ -82,24 +76,20 @@ class MenuC extends GetxController {
       final cat = menu['cat'].toString().toLowerCase();
       final selectedCat = selectedCategory.value.toLowerCase();
 
-      /// 🔍 PRIORITAS SEARCH
       if (q.isNotEmpty) {
         return name.contains(q);
       }
 
-      /// 📂 SEMUA
       if (selectedCat == "semua" || selectedCat.isEmpty) {
         return true;
       }
 
-      /// 📂 FILTER CATEGORY
       return cat == selectedCat;
     }).toList();
 
     menus.value = filtered;
   }
 
-  /// ================= FILTER CATEGORY =================
   void filterByCategory(String category) {
     selectedCategory.value = category;
 
@@ -114,7 +104,6 @@ class MenuC extends GetxController {
     menus.value = filtered;
   }
 
-  /// ================= FETCH CATEGORY =================
   Future<void> fetchCategories() async {
     try {
       final data = await service.getCategories();
@@ -127,7 +116,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ================= ADD MENU =================
   Future<void> addMenu({
     required String name,
     required int price,
@@ -153,7 +141,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ================= UPDATE MENU =================
   Future<void> updateMenu({
     required dynamic id,
     required String name,
@@ -181,7 +168,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ================= DELETE MENU =================
   Future<void> deleteMenu(dynamic id) async {
     try {
       await service.deleteMenu(id);
@@ -199,7 +185,6 @@ class MenuC extends GetxController {
     }
   }
 
-  /// ================= UPDATE AVAILABILITY =================
   Future<void> updateAvailability(String id, bool isAvailable) async {
     try {
       await service.updateMenuAvailability(id, isAvailable);

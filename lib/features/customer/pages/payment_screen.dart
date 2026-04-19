@@ -83,7 +83,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  /// ================= EMPTY =================
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -118,7 +117,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  /// ================= CONTENT =================
   Widget _buildContent(List<OrderItem> entries, CartController cartC) {
     final subtotal = cartC.subtotal;
     final serviceFee = CartController.serviceFee;
@@ -196,7 +194,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  /// ================= ITEM CARD (FIXED FITUR) =================
   Widget _buildItemRow(OrderItem e) {
     final cartC = Get.find<CartController>();
 
@@ -225,7 +222,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (context, error, stackTrace) => Container(
                     width: 50,
                     height: 50,
                     color: AppColors.imgBg,

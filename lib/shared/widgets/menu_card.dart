@@ -37,6 +37,10 @@ class _MenuCardState extends State<MenuCard> {
     final isOwnerOrEmployee =
         widget.role == 'owner' || widget.role == 'karyawan';
 
+    final int originalPrice = _toInt(widget.item['price']);
+    final int appPrice = originalPrice >= 1000 ? originalPrice - 1000 : originalPrice;
+    final bool showAppPromo = !isOwnerOrEmployee && originalPrice > appPrice;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -67,6 +71,31 @@ class _MenuCardState extends State<MenuCard> {
                     fit: BoxFit.cover,
                   ),
                 ),
+
+                if (showAppPromo && _isAvailable)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Promo App',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
                 if (!_isAvailable)
                   Positioned.fill(
                     child: Container(
@@ -117,28 +146,42 @@ class _MenuCardState extends State<MenuCard> {
             const Spacer(),
 
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: Row(
-                    children: [
-                      Text(
-                        "Rp ${widget.item['price']}",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: _isAvailable ? Colors.black : Colors.grey,
+                  child: showAppPromo
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Rp $originalPrice",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey.shade500,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "Rp $appPrice",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: _isAvailable
+                                    ? AppColors.primary
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          "Rp $originalPrice",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: _isAvailable ? Colors.black : Colors.grey,
+                          ),
                         ),
-                      ),
-                      Text(
-                        "Rp ${widget.item['price']}",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: _isAvailable ? Colors.black : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
 
                 if (isOwnerOrEmployee)
@@ -155,6 +198,12 @@ class _MenuCardState extends State<MenuCard> {
     );
   }
 
+  int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
   Widget _buildAddButton(CartController cartC) {
     return Obx(() {
       final id = widget.item['id'].toString();
@@ -163,7 +212,10 @@ class _MenuCardState extends State<MenuCard> {
       if (qty == 0) {
         return GestureDetector(
           onTap: () {
-            cartC.add(widget.item);
+            cartC.add({
+              ...widget.item,
+              'price': _getFinalPrice(),
+            });
             widget.onChanged?.call();
           },
           child: Container(
@@ -180,7 +232,10 @@ class _MenuCardState extends State<MenuCard> {
       return _Counter(
         qty: qty,
         onAdd: () {
-          cartC.add(widget.item);
+          cartC.add({
+            ...widget.item,
+            'price': _getFinalPrice(),
+          });
           widget.onChanged?.call();
         },
         onRemove: () {
@@ -189,6 +244,15 @@ class _MenuCardState extends State<MenuCard> {
         },
       );
     });
+  }
+
+  int _getFinalPrice() {
+    final isOwnerOrEmployee =
+        widget.role == 'owner' || widget.role == 'karyawan';
+    final int originalPrice = _toInt(widget.item['price']);
+
+    if (isOwnerOrEmployee) return originalPrice;
+    return originalPrice >= 1000 ? originalPrice - 1000 : originalPrice;
   }
 
   Widget _buildOffLabel() {

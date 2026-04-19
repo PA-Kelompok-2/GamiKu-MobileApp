@@ -71,10 +71,6 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
   }
 
   Future<void> loadStatistik() async {
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = startOfDay.add(const Duration(days: 1));
-
     final menu = await Supabase.instance.client.from('menus').select();
     totalMenu = menu.length;
 
@@ -83,30 +79,17 @@ class _HomeTabInternalScreenState extends State<HomeTabInternalScreen> {
         .select('total_price, status, created_at')
         .eq('status', 'completed');
 
-    final todayOrders = completedOrders.where((o) {
-      final createdAt = DateTime.parse(o['created_at'])
-        .add(const Duration(hours: 7));
-      return createdAt.isAfter(startOfDay) &&
-          createdAt.isBefore(endOfDay);
-    }).toList();
-
-    pemasukan = todayOrders.fold<int>(
+    pemasukan = completedOrders.fold<int>(
       0,
       (sum, item) => sum + ((item['total_price'] ?? 0) as num).toInt(),
     );
 
     final pengeluaranData = await Supabase.instance.client
         .from('keuangan')
-        .select('nominal, jenis, created_at')
+        .select('nominal, jenis, tanggal')
         .eq('jenis', 'pengeluaran');
 
-    final todayPengeluaran = pengeluaranData.where((o) {
-      final createdAt = DateTime.parse(o['created_at']).toLocal();
-      return createdAt.isAfter(startOfDay) &&
-          createdAt.isBefore(endOfDay);
-    }).toList();
-
-    pengeluaran = todayPengeluaran.fold<int>(
+    pengeluaran = pengeluaranData.fold<int>(
       0,
       (sum, item) => sum + ((item['nominal'] ?? 0) as num).toInt(),
     );

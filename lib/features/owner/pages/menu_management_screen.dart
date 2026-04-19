@@ -28,7 +28,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     _searchController.addListener(() {
       final menuC = Get.find<MenuC>();
 
-      menuC.selectedCategory.value = "Semua"; // reset category
+      menuC.selectedCategory.value = "Semua"; 
       menuC.applyFilter(_searchController.text);
     });
 
@@ -681,8 +681,6 @@ class _MenuFormSheetState extends State<_MenuFormSheet> {
         }
       });
     } catch (e) {
-      print('ERROR SAVE: $e');
-
       showErrorSnackbar(
         'Error',
         e.toString(),

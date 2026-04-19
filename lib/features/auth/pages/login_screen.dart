@@ -63,7 +63,6 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Column(
             children: [
-              /// HEADER
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60, bottom: 40),
@@ -107,7 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              /// FORM
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -135,7 +133,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         const SizedBox(height: 25),
 
-                        /// EMAIL
                         TextField(
                           controller: emailController,
                           decoration: InputDecoration(
@@ -155,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         const SizedBox(height: 15),
 
-                        /// PASSWORD
                         TextField(
                           controller: passwordController,
                           obscureText: isObscure,
@@ -188,7 +184,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         const SizedBox(height: 20),
 
-                        /// BUTTON LOGIN
                         Obx(
                           () => SizedBox(
                             width: double.infinity,
@@ -221,7 +216,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         const SizedBox(height: 20),
 
-                        /// REGISTER
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -239,7 +233,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -248,8 +241,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
-
-          /// BACK BUTTON
           Positioned(
             top: 15,
             left: 10,

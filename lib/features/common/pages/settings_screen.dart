@@ -78,17 +78,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
               },
             ),
-
-          _buildMenuItem(
-            icon: Icons.info_outline,
-            title: 'Tentang',
-            trailing: const Icon(
-              Icons.chevron_right,
-              color: AppColors.textLight,
+            _buildMenuItem(
+              icon: Icons.info_outline,
+              title: 'Versi Aplikasi',
+              subtitle: 'GamiKu',
+              trailing: const Text(
+                'v3.3.12',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-            onTap: () => Get.toNamed(Routes.about),
-          ),
-
           if (isLoggedIn)
             _buildMenuItem(
               icon: Icons.close,
@@ -105,6 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
+    String? subtitle,
     Widget? trailing,
     Color? iconColor,
     Color? textColor,
@@ -126,6 +129,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: textColor ?? AppColors.textDark,
           ),
         ),
+        subtitle: subtitle == null
+            ? null
+            : Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textLight,
+                ),
+              ),
         trailing: trailing,
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),

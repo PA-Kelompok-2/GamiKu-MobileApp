@@ -154,8 +154,8 @@ class _BannerCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                data.gradientStart.withOpacity(0.85),
-                data.gradientEnd.withOpacity(0.5),
+                data.gradientStart.withValues(alpha: 0.85),
+                data.gradientEnd.withValues(alpha: 0.5),
                 AppColors.bannerCircle,
               ],
               begin: Alignment.centerLeft,

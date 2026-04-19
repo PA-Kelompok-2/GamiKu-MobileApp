@@ -281,7 +281,6 @@ class _HomeTabState extends State<HomeTab> {
               child: Obx(() {
               final menuC = Get.find<MenuC>();
 
-              // 🔥 trigger reactive (WAJIB)
               final _ = menuC.menus.length;
 
               final popularMenus = List<Map<String, dynamic>>.from(menuC.allMenus)
@@ -347,7 +346,7 @@ class _HomeTabState extends State<HomeTab> {
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                    ? Colors.red.withOpacity(0.3)
+                    ? Colors.red.withValues(alpha: 0.3)
                     : AppColors.shadow,
                 blurRadius: isSelected ? 12 : 8,
                 offset: const Offset(0, 4),
@@ -366,7 +365,7 @@ class _HomeTabState extends State<HomeTab> {
                   width: 50,
                   fit: BoxFit.cover,
 
-                  errorBuilder: (_, __, ___) => Icon(
+                  errorBuilder: (context, error, stackTrace) => Icon(
                     Icons.fastfood,
                     size: 30,
                     color: isSelected
@@ -409,7 +408,7 @@ class _HomeTabState extends State<HomeTab> {
               child: Image.network(
                 item['image_url'] ?? '',
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (context, error, stackTrace) => Container(
                   color: AppColors.imgBg,
                   child: const Icon(Icons.fastfood, size: 40),
                 ),
@@ -421,8 +420,8 @@ class _HomeTabState extends State<HomeTab> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.1),
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.1),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -454,7 +453,7 @@ class _HomeTabState extends State<HomeTab> {
                   Text(
                     item['cat'] ?? '',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -485,7 +484,7 @@ class _HomeTabState extends State<HomeTab> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha : 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

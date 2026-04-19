@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/routes/app_routes.dart';
 import '../../../core/services/supabase_services.dart';

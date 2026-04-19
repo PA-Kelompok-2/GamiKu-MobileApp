@@ -24,7 +24,7 @@ class _MenuSearchBarState extends State<MenuSearchBar> {
   }
 
   void _onTextChanged() {
-    setState(() {}); // rebuild untuk update suffix icon
+    setState(() {});
   }
 
   @override

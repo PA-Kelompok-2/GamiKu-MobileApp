@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../../../shared/widgets/order_card.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -15,7 +17,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   List<Map<String, dynamic>> orders = [];
   bool isLoading = true;
-  bool isUpdating = false; 
+  bool isUpdating = false;
   String? userRole;
   String selectedFilter = 'Semua';
 
@@ -28,12 +30,8 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Future<void> init() async {
-    try {
-      await loadRole();
-      await loadOrders();
-    } catch (e) {
-      print("INIT ERROR: $e");
-    }
+    await loadRole();
+    await loadOrders();
   }
 
   Future<void> loadOrders() async {
@@ -47,52 +45,165 @@ class _OrderScreenState extends State<OrderScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print("ERROR LOAD ORDERS: $e");
-
       if (!mounted) return;
 
       setState(() {
         isLoading = false;
       });
+
+      showErrorSnackbar('Error', 'Gagal memuat pesanan');
     }
   }
 
   Future<void> loadRole() async {
-    try {
-      final role = await service.getUserRole();
+    final role = await service.getUserRole();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      setState(() {
-        userRole = role;
-      });
-    } catch (e) {
-      print("ERROR LOAD ROLE: $e");
-    }
+    setState(() {
+      userRole = role;
+    });
   }
 
   Future<void> updateStatus(String id, String currentStatus) async {
-    if (isUpdating) return; 
+    if (isUpdating) return;
+
+    String next;
+    String title;
+    String message;
+    String successMessage;
+    IconData dialogIcon;
+
+    if (currentStatus == 'pending') {
+      next = 'paid';
+      title = "Proses Pesanan";
+      message = "Yakin ingin memproses pesanan ini?";
+      successMessage = "Pesanan berhasil diproses";
+      dialogIcon = Icons.play_arrow_rounded;
+    } else if (currentStatus == 'paid') {
+      next = 'completed';
+      title = "Selesaikan Pesanan";
+      message = "Yakin ingin menyelesaikan pesanan ini?";
+      successMessage = "Pesanan telah diselesaikan";
+      dialogIcon = Icons.check_rounded;
+    } else {
+      return;
+    }
+
+    final confirm = await Get.dialog<bool>(
+      Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 340,
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    dialogIcon,
+                    color: AppColors.primary,
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textGrey,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(result: false),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: const Text(
+                          "Batal",
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Get.back(result: true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          currentStatus == 'pending' ? "Proses" : "Selesaikan",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+    if (confirm != true) return;
 
     isUpdating = true;
 
     try {
-      String next;
-      if (currentStatus == 'pending') {
-        next = 'paid';
-      } else if (currentStatus == 'paid') {
-        next = 'completed';
-      } else {
-        return;
-      }
-
       await service.updateOrderStatus(id, next);
 
       if (!mounted) return;
 
-      await loadOrders(); 
+      await loadOrders();
+
+      showSuccessSnackbar("Berhasil", successMessage);
     } catch (e) {
-      print("ERROR UPDATE STATUS: $e");
+      showErrorSnackbar('Error', 'Gagal update status pesanan');
     } finally {
       isUpdating = false;
     }
@@ -148,7 +259,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
-
             Container(
               height: 40,
               margin: const EdgeInsets.only(bottom: 8),
@@ -174,9 +284,10 @@ class _OrderScreenState extends State<OrderScreen> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.white,
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : AppColors.white,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -191,9 +302,10 @@ class _OrderScreenState extends State<OrderScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.textGrey,
+                              color:
+                                  isSelected
+                                      ? Colors.white
+                                      : AppColors.textGrey,
                             ),
                           ),
                         ),
@@ -236,26 +348,26 @@ class _OrderScreenState extends State<OrderScreen> {
                 },
               ),
             ),
-
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : filteredOrders.isEmpty
-                  ? const OrderEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: filteredOrders.length,
-                      itemBuilder: (context, index) {
-                        final order = filteredOrders[index];
-                        return OrderCard(
-                          order: order,
-                          showButton: true,
-                          userRole: userRole,
-                          onUpdateStatus: updateStatus,
-                          onRefresh: loadOrders,
-                        );
-                      },
-                    ),
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredOrders.isEmpty
+                      ? const OrderEmptyState()
+                      : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredOrders.length,
+                        itemBuilder: (context, index) {
+                          final order = filteredOrders[index];
+                          return OrderCard(
+                            order: order,
+                            showButton: true,
+                            userRole: userRole,
+                            onUpdateStatus: updateStatus,
+                            onRefresh: loadOrders,
+                          );
+                        },
+                      ),
             ),
           ],
         ),

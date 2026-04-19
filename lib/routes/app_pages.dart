@@ -8,7 +8,6 @@ import '../features/auth/pages/splash_screen.dart';
 import '../features/common/pages/home_screen.dart';
 import '../features/common/pages/settings_screen.dart';
 import '../features/common/pages/my_profile_screen.dart';
-import '../features/common/pages/about_screen.dart';
 import '../features/common/pages/profile_screen.dart';
 import '../features/common/pages/help_center_screen.dart';
 import '../features/common/pages/terms_of_services_screen.dart';
@@ -57,8 +56,6 @@ class AppPages {
       page: () => const MyProfileScreen(),
       middlewares: [StartupMiddleware()],
     ),
-
-    GetPage(name: Routes.about, page: () => const AboutScreen()),
 
     GetPage(
       name: Routes.profile,

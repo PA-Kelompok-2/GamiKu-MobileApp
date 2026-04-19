@@ -22,12 +22,12 @@ void _showCustomSnackbar({
     messageText: Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.white, // 🔥 pakai warna kamu
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow, // 🔥 dari AppColors
+            color: AppColors.shadow, 
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -35,7 +35,6 @@ void _showCustomSnackbar({
       ),
       child: Row(
         children: [
-          /// ICON
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -47,7 +46,6 @@ void _showCustomSnackbar({
 
           const SizedBox(width: 12),
 
-          /// TEXT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +75,6 @@ void _showCustomSnackbar({
   );
 }
 
-/// ✅ SUCCESS
 void showSuccessSnackbar(String title, String message) {
   _showCustomSnackbar(
     title: title,
@@ -89,7 +86,6 @@ void showSuccessSnackbar(String title, String message) {
   );
 }
 
-/// ❌ ERROR
 void showErrorSnackbar(String title, String message) {
   _showCustomSnackbar(
     title: title,
@@ -101,7 +97,6 @@ void showErrorSnackbar(String title, String message) {
   );
 }
 
-/// ⚠️ WARNING
 void showWarningSnackbar(String title, String message) {
   _showCustomSnackbar(
     title: title,

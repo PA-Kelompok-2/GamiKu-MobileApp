@@ -4,7 +4,6 @@ import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
 import '../../../controllers/menu_controller.dart';
-import '../../../controllers/cart_controller.dart';
 import 'package:application_gamiku/features/auth/controllers/auth_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
