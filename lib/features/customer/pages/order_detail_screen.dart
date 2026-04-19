@@ -36,45 +36,39 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> _updateStatus() async {
-    final currentStatus = resolvedOrder['status'] as String;
-    String nextStatus;
-
-    if (currentStatus == 'pending') {
-      nextStatus = 'paid';
-    } else if (currentStatus == 'paid') {
-      nextStatus = 'completed';
-    } else {
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
-      await _service.updateOrderStatus(resolvedOrder['id'], nextStatus);
+      await _service.updateOrderStatus(resolvedOrder['id'], 'completed');
+
       setState(() {
-        resolvedOrder = {...resolvedOrder, 'status': nextStatus};
+        resolvedOrder['status'] = 'completed';
       });
-      showSuccessSnackbar(
-        'Berhasil',
-        nextStatus == 'paid' ? 'Pesanan diproses' : 'Pesanan selesai',
-      );
+
+      showSuccessSnackbar('Berhasil', 'Pesanan selesai');
     } catch (e) {
-      showSuccessSnackbar('Error', 'Gagal update status: $e');
+      showErrorSnackbar('Error', 'Gagal update status');
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _refreshOrder() async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      final fresh = await _service.getOrderById(resolvedOrder['id']);
 
-    final fresh = await _service.getOrderById(resolvedOrder['id']);
-
-    if (fresh != null) {
-      print("UPDATED ORDER: $fresh"); // debug
-      setState(() {
-        resolvedOrder = fresh;
-      });
+      if (fresh != null) {
+        setState(() {
+          resolvedOrder = {
+            ...resolvedOrder,
+            ...fresh.map(
+              (key, value) => MapEntry(key, value ?? resolvedOrder[key]),
+            ),
+          };
+        });
+      }
+    } catch (_) {
+      // optional: silent fail
     }
   }
 
@@ -83,8 +77,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final items = resolvedOrder['order_items'] as List;
     final status = resolvedOrder['status'] as String;
     final isKaryawan = resolvedRole == 'karyawan';
-    final canUpdateStatus =
-        isKaryawan && (status == 'pending' || status == 'paid');
+    final canUpdateStatus = isKaryawan && status == 'paid';
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -360,8 +353,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         const SizedBox(height: 16),
 
-                        // 🔥 BUTTON KONFIRMASI
-                        if (isKaryawan)
+                        // 🔥 BUTTON KONFIRMASI (CUMA SAAT PENDING)
+                        if (isKaryawan && resolvedOrder['status'] == 'pending')
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -376,12 +369,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                       setState(() {
                                         resolvedOrder['payment_status'] =
                                             'success';
-                                        resolvedOrder['status'] = 'completed';
+                                        resolvedOrder['status'] =
+                                            'paid'; // 🔥 FIX
                                       });
 
-                                      Get.snackbar(
+                                      showSuccessSnackbar(
                                         "Berhasil",
-                                        "Pembayaran dikonfirmasi",
+                                        "Pembayaran dikonfirmasi, pesanan diproses",
                                       );
                                     },
                               style: ElevatedButton.styleFrom(
@@ -457,14 +451,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       strokeWidth: 2,
                     ),
                   )
-                : Text(
-                    status == 'pending'
-                        ? 'Proses Pesanan'
-                        : 'Selesaikan Pesanan',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
+                : const Text(
+                    'Selesaikan Pesanan',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   ),
           ),
         ),

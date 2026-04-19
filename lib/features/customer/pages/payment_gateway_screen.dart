@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../controllers/cart_controller.dart';
-import '../../../core/services/supabase_services.dart';
+import 'package:flutter/services.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/utils/app_snackbar.dart';
 
@@ -218,10 +218,18 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
       child: TextField(
         controller: _tableCtrl,
         keyboardType: TextInputType.number,
-        decoration: const InputDecoration(
-          hintText: 'Masukkan nomor meja',
-          prefixIcon: Icon(Icons.table_restaurant),
-          border: OutlineInputBorder(),
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly, // 🔥 ONLY ANGKA
+          LengthLimitingTextInputFormatter(3), // optional: max 3 digit
+        ],
+        decoration: InputDecoration(
+          hintText: 'Contoh: 12',
+          prefixIcon: const Icon(Icons.table_restaurant),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+          ),
         ),
       ),
     );
