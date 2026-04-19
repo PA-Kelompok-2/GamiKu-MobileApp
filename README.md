@@ -1,5 +1,5 @@
 # 📝 Deskripsi Aplikasi
-<img width="746" height="679" alt="image" src="https://github.com/user-attachments/assets/3eb2fa97-4bdc-4640-b5f0-dc141278eb6d" />
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/3eb2fa97-4bdc-4640-b5f0-dc141278eb6d" />
 
 Aplikasi ini merupakan aplikasi mobile berbasis Flutter yang dirancang untuk mempermudah proses pemesanan menu makanan dan minuman secara digital. Sistem ini terintegrasi dengan backend Supabase yang berfungsi untuk menangani autentikasi pengguna serta penyimpanan dan pengelolaan data secara real-time. Dengan adanya integrasi ini, pengguna dapat mengakses data secara cepat dan aman melalui perangkat mobile.
 
