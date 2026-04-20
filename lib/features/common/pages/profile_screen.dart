@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controllers/profile_controller.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../routes/app_routes.dart';
@@ -14,13 +15,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final profileC = Get.find<ProfileController>();
   final service = SupabaseService();
 
-  String name = '';
-  String role = '';
-  bool isLoading = true;
-
-  bool isLoggedIn = false;
+  bool get isLoggedIn => service.supabase.auth.currentUser != null;
 
   void confirmLogout() {
     Get.dialog(
@@ -129,35 +127,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    loadProfile();
-  }
 
-  void loadProfile() async {
-    final user = service.supabase.auth.currentUser;
-
-    if (user == null) {
-      setState(() {
-        name = "Customer";
-        role = "guest";
-        isLoggedIn = false;
-        isLoading = false;
-      });
-      return;
-    }
-
-    final data = await service.getProfile();
-
-    setState(() {
-      name = data?['name'] ?? 'User';
-      role = data?['role'] ?? 'customer';
-      isLoggedIn = true;
-      isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await profileC.loadProfile();
     });
   }
 
-  String getRandomAvatarUrl() {
-    final randomSeed = DateTime.now().millisecondsSinceEpoch % 1000;
-    return 'https://api.dicebear.com/7.x/avataaars/png?seed=$randomSeed&backgroundColor=f5f5f5';
+  String getAvatarUrl(String seed) {
+    final safeSeed = seed.trim().isEmpty ? 'guest' : seed.trim().toLowerCase();
+    return 'https://api.dicebear.com/7.x/avataaars/png?seed=$safeSeed&backgroundColor=f5f5f5';
   }
 
   Widget _buildMenuItem(
@@ -223,234 +201,243 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
-          : CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-                    child: Column(
-                      children: [
-                        Stack(
+        body: Obx(() {
+          final name = profileC.name.value;
+          final email = profileC.email.value;
+          final role = profileC.role.value;
+          final isLoading = profileC.isLoading.value;
+
+          return isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                )
+              : CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                        child: Column(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4,
-                                ),
-                              ),
-                              child: ClipOval(
-                                child: Image.network(
-                                  getRandomAvatarUrl(),
-                                  width: 90,
-                                  height: 90,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            if (isLoggedIn)
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: () => Get.toNamed(Routes.myProfile),
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.primary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.edit,
-                                      size: 16,
+                            Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
                                       color: Colors.white,
+                                      width: 4,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      getAvatarUrl(isLoggedIn ? email : 'guest'),
+                                      width: 90,
+                                      height: 90,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
+                                if (isLoggedIn)
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final result = await Get.toNamed(Routes.myProfile);
+                                        if (result == true) {
+                                          await profileC.loadProfile();
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.edit,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              isLoggedIn ? name : "Belum Masuk",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              isLoggedIn
+                                  ? email
+                                  : "Login untuk melihat profil & pesanan",
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
                           ],
                         ),
-
-                        const SizedBox(height: 12),
-
-                        Text(
-                          isLoggedIn ? name : "Belum Masuk",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          isLoggedIn
-                              ? "$name@gmail.com"
-                              : "Login untuk melihat profil & pesanan",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
-                        ),
-
-                        const SizedBox(height: 30),
-                      ],
-                    ),
-                  ),
-                ),
-
-                if (role == 'owner' || role == 'karyawan')
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _sectionTitle('MANAJEMEN'),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: AppColors.border),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: AppColors.shadow,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                _buildMenuItem(
-                                  Icons.countertops_outlined,
-                                  'Bahan Baku',
-                                  subtitle: 'Kelola stok & inventori',
-                                  iconBg: AppColors.statusMenungguBg,
-                                  iconColor: AppColors.statusMenungguFg,
-                                  onTap: () => Get.toNamed(Routes.bahanBaku),
-                                ),
-                                _divider(),
-                                _buildMenuItem(
-                                  Icons.restaurant_menu,
-                                  'Kelola Menu',
-                                  subtitle: 'Kelola Menu Usaha',
-                                  iconBg: AppColors.statusMenungguBg,
-                                  iconColor: AppColors.statusMenungguFg,
-                                  onTap: () =>
-                                      Get.toNamed(Routes.menuManagement),
-                                ),
-                                if (role == 'owner') ...[
-                                  _divider(),
-                                  _buildMenuItem(
-                                    Icons.account_balance_wallet_outlined,
-                                    'Keuangan',
-                                    subtitle: 'Laporan & transaksi',
-                                    iconBg: AppColors.tagGreenBg,
-                                    iconColor: AppColors.tagGreen,
-                                    onTap: () => Get.toNamed(Routes.keuangan),
-                                  ),
-                                  _divider(),
-                                  _buildMenuItem(
-                                    Icons.people_outline,
-                                    'Karyawan',
-                                    subtitle: 'Data & jadwal tim',
-                                    iconBg: AppColors.statusDiprosesBg,
-                                    iconColor: AppColors.statusDiprosesFg,
-                                    onTap: () =>
-                                        Get.toNamed(Routes.karyawanManagement),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
                     ),
-                  ),
 
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _sectionTitle('UMUM'),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: AppColors.shadow,
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
+                    if (role == 'owner' || role == 'karyawan')
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildMenuItem(
-                                Icons.help_outline,
-                                'Help Center',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.helpCenter),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.description_outlined,
-                                'Terms of Services',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.terms),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.privacy_tip_outlined,
-                                'Privacy Policy',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.privacyPolicy),
-                              ),
-                              _divider(),
-                              _buildMenuItem(
-                                Icons.settings_outlined,
-                                'Settings',
-                                iconBg: AppColors.statusDiprosesBg,
-                                iconColor: AppColors.statusDiprosesFg,
-                                onTap: () => Get.toNamed(Routes.settings),
-                              ),
-                              _buildMenuItem(
-                                isLoggedIn ? Icons.logout : Icons.login,
-                                isLoggedIn ? 'Logout' : 'Login',
-                                iconBg: const Color(0xFFFFEBEE),
-                                iconColor: Colors.red,
-                                onTap: () {
-                                  if (isLoggedIn) {
-                                    confirmLogout();
-                                  } else {
-                                    Get.toNamed('/login');
-                                  }
-                                },
+                              _sectionTitle('MANAJEMEN'),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: AppColors.border),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.shadow,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    _buildMenuItem(
+                                      Icons.countertops_outlined,
+                                      'Bahan Baku',
+                                      subtitle: 'Kelola stok & inventori',
+                                      iconBg: AppColors.statusMenungguBg,
+                                      iconColor: AppColors.statusMenungguFg,
+                                      onTap: () => Get.toNamed(Routes.bahanBaku),
+                                    ),
+                                    _divider(),
+                                    _buildMenuItem(
+                                      Icons.restaurant_menu,
+                                      'Kelola Menu',
+                                      subtitle: 'Kelola Menu Usaha',
+                                      iconBg: AppColors.statusMenungguBg,
+                                      iconColor: AppColors.statusMenungguFg,
+                                      onTap: () => Get.toNamed(Routes.menuManagement),
+                                    ),
+                                    if (role == 'owner') ...[
+                                      _divider(),
+                                      _buildMenuItem(
+                                        Icons.account_balance_wallet_outlined,
+                                        'Keuangan',
+                                        subtitle: 'Laporan & transaksi',
+                                        iconBg: AppColors.tagGreenBg,
+                                        iconColor: AppColors.tagGreen,
+                                        onTap: () => Get.toNamed(Routes.keuangan),
+                                      ),
+                                      _divider(),
+                                      _buildMenuItem(
+                                        Icons.people_outline,
+                                        'Karyawan',
+                                        subtitle: 'Data & jadwal tim',
+                                        iconBg: AppColors.statusDiprosesBg,
+                                        iconColor: AppColors.statusDiprosesFg,
+                                        onTap: () => Get.toNamed(Routes.karyawanManagement),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 40)),
-              ],
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _sectionTitle('UMUM'),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: AppColors.border),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppColors.shadow,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  _buildMenuItem(
+                                    Icons.help_outline,
+                                    'Help Center',
+                                    iconBg: AppColors.statusDiprosesBg,
+                                    iconColor: AppColors.statusDiprosesFg,
+                                    onTap: () => Get.toNamed(Routes.helpCenter),
+                                  ),
+                                  _divider(),
+                                  _buildMenuItem(
+                                    Icons.description_outlined,
+                                    'Terms of Services',
+                                    iconBg: AppColors.statusDiprosesBg,
+                                    iconColor: AppColors.statusDiprosesFg,
+                                    onTap: () => Get.toNamed(Routes.terms),
+                                  ),
+                                  _divider(),
+                                  _buildMenuItem(
+                                    Icons.privacy_tip_outlined,
+                                    'Privacy Policy',
+                                    iconBg: AppColors.statusDiprosesBg,
+                                    iconColor: AppColors.statusDiprosesFg,
+                                    onTap: () => Get.toNamed(Routes.privacyPolicy),
+                                  ),
+                                  _divider(),
+                                  _buildMenuItem(
+                                    Icons.settings_outlined,
+                                    'Settings',
+                                    iconBg: AppColors.statusDiprosesBg,
+                                    iconColor: AppColors.statusDiprosesFg,
+                                    onTap: () => Get.toNamed(Routes.settings),
+                                  ),
+                                  _divider(),
+                                  _buildMenuItem(
+                                    isLoggedIn ? Icons.logout : Icons.login,
+                                    isLoggedIn ? 'Logout' : 'Login',
+                                    iconBg: const Color(0xFFFFEBEE),
+                                    iconColor: Colors.red,
+                                    onTap: () {
+                                      if (isLoggedIn) {
+                                        confirmLogout();
+                                      } else {
+                                        Get.toNamed(Routes.login);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                  ],
+                );
+              }
             ),
-    );
+          );
   }
 }

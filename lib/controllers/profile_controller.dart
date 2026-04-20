@@ -4,9 +4,10 @@ import '../core/services/supabase_services.dart';
 class ProfileController extends GetxController {
   final service = SupabaseService();
 
-  var name = ''.obs;
-  var role = ''.obs;
-  var isLoading = true.obs;
+  final name = ''.obs;
+  final email = ''.obs;
+  final role = ''.obs;
+  final isLoading = true.obs;
 
   @override
   void onInit() {
@@ -15,24 +16,34 @@ class ProfileController extends GetxController {
   }
 
   Future<void> loadProfile() async {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    final user = service.supabase.auth.currentUser;
+      final user = service.supabase.auth.currentUser;
 
-    if (user == null) {
-      name.value = "Guest User";
-      role.value = "customer";
+      if (user == null) {
+        name.value = 'Guest User';
+        email.value = '';
+        role.value = 'guest';
+        return;
+      }
+
+      final data = await service.getProfile();
+
+      name.value =
+          (data?['name'] ?? user.email?.split('@').first ?? 'User').toString();
+
+      email.value =
+          (data?['email'] ?? user.email ?? '').toString();
+
+      role.value =
+          (data?['role'] ?? 'customer').toString();
+    } catch (e) {
+      name.value = 'User';
+      email.value = '';
+      role.value = 'customer';
+    } finally {
       isLoading.value = false;
-      return;
     }
-
-    final data = await service.getProfile();
-
-    if (data != null) {
-      name.value = data['name'] ?? 'User';
-      role.value = data['role'] ?? 'customer';
-    }
-
-    isLoading.value = false;
   }
 }

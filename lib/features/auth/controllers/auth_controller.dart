@@ -8,15 +8,17 @@ import '../../../controllers/menu_controller.dart';
 class AuthController extends GetxController {
   final service = SupabaseService();
 
-  var isLoading = false.obs;
-  var role = ''.obs; // 🔥 WAJIB ADA
+  final isLoading = false.obs;
 
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
       final res = await service.login(email, password);
       if (res.user == null) {
-        showErrorSnackbar("Login Gagal", "Email atau password salah.");
+        showErrorSnackbar(
+          "Login Gagal",
+          "Email atau password salah.",
+        );
         return;
       }
 
@@ -25,8 +27,9 @@ class AuthController extends GetxController {
       print("=== ROLE SET TO: ${role.value} ===");
       // ↑ ini otomatis trigger ever() di MenuC, tidak perlu fetchMenus() manual lagi
 
-      Get.put(ProfileController());
-      Get.offNamed(Routes.home);
+      await Get.find<ProfileController>().loadProfile();
+
+      Get.offAllNamed(Routes.home);
     } catch (e) {
       showErrorSnackbar(
         "Login Gagal",
@@ -40,11 +43,13 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await service.logout();
 
-    role.value = ''; // 🔥 RESET
+    final profileC = Get.find<ProfileController>();
+    profileC.name.value = 'Guest User';
+    profileC.email.value = '';
+    profileC.role.value = 'guest';
+    profileC.isLoading.value = false;
 
-    Get.delete<ProfileController>();
-
-    Get.offNamed(Routes.login);
+    Get.offAllNamed(Routes.home);
   }
 
   Future<void> register({
@@ -69,9 +74,12 @@ class AuthController extends GetxController {
         );
       }
 
-      Get.back();
+      showSuccessSnackbar(
+        "Registrasi Berhasil",
+        "Akun berhasil dibuat. Silakan login.",
+      );
 
-      showSuccessSnackbar("Registrasi Berhasil", "Akun berhasil dibuat");
+      Get.offAllNamed(Routes.login);
     } catch (e) {
       String pesan = "Registrasi gagal.";
 

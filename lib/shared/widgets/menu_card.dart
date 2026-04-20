@@ -26,6 +26,11 @@ class MenuCard extends StatefulWidget {
 class _MenuCardState extends State<MenuCard> {
   @override
   Widget build(BuildContext context) {
+    final isGuest =
+    widget.role == null ||
+    widget.role!.isEmpty ||
+    widget.role == 'guest';
+    final isCustomer = widget.role == 'customer';
     final cartC = Get.find<CartController>();
     final isOwnerOrEmployee =
         widget.role == 'owner' || widget.role == 'karyawan';
@@ -57,29 +62,42 @@ class _MenuCardState extends State<MenuCard> {
           children: [
             Stack(
               children: [
-                // 🔥 IMAGE + GRAYSCALE
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                  child: ColorFiltered(
-                    colorFilter: isAvailable
-                        ? const ColorFilter.mode(
-                            Colors.transparent,
-                            BlendMode.multiply,
-                          )
-                        : const ColorFilter.mode(
-                            Colors.grey,
-                            BlendMode.saturation, // 🔥 bikin abu
-                          ),
-                    child: Image.network(
-                      widget.item['image_url'] ?? '',
-                      width: double.infinity,
-                      height: 120,
-                      fit: BoxFit.cover,
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 10,
+                      child: Image.network(
+                        widget.item['image_url'] ?? '',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
+
+                if (showAppPromo && _isAvailable)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Promo App',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
 
                 // 🔥 OVERLAY KALAU OFF
                 if (!isAvailable)
@@ -129,8 +147,7 @@ class _MenuCardState extends State<MenuCard> {
                     : Colors.grey.shade400,
               ),
             ),
-            const Spacer(),
-
+            const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -170,12 +187,12 @@ class _MenuCardState extends State<MenuCard> {
                         ),
                 ),
 
-                if (isOwnerOrEmployee)
-                  const SizedBox.shrink()
-                else if (isAvailable)
-                  _buildAddButton(cartC)
-                else
-                  _buildOffLabel(),
+    if (isOwnerOrEmployee || isGuest)
+      const SizedBox.shrink()
+    else if (_isAvailable && isCustomer)
+      _buildAddButton(cartC)
+    else
+      _buildOffLabel(),
               ],
             ),
           ],
@@ -198,8 +215,10 @@ class _MenuCardState extends State<MenuCard> {
       if (qty == 0) {
         return GestureDetector(
           onTap: () {
-            cartC.add({...widget.item, 'price': _getFinalPrice()});
-            widget.onChanged?.call();
+            cartC.add({
+              ...widget.item,
+              'price': _getFinalPrice(),
+            });
           },
           child: Container(
             padding: const EdgeInsets.all(6),
@@ -215,12 +234,13 @@ class _MenuCardState extends State<MenuCard> {
       return _Counter(
         qty: qty,
         onAdd: () {
-          cartC.add({...widget.item, 'price': _getFinalPrice()});
-          widget.onChanged?.call();
+          cartC.add({
+            ...widget.item,
+            'price': _getFinalPrice(),
+          });
         },
         onRemove: () {
           cartC.remove(id);
-          widget.onChanged?.call();
         },
       );
     });
