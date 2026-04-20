@@ -31,13 +31,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
   Future<void> _placeOrder() async {
     if (_isSubmitting) return;
 
-    final tableNumber = _tableCtrl.text.trim();
-
-    if (_orderType == 'dine_in' && tableNumber.isEmpty) {
-      showWarningSnackbar("Validasi", "Nomor meja wajib diisi untuk Dine In");
-      return;
-    }
-
     final cartC = Get.find<CartController>();
 
     if (cartC.entries.isEmpty) {
@@ -131,12 +124,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               _orderTypeSelector(),
-
-              if (_orderType == 'dine_in') ...[
-                const SizedBox(height: 16),
-                _tableField(),
-              ],
-
               const SizedBox(height: 16),
               _paymentMethodSection(),
               const SizedBox(height: 16),
@@ -208,29 +195,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _tableField() {
-    return _sectionCard(
-      title: 'Nomor Meja',
-      child: TextField(
-        controller: _tableCtrl,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly, // 🔥 ONLY ANGKA
-          LengthLimitingTextInputFormatter(3), // optional: max 3 digit
-        ],
-        decoration: InputDecoration(
-          hintText: 'Contoh: 12',
-          prefixIcon: const Icon(Icons.table_restaurant),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 2),
-          ),
         ),
       ),
     );
