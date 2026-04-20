@@ -133,9 +133,6 @@ class _HomeScreenState extends State<HomeScreen>
                     : role == 'karyawan'
                         ? const HomeTabInternalScreen()
                         : HomeTab(
-                            onCartChanged: () {
-                              if (mounted) setState(() {});
-                            },
                             onOpenMenu: (cat) {
                               final menuC = Get.find<MenuC>();
 

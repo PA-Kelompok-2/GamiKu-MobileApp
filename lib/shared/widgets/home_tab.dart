@@ -6,13 +6,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'banner_slider.dart';
 
 class HomeTab extends StatefulWidget {
-  final VoidCallback onCartChanged;
   final Function(String category) onOpenMenu;
   final VoidCallback onOpenOrders;
 
   const HomeTab({
     super.key,
-    required this.onCartChanged,
     required this.onOpenMenu,
     required this.onOpenOrders,
   });

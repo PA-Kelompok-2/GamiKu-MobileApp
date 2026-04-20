@@ -27,7 +27,7 @@ class AuthController extends GetxController {
 
       await Future.delayed(const Duration(milliseconds: 200));
 
-      Get.offNamed(
+      Get.offAllNamed(
         Routes.home
       );
     } catch (e) {
