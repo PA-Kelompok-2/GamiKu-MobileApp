@@ -1,3 +1,10 @@
+# APLIKASI MOBILE GAMIKU
+### Anggota:
+1. Franklyn Galvin Lodo 2409116047
+2. Zahra Aurellya Herdiansyah 2409116062
+3. Irvan Alif 2409116071
+4. Ahmad Dhani 2409116074
+
 # 📝 Deskripsi Aplikasi
 <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/3eb2fa97-4bdc-4640-b5f0-dc141278eb6d" />
 
