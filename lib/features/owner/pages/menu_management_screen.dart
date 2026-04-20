@@ -319,7 +319,15 @@ class _ManageMenuCardState extends State<_ManageMenuCard> {
 
     // Pakai _isAvailable (dari controller), bukan widget.item
     final newValue = !_isAvailable;
-    final itemId = widget.item['id'].toString();
+    final itemId = widget.item['id'];
+
+    print("========== DEBUG ==========");
+    print("ID DARI CARD: $itemId");
+    print("TYPE: ${itemId.runtimeType}");
+    print("===========================");
+
+    final cleanId = itemId.toString().trim();
+    print("ID KE DB: $cleanId");
 
     try {
       await widget.onToggleAvailability(itemId, newValue);

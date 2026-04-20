@@ -49,7 +49,7 @@ class MenuC extends GetxController {
 
       final mappedMenus = data.map<Map<String, dynamic>>((e) {
         return {
-          'id': e['id'],
+          'id': e['id'].toString(),
           'name': e['name'],
           'price': e['price'],
           'image_url': e['image_url'],
@@ -179,14 +179,30 @@ class MenuC extends GetxController {
 
   Future<void> updateAvailability(String id, bool isAvailable) async {
     try {
-      await service.updateMenuAvailability(id, isAvailable);
-      await fetchMenus();
+      // 🔥 TAMBAH INI
+      final cleanId = id.toString().trim();
 
-      final index = menus.indexWhere((m) => m['id'].toString() == id);
+      // 1. Update DB
+      await service.updateMenuAvailability(cleanId, isAvailable);
+
+      // 2. Update state lokal (menus)
+      final index = menus.indexWhere((m) => m['id'].toString() == cleanId);
       if (index != -1) {
-        menus[index] = {...menus[index], 'is_available': isAvailable};
-        menus.refresh();
+        menus[index] = {
+          ...menus[index],
+          'is_available': isAvailable,
+        };
       }
+
+      // 3. Update allMenus
+      final allIndex = allMenus.indexWhere((m) => m['id'].toString() == cleanId);
+      if (allIndex != -1) {
+        allMenus[allIndex]['is_available'] = isAvailable;
+      }
+
+      // 4. Refresh UI
+      menus.refresh();
+
     } catch (e) {
       showErrorSnackbar('Error', 'Gagal update status: $e');
     }

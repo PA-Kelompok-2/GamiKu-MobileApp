@@ -22,6 +22,8 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  print("SUPABASE URL: ${dotenv.env['SUPABASE_URL']}");
+
   Get.put<AuthController>(AuthController(), permanent: true);
   Get.put<CartController>(CartController(), permanent: true);
   Get.put<MenuC>(MenuC(), permanent: true);
