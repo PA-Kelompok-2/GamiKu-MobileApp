@@ -5,6 +5,7 @@ import '../../../core/utils/app_snackbar.dart';
 import '../../../controllers/cart_controller.dart';
 import '../../models/order_model.dart';
 import '../../../routes/app_routes.dart';
+import '../../../utils/format.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -41,10 +42,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return;
     }
 
-    showSuccessSnackbar(
-      "Berhasil",
-      "Melanjutkan ke pembayaran",
-    );
+    showSuccessSnackbar("Berhasil", "Melanjutkan ke pembayaran");
 
     Future.delayed(const Duration(milliseconds: 300), () {
       Get.toNamed(
@@ -135,17 +133,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   children: [
                     ...entries.map(_buildItemRow),
                     const Divider(height: 24, color: AppColors.border),
-                    _priceRow('Subtotal', 'Rp $subtotal'),
+                    _priceRow('Subtotal', subtotal.formatCurrency()),
                     const SizedBox(height: 4),
                     _priceRow(
                       'Biaya Layanan',
-                      'Rp $serviceFee',
+                      serviceFee.formatCurrency(),
                       valueColor: AppColors.textGrey,
                     ),
                     const Divider(height: 16, color: AppColors.border),
                     _priceRow(
                       'Total',
-                      'Rp $grandTotal',
+                      grandTotal.formatCurrency(),
                       isBold: true,
                       valueColor: AppColors.primary,
                     ),
@@ -227,8 +225,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     height: 50,
                     color: AppColors.imgBg,
                     child: Center(
-                      child: Text(e.emoji,
-                          style: const TextStyle(fontSize: 20)),
+                      child: Text(
+                        e.emoji,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                   ),
                 ),
@@ -248,7 +248,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                     Text(
-                      'Rp ${e.price}',
+                      e.price.formatCurrency(),
                       style: const TextStyle(color: AppColors.textGrey),
                     ),
                   ],
@@ -285,7 +285,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ],
               ),
               Text(
-                'Rp ${e.price * e.qty}',
+                (e.price * e.qty).formatCurrency(),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -322,8 +322,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Widget _priceRow(String label, String value,
-      {bool isBold = false, Color? valueColor}) {
+  Widget _priceRow(
+    String label,
+    String value, {
+    bool isBold = false,
+    Color? valueColor,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -349,9 +353,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: AppColors.shadow, blurRadius: 8),
-        ],
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 8)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,8 +362,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             children: [
               Icon(icon, color: AppColors.primary),
               const SizedBox(width: 8),
-              Text(title,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 10),
@@ -391,7 +392,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             children: [
               const Text('Total Bayar'),
               Text(
-                'Rp $total',
+                total.formatCurrency(),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,

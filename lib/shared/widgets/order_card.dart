@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../routes/app_routes.dart';
+import '../../utils/format.dart';
 import '../../core/services/supabase_services.dart';
 
 class OrderCard extends StatelessWidget {
@@ -25,6 +26,8 @@ class OrderCard extends StatelessWidget {
     final items = order['order_items'] as List;
     final firstItem = items.isNotEmpty ? items[0] : null;
     final menu = firstItem?['menus'];
+    final raw = order['total_price'];
+    final total = raw is int ? raw : int.tryParse(raw.toString()) ?? 0;
 
     return GestureDetector(
       onTap: () async {
@@ -236,7 +239,7 @@ class OrderCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Rp ${order['total_price']}',
+                            total.formatCurrency(),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,

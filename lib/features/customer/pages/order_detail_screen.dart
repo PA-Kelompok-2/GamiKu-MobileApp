@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../controllers/menu_controller.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../utils/format.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key});
@@ -78,6 +79,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final status = resolvedOrder['status'] as String;
     final isKaryawan = resolvedRole == 'karyawan';
     final canUpdateStatus = isKaryawan && status == 'paid';
+    final totalRaw = resolvedOrder['total_price'];
+    final total = totalRaw is int
+        ? totalRaw
+        : int.tryParse(totalRaw.toString()) ?? 0;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -189,6 +194,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       const SizedBox(height: 16),
                       ...items.map<Widget>((item) {
                         final menu = item['menus'];
+                        final price = menu['price'];
+                        final priceInt = price is int
+                            ? price
+                            : int.tryParse(price.toString()) ?? 0;
+
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Row(
@@ -225,7 +235,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '${item['quantity']} pcs x Rp${menu['price']}',
+                                      '${item['quantity']} x ${priceInt.formatCurrency()}',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textGrey,
@@ -250,7 +260,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             ),
                           ),
                           Text(
-                            'Rp ${resolvedOrder['total_price']}',
+                            total.formatCurrency(),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -288,10 +298,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildPriceRow(
-                        'Subtotal',
-                        'Rp ${resolvedOrder['total_price']}',
-                      ),
+                      _buildPriceRow('Subtotal', total.formatCurrency()),
                       const SizedBox(height: 8),
                       _buildPriceRow('Diskon', '-Rp0', isDiscount: true),
                       const Padding(
@@ -300,7 +307,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                       _buildPriceRow(
                         'Total Pembayaran',
-                        'Rp ${resolvedOrder['total_price']}',
+                        total.formatCurrency(),
                         isTotal: true,
                       ),
                       // 🔥 QRIS VERIFICATION

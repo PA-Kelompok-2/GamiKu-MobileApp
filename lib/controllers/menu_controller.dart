@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../core/services/supabase_services.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../features/auth/controllers/auth_controller.dart';
 
 class MenuC extends GetxController {
   final SupabaseService service = SupabaseService();
@@ -15,18 +16,29 @@ class MenuC extends GetxController {
 
   void resetMenu() {
     selectedCategory.value = "Semua";
-
     menus.clear();
     allMenus.clear();
-
     isLoading.value = false;
   }
 
   @override
   void onInit() {
     super.onInit();
-    fetchMenus();
     fetchCategories();
+
+    final authC = Get.find<AuthController>();
+
+    if (authC.role.value.isNotEmpty) {
+      fetchMenus();
+    }
+
+    ever(authC.role, (role) {
+      if (role.isNotEmpty) {
+        fetchMenus();
+      } else {
+        resetMenu();
+      }
+    });
   }
 
   Future<void> fetchMenus() async {
@@ -34,12 +46,6 @@ class MenuC extends GetxController {
       isLoading.value = true;
 
       final data = await service.getMenus();
-
-      if (data.isEmpty) {
-        menus.clear();
-        allMenus.clear();
-        return;
-      }
 
       final mappedMenus = data.map<Map<String, dynamic>>((e) {
         return {
@@ -49,22 +55,28 @@ class MenuC extends GetxController {
           'image_url': e['image_url'],
           'category_id': e['category_id'],
           'cat': e['categories']?['name'] ?? 'unknown',
+          'is_available': e['is_available'] ?? true,
         };
       }).toList();
 
-      allMenus = mappedMenus;
-      menus.value = List.from(allMenus); 
+      final authC = Get.find<AuthController>();
 
+      final filteredMenus = mappedMenus.where((m) {
+        if (authC.role.value == 'pembeli') {
+          return m['is_available'] == true;
+        }
+        return true;
+      }).toList();
+
+      allMenus = filteredMenus;
+      menus.value = List.from(allMenus);
+      update();
     } catch (e) {
       menus.clear();
       allMenus.clear();
-
-      showErrorSnackbar(
-        'Error',
-        'Failed to fetch menus: $e',
-      );
+      showErrorSnackbar('Error', 'Failed to fetch menus: $e');
     } finally {
-      isLoading.value = false; 
+      isLoading.value = false; // ← INI YANG BIKIN LOADING BERHENTI
     }
   }
 
@@ -98,8 +110,7 @@ class MenuC extends GetxController {
       return;
     }
 
-    final filtered =
-        allMenus.where((menu) => menu['cat'] == category).toList();
+    final filtered = allMenus.where((menu) => menu['cat'] == category).toList();
 
     menus.value = filtered;
   }
@@ -109,10 +120,7 @@ class MenuC extends GetxController {
       final data = await service.getCategories();
       categories.value = data;
     } catch (e) {
-      showErrorSnackbar(
-        'Error',
-        'Failed to fetch categories: $e',
-      );
+      showErrorSnackbar('Error', 'Failed to fetch categories: $e');
     }
   }
 
@@ -129,15 +137,10 @@ class MenuC extends GetxController {
         imageUrl: imageUrl,
         categoryId: categoryId,
       );
-
       await fetchMenus();
-
       showSuccessSnackbar('Success', 'Menu berhasil ditambahkan');
     } catch (e) {
-      showErrorSnackbar(
-        'Error',
-        'Failed to add menu: $e',
-      );
+      showErrorSnackbar('Error', 'Failed to add menu: $e');
     }
   }
 
@@ -156,55 +159,36 @@ class MenuC extends GetxController {
         imageUrl: imageUrl,
         categoryId: categoryId,
       );
-
       await fetchMenus();
-
       showSuccessSnackbar('Success', 'Menu berhasil diupdate');
     } catch (e) {
-      showErrorSnackbar(
-        'Error',
-        'Failed to update menu: $e',
-      );
+      showErrorSnackbar('Error', 'Failed to update menu: $e');
     }
   }
 
   Future<void> deleteMenu(dynamic id) async {
     try {
       await service.deleteMenu(id);
-
       menus.removeWhere((m) => m['id'] == id);
-
       await fetchMenus();
-
       showSuccessSnackbar('Success', 'Menu berhasil dihapus');
     } catch (e) {
-      showErrorSnackbar(
-        'Error',
-        'Failed to delete menu: $e',
-      );
+      showErrorSnackbar('Error', 'Failed to delete menu: $e');
     }
   }
 
   Future<void> updateAvailability(String id, bool isAvailable) async {
     try {
       await service.updateMenuAvailability(id, isAvailable);
+      await fetchMenus();
 
-      final index =
-          menus.indexWhere((m) => m['id'].toString() == id);
-
+      final index = menus.indexWhere((m) => m['id'].toString() == id);
       if (index != -1) {
-        menus[index] = {
-          ...menus[index],
-          'is_available': isAvailable,
-        };
-
+        menus[index] = {...menus[index], 'is_available': isAvailable};
         menus.refresh();
       }
     } catch (e) {
-      showErrorSnackbar(
-        'Error',
-        'Gagal update status: $e',
-      );
+      showErrorSnackbar('Error', 'Gagal update status: $e');
     }
   }
 }

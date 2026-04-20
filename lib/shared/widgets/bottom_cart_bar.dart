@@ -1,3 +1,4 @@
+import 'package:application_gamiku/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
@@ -71,7 +72,7 @@ class BottomCartBar extends StatelessWidget {
                     style: TextStyle(color: AppColors.white70, fontSize: 11),
                   ),
                   Text(
-                    'Rp $total',
+                    total.formatCurrency(),
                     style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 16,

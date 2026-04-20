@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../controllers/cart_controller.dart';
+import '../../utils/format.dart';
 
 class MenuCard extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -32,13 +33,26 @@ class _MenuCardState extends State<MenuCard> {
   }
 
   @override
+  void didUpdateWidget(covariant MenuCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.item['is_available'] != widget.item['is_available']) {
+      setState(() {
+        _isAvailable = widget.item['is_available'] ?? true;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cartC = Get.find<CartController>();
     final isOwnerOrEmployee =
         widget.role == 'owner' || widget.role == 'karyawan';
 
     final int originalPrice = _toInt(widget.item['price']);
-    final int appPrice = originalPrice >= 1000 ? originalPrice - 1000 : originalPrice;
+    final int appPrice = originalPrice >= 1000
+        ? originalPrice - 1000
+        : originalPrice;
     final bool showAppPromo = !isOwnerOrEmployee && originalPrice > appPrice;
 
     return Container(
@@ -60,57 +74,46 @@ class _MenuCardState extends State<MenuCard> {
           children: [
             Stack(
               children: [
+                // 🔥 IMAGE + GRAYSCALE
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
-                  child: Image.network(
-                    widget.item['image_url'] ?? '',
-                    width: double.infinity,
-                    height: 120,
-                    fit: BoxFit.cover,
+                  child: ColorFiltered(
+                    colorFilter: _isAvailable
+                        ? const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.multiply,
+                          )
+                        : const ColorFilter.mode(
+                            Colors.grey,
+                            BlendMode.saturation, // 🔥 bikin abu
+                          ),
+                    child: Image.network(
+                      widget.item['image_url'] ?? '',
+                      width: double.infinity,
+                      height: 120,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
 
-                if (showAppPromo && _isAvailable)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'Promo App',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-
+                // 🔥 OVERLAY KALAU OFF
                 if (!_isAvailable)
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
+                        color: Colors.black.withOpacity(0.4),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(16),
                         ),
                       ),
                       child: const Center(
                         child: Text(
-                          'OFF',
+                          'Tidak Tersedia',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -154,7 +157,7 @@ class _MenuCardState extends State<MenuCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Rp $originalPrice",
+                              originalPrice.formatCurrency(),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey.shade500,
@@ -163,7 +166,7 @@ class _MenuCardState extends State<MenuCard> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              "Rp $appPrice",
+                              appPrice.formatCurrency(),
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -212,10 +215,7 @@ class _MenuCardState extends State<MenuCard> {
       if (qty == 0) {
         return GestureDetector(
           onTap: () {
-            cartC.add({
-              ...widget.item,
-              'price': _getFinalPrice(),
-            });
+            cartC.add({...widget.item, 'price': _getFinalPrice()});
             widget.onChanged?.call();
           },
           child: Container(
@@ -232,10 +232,7 @@ class _MenuCardState extends State<MenuCard> {
       return _Counter(
         qty: qty,
         onAdd: () {
-          cartC.add({
-            ...widget.item,
-            'price': _getFinalPrice(),
-          });
+          cartC.add({...widget.item, 'price': _getFinalPrice()});
           widget.onChanged?.call();
         },
         onRemove: () {

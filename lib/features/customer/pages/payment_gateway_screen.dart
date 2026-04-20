@@ -1,3 +1,4 @@
+import 'package:application_gamiku/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
@@ -421,7 +422,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen> {
                 style: TextStyle(fontSize: 11, color: AppColors.textGrey),
               ),
               Text(
-                'Rp $total',
+                total.formatCurrency(),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,

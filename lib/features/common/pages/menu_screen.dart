@@ -5,9 +5,9 @@ import 'dart:math';
 import '../../../routes/app_routes.dart';
 import '../../../controllers/menu_controller.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/services/supabase_services.dart';
 import '../../../shared/widgets/menu_card.dart';
 import '../../../shared/widgets/search_bar.dart';
+import '../../../features/auth/controllers/auth_controller.dart'; // tambah ini
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -20,54 +20,29 @@ class _MenuScreenState extends State<MenuScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _catScroll = ScrollController();
 
-  String? _role;
-  String selectedCategory = 'Semua';
+  String selectedCategory = 'Semua'; // ← deklarasi di sini
 
   @override
   void initState() {
     super.initState();
 
-    _loadRole();
-
     final menuC = Get.find<MenuC>();
     selectedCategory = menuC.selectedCategory.value;
 
     ever(menuC.selectedCategory, (cat) {
-      setState(() {
-        selectedCategory = cat;
-      });
-
-      Future.delayed(const Duration(milliseconds: 200), () {
-        _scrollToCenter();
-      });
+      if (!mounted) return;
+      setState(() => selectedCategory = cat);
+      Future.delayed(const Duration(milliseconds: 200), _scrollToCenter);
     });
 
     _searchController.addListener(() {
-      final menuC = Get.find<MenuC>();
-
       menuC.selectedCategory.value = "Semua";
       menuC.applyFilter(_searchController.text);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      menuC.applyFilter('');
+      Future.delayed(const Duration(milliseconds: 200), _scrollToCenter);
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 200), () {
-        _scrollToCenter();
-      });
-    });
-  }
-
-  Future<void> _loadRole() async {
-    final role = await SupabaseService().getUserRole();
-
-    if (mounted) {
-      setState(() {
-        _role = role;
-      });
-    }
   }
 
   void _scrollToCenter() {
@@ -79,17 +54,15 @@ class _MenuScreenState extends State<MenuScreen> {
     ];
 
     final index = cats.indexOf(selectedCategory);
-
     if (index == -1 || !_catScroll.hasClients) return;
-
-    final position = _catScroll.position;
 
     const itemWidth = 110.0;
     final screenWidth = MediaQuery.of(context).size.width;
-
     final offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
-
-    final finalOffset = max(0.0, min(offset, position.maxScrollExtent));
+    final finalOffset = max(
+      0.0,
+      min(offset, _catScroll.position.maxScrollExtent),
+    );
 
     _catScroll.animateTo(
       finalOffset,
@@ -101,6 +74,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _catScroll.dispose(); // ← jangan lupa dispose ini juga
     super.dispose();
   }
 
@@ -108,13 +82,14 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final menuC = Get.find<MenuC>();
 
+    // ← role dari AuthController, reaktif, satu sumber kebenaran
     return Obx(() {
-    final Set<String> categorySet = menuC.allMenus
-        .map((m) => (m['cat'] ?? 'Unknown').toString())
-        .toSet();
+      final role = Get.find<AuthController>().role.value;
 
+      final Set<String> categorySet = menuC.allMenus
+          .map((m) => (m['cat'] ?? 'Unknown').toString())
+          .toSet();
       final List<String> categories = ['Semua', ...categorySet];
-
       final items = menuC.menus;
 
       return Scaffold(
@@ -124,7 +99,6 @@ class _MenuScreenState extends State<MenuScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: RichText(
@@ -144,21 +118,15 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
               MenuSearchBar(
                 controller: _searchController,
                 onChanged: (value) {
-                  final menuC = Get.find<MenuC>();
-
                   menuC.selectedCategory.value = "Semua";
                   menuC.applyFilter(value);
                 },
               ),
-
               const SizedBox(height: 16),
-
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -171,21 +139,15 @@ class _MenuScreenState extends State<MenuScreen> {
                     final isSelected = cat == selectedCategory;
 
                     return GestureDetector(
-                    onTap: () {
-                      final menuC = Get.find<MenuC>();
-
-                      setState(() {
-                        selectedCategory = cat;
-                      });
-
-                      menuC.selectedCategory.value = cat;
-                      menuC.applyFilter(_searchController.text);
-
-                      Future.delayed(
-                        const Duration(milliseconds: 50),
-                        _scrollToCenter,
-                      );
-                    },
+                      onTap: () {
+                        setState(() => selectedCategory = cat);
+                        menuC.selectedCategory.value = cat;
+                        menuC.applyFilter(_searchController.text);
+                        Future.delayed(
+                          const Duration(milliseconds: 50),
+                          _scrollToCenter,
+                        );
+                      },
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 6),
                         padding: const EdgeInsets.symmetric(
@@ -222,9 +184,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   },
                 ),
               ),
-
               const SizedBox(height: 16),
-
               Expanded(
                 child: menuC.isLoading.value
                     ? const Center(child: CircularProgressIndicator())
@@ -244,15 +204,17 @@ class _MenuScreenState extends State<MenuScreen> {
                         itemCount: items.length,
                         itemBuilder: (_, i) => MenuCard(
                           item: items[i],
-                          role: _role,
-                          onChanged: () => setState(() {}),
+                          role: role.isEmpty
+                              ? 'pembeli'
+                              : role, // ← reaktif dari Obx
+                          onChanged: () {},
                         ),
                       ),
               ),
             ],
           ),
         ),
-        floatingActionButton: (_role == 'owner' || _role == 'karyawan')
+        floatingActionButton: (role == 'owner' || role == 'karyawan')
             ? FloatingActionButton(
                 backgroundColor: AppColors.primary,
                 onPressed: () => Get.toNamed(Routes.menuManagement),

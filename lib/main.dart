@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 
@@ -21,11 +22,11 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  Get.lazyPut<AuthController>(() => AuthController(), fenix: true);
-  Get.lazyPut<CartController>(() => CartController(), fenix: true);
-  Get.lazyPut<MenuC>(() => MenuC(), fenix: true);
-  Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
-  Get.lazyPut<KeuanganController>(() => KeuanganController(), fenix: true);
+  Get.put<AuthController>(AuthController(), permanent: true);
+  Get.put<CartController>(CartController(), permanent: true);
+  Get.put<MenuC>(MenuC(), permanent: true);
+  Get.put<ProfileController>(ProfileController(), permanent: true);
+  Get.put<KeuanganController>(KeuanganController(), permanent: true);
 
   runApp(const GamikuApp());
 }
@@ -39,6 +40,7 @@ class GamikuApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: Routes.splash,
       getPages: AppPages.pages,
+      theme: ThemeData(textTheme: GoogleFonts.plusJakartaSansTextTheme()),
     );
   }
 }

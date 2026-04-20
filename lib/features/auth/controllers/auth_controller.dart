@@ -3,37 +3,34 @@ import 'package:application_gamiku/controllers/profile_controller.dart';
 import 'package:application_gamiku/routes/app_routes.dart';
 import '../../../core/services/supabase_services.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../controllers/menu_controller.dart';
 
 class AuthController extends GetxController {
   final service = SupabaseService();
 
   var isLoading = false.obs;
+  var role = ''.obs; // 🔥 WAJIB ADA
 
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
-
       final res = await service.login(email, password);
-
       if (res.user == null) {
-        showErrorSnackbar(
-          "Login Gagal",
-          "Email atau password salah."
-        );
+        showErrorSnackbar("Login Gagal", "Email atau password salah.");
         return;
       }
 
+      final profile = await service.getProfile();
+      role.value = profile?['role'] ?? 'pembeli';
+      print("=== ROLE SET TO: ${role.value} ===");
+      // ↑ ini otomatis trigger ever() di MenuC, tidak perlu fetchMenus() manual lagi
+
       Get.put(ProfileController());
-
-      await Future.delayed(const Duration(milliseconds: 200));
-
-      Get.offNamed(
-        Routes.home
-      );
+      Get.offNamed(Routes.home);
     } catch (e) {
       showErrorSnackbar(
         "Login Gagal",
-        "Tidak dapat login. Periksa email dan password."
+        "Tidak dapat login. Periksa email dan password.",
       );
     } finally {
       isLoading.value = false;
@@ -42,9 +39,12 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     await service.logout();
+
+    role.value = ''; // 🔥 RESET
+
     Get.delete<ProfileController>();
 
-    Get.offNamed(Routes.login); 
+    Get.offNamed(Routes.login);
   }
 
   Future<void> register({
@@ -71,10 +71,7 @@ class AuthController extends GetxController {
 
       Get.back();
 
-      showSuccessSnackbar(
-        "Registrasi Berhasil",
-        "Akun berhasil dibuat"
-      );
+      showSuccessSnackbar("Registrasi Berhasil", "Akun berhasil dibuat");
     } catch (e) {
       String pesan = "Registrasi gagal.";
 
@@ -82,10 +79,7 @@ class AuthController extends GetxController {
         pesan = "Email sudah terdaftar. Silakan gunakan email lain.";
       }
 
-      showErrorSnackbar(
-        "Registrasi Gagal!",
-        pesan,
-      );
+      showErrorSnackbar("Registrasi Gagal!", pesan);
     } finally {
       isLoading.value = false;
     }
