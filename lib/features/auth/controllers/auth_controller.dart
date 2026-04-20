@@ -7,7 +7,7 @@ import '../../../core/utils/app_snackbar.dart';
 class AuthController extends GetxController {
   final service = SupabaseService();
 
-  var isLoading = false.obs;
+  final isLoading = false.obs;
 
   Future<void> login(String email, String password) async {
     try {
@@ -18,22 +18,18 @@ class AuthController extends GetxController {
       if (res.user == null) {
         showErrorSnackbar(
           "Login Gagal",
-          "Email atau password salah."
+          "Email atau password salah.",
         );
         return;
       }
 
-      Get.put(ProfileController());
+      await Get.find<ProfileController>().loadProfile();
 
-      await Future.delayed(const Duration(milliseconds: 200));
-
-      Get.offAllNamed(
-        Routes.home
-      );
+      Get.offAllNamed(Routes.home);
     } catch (e) {
       showErrorSnackbar(
         "Login Gagal",
-        "Tidak dapat login. Periksa email dan password."
+        "Tidak dapat login. Periksa email dan password.",
       );
     } finally {
       isLoading.value = false;
@@ -42,9 +38,14 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     await service.logout();
-    Get.delete<ProfileController>();
 
-    Get.offNamed(Routes.login); 
+    final profileC = Get.find<ProfileController>();
+    profileC.name.value = 'Guest User';
+    profileC.email.value = '';
+    profileC.role.value = 'guest';
+    profileC.isLoading.value = false;
+
+    Get.offAllNamed(Routes.home);
   }
 
   Future<void> register({
@@ -69,12 +70,12 @@ class AuthController extends GetxController {
         );
       }
 
-      Get.back();
-
       showSuccessSnackbar(
         "Registrasi Berhasil",
-        "Akun berhasil dibuat"
+        "Akun berhasil dibuat. Silakan login.",
       );
+
+      Get.offAllNamed(Routes.login);
     } catch (e) {
       String pesan = "Registrasi gagal.";
 
