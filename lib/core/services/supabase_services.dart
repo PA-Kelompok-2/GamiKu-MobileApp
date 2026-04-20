@@ -134,11 +134,22 @@ class SupabaseService {
     await supabase.from('menus').delete().eq('id', id);
   }
 
-  Future<void> updateMenuAvailability(String id, bool isAvailable) async {
-    await supabase
-        .from('menus')
-        .update({'is_available': isAvailable})
-        .eq('id', id);
+Future<void> updateMenuAvailability(String id, bool isAvailable) async {
+  final cleanId = id.toString().trim();
+
+  print("ID DIKIRIM KE DB: $cleanId");
+
+  final res = await supabase
+      .from('menus')
+      .update({'is_available': isAvailable})
+      .eq('id', cleanId)
+      .select();
+
+  print("HASIL UPDATE: $res");
+
+  if (res.isEmpty) {
+    throw Exception("Update gagal: ID tidak ditemukan");
+  }
   }
 
   Future<List<Map<String, dynamic>>> getOrders() async {
