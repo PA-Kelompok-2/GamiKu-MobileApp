@@ -187,6 +187,9 @@ Folder ini berisi widget yang bisa digunakan ulang (reusable components) di berb
 File ini merupakan entry point aplikasi, yaitu file pertama yang dijalankan saat aplikasi dibuka. Di sini biasanya terdapat inisialisasi aplikasi.
 
 # ⭐ Nilai Tambah (Package Tambahan)
+
+<img width="194" height="252" alt="image" src="https://github.com/user-attachments/assets/d6107fec-0537-41a5-b033-86167e8eb5d9" />
+
 Beberapa package yang digunakan dalam aplikasi ini termasuk dalam kategori nilai tambah karena tidak termasuk dalam daftar package yang diajarkan pada praktikum. Package tersebut antara lain:
 
 `provider`
