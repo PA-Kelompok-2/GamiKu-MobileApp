@@ -185,3 +185,33 @@ Folder ini berisi widget yang bisa digunakan ulang (reusable components) di berb
 
 ## 📄 main.dart
 File ini merupakan entry point aplikasi, yaitu file pertama yang dijalankan saat aplikasi dibuka. Di sini biasanya terdapat inisialisasi aplikasi.
+
+# ⭐ Nilai Tambah (Package Tambahan)
+Beberapa package yang digunakan dalam aplikasi ini termasuk dalam kategori nilai tambah karena tidak termasuk dalam daftar package yang diajarkan pada praktikum. Package tersebut antara lain:
+
+`provider`
+aplikasi ini juga menggunakan Provider sebagai salah satu pendekatan dalam state management. Provider membantu dalam mengelola data global dan mempermudah distribusi state ke berbagai bagian aplikasi, sehingga memudahkan pengelolaan data yang bersifat dinamis.\
+
+`intl`
+Package intl digunakan untuk membantu proses formatting data, seperti format tanggal, waktu, maupun angka, sehingga data yang ditampilkan menjadi lebih mudah dibaca dan sesuai dengan standar.
+
+`image_picker`
+Untuk fitur pengolahan gambar, digunakan image_picker yang memungkinkan pengguna untuk mengambil gambar dari kamera atau galeri perangkat. 
+
+`qr_flutter`
+Aplikasi ini juga memanfaatkan qr_flutter untuk menghasilkan QR Code, yang dapat digunakan dalam berbagai kebutuhan seperti identifikasi atau pembayaran. 
+
+`path`
+package path digunakan untuk membantu dalam pengelolaan path file, terutama saat menangani file gambar yang diambil oleh pengguna.
+
+`confetti`
+Untuk meningkatkan pengalaman pengguna, digunakan package confetti yang berfungsi menampilkan animasi efek visual, misalnya saat pengguna berhasil melakukan suatu aksi.
+
+`mobile_scanner`
+package mobile_scanner digunakan untuk melakukan pemindaian QR Code secara langsung menggunakan kamera perangkat.
+
+`google_fonts`
+google_fonts digunakan untuk mempercantik tampilan teks dengan menggunakan font dari Google Fonts sehingga antarmuka aplikasi menjadi lebih menarik.
+
+Penggunaan package tambahan ini memberikan keunggulan pada aplikasi, seperti fitur scan QR, tampilan UI yang lebih menarik, serta pengolahan data yang lebih fleksibel.
+
