@@ -24,30 +24,13 @@ class MenuCard extends StatefulWidget {
 }
 
 class _MenuCardState extends State<MenuCard> {
-  late bool _isAvailable;
-
-  @override
-  void initState() {
-    super.initState();
-    _isAvailable = widget.item['is_available'] ?? true;
-  }
-
-  @override
-  void didUpdateWidget(covariant MenuCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.item['is_available'] != widget.item['is_available']) {
-      setState(() {
-        _isAvailable = widget.item['is_available'] ?? true;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final cartC = Get.find<CartController>();
     final isOwnerOrEmployee =
         widget.role == 'owner' || widget.role == 'karyawan';
+
+    final isAvailable = widget.item['is_available'] ?? true;
 
     final int originalPrice = _toInt(widget.item['price']);
     final int appPrice = originalPrice >= 1000
@@ -80,7 +63,7 @@ class _MenuCardState extends State<MenuCard> {
                     top: Radius.circular(16),
                   ),
                   child: ColorFiltered(
-                    colorFilter: _isAvailable
+                    colorFilter: isAvailable
                         ? const ColorFilter.mode(
                             Colors.transparent,
                             BlendMode.multiply,
@@ -99,7 +82,7 @@ class _MenuCardState extends State<MenuCard> {
                 ),
 
                 // 🔥 OVERLAY KALAU OFF
-                if (!_isAvailable)
+                if (!isAvailable)
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
@@ -131,8 +114,8 @@ class _MenuCardState extends State<MenuCard> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: _isAvailable ? Colors.black : Colors.grey,
-                decoration: _isAvailable ? null : TextDecoration.lineThrough,
+                color: isAvailable ? Colors.black : Colors.grey,
+                decoration: isAvailable ? null : TextDecoration.lineThrough,
               ),
             ),
             const SizedBox(height: 2),
@@ -141,7 +124,7 @@ class _MenuCardState extends State<MenuCard> {
               widget.item['cat'] ?? '',
               style: TextStyle(
                 fontSize: 12,
-                color: _isAvailable
+                color: isAvailable
                     ? Colors.grey.shade600
                     : Colors.grey.shade400,
               ),
@@ -170,7 +153,7 @@ class _MenuCardState extends State<MenuCard> {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: _isAvailable
+                                color: isAvailable
                                     ? AppColors.primary
                                     : Colors.grey,
                               ),
@@ -182,14 +165,14 @@ class _MenuCardState extends State<MenuCard> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: _isAvailable ? Colors.black : Colors.grey,
+                            color: isAvailable ? Colors.black : Colors.grey,
                           ),
                         ),
                 ),
 
                 if (isOwnerOrEmployee)
                   const SizedBox.shrink()
-                else if (_isAvailable)
+                else if (isAvailable)
                   _buildAddButton(cartC)
                 else
                   _buildOffLabel(),

@@ -27,6 +27,9 @@ class _MenuScreenState extends State<MenuScreen> {
     super.initState();
 
     final menuC = Get.find<MenuC>();
+    Future.microtask(() {
+      menuC.fetchMenus();
+    });
     selectedCategory = menuC.selectedCategory.value;
 
     ever(menuC.selectedCategory, (cat) {

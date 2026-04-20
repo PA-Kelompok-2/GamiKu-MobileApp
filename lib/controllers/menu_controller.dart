@@ -59,14 +59,9 @@ class MenuC extends GetxController {
         };
       }).toList();
 
-      final authC = Get.find<AuthController>();
+      final filteredMenus = mappedMenus;
 
-      final filteredMenus = mappedMenus.where((m) {
-        if (authC.role.value == 'pembeli') {
-          return m['is_available'] == true;
-        }
-        return true;
-      }).toList();
+      print("🔥 FETCH JALAN");
 
       allMenus = filteredMenus;
       menus.value = List.from(allMenus);
@@ -180,13 +175,17 @@ class MenuC extends GetxController {
   Future<void> updateAvailability(String id, bool isAvailable) async {
     try {
       await service.updateMenuAvailability(id, isAvailable);
-      await fetchMenus();
 
       final index = menus.indexWhere((m) => m['id'].toString() == id);
+
       if (index != -1) {
         menus[index] = {...menus[index], 'is_available': isAvailable};
         menus.refresh();
       }
+
+      Future.delayed(const Duration(milliseconds: 300), () {
+        fetchMenus();
+      });
     } catch (e) {
       showErrorSnackbar('Error', 'Gagal update status: $e');
     }

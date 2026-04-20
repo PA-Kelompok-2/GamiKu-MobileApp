@@ -25,8 +25,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
   void initState() {
     super.initState();
+
+    final menuC = Get.find<MenuC>();
+
+    Future.microtask(() {
+      menuC.fetchMenus();
+    });
+
     _searchController.addListener(() {
-      final menuC = Get.find<MenuC>();
       menuC.selectedCategory.value = "Semua";
       menuC.applyFilter(_searchController.text);
     });
